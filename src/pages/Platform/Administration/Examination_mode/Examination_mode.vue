@@ -241,13 +241,13 @@ export default {
         list:'第6题',
         bol: true
       },{
-        list:'第6题',
+        list:'第7题',
         bol: true
       },{
-        list:'第6题',
+        list:'第8题',
         bol: true
       },{
-        list:'第6题',
+        list:'第9题',
         bol: true
       }]
     }

@@ -251,15 +251,6 @@ export default {
       },{
         list:'第6题',
         bol: true
-      },{
-        list:'第6题',
-        bol: true
-      },{
-        list:'第6题',
-        bol: true
-      },{
-        list:'第6题',
-        bol: true
       }]
     }
   },

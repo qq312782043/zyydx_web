@@ -10,9 +10,9 @@
         <el-input placeholder="输入考试ID或考试名称" v-model="input" size="small" clearable></el-input>
       </div>
       <div class="button_box">
-        <el-button type="primary" size="small" plain>搜索</el-button>
-        <el-button type="primary" size="small" plain>重置</el-button>
-        <el-button type="primary" size="small" plain>导出</el-button>
+        <el-button icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
+        <el-button icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
+        <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main">

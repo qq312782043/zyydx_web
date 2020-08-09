@@ -18,11 +18,11 @@
         </el-select>
       </div>
       <div class="button_box">
-        <el-button type="primary" size="small" plain>搜索</el-button>
-        <el-button type="primary" size="small" plain>重置</el-button>
-        <el-button type="primary" size="small" plain>表格导入</el-button>
-        <el-button type="primary" size="small" plain>导出</el-button>
-        <el-button @click="BatchDeletion()" type="primary" size="small" plain>批量删除</el-button>
+        <el-button icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
+        <el-button icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
+        <el-button icon="el-icon-download" type="primary" size="small" plain>表格导入</el-button>
+        <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
+        <el-button @click="BatchDeletion()" icon="el-icon-delete" type="primary" size="small" plain>批量删除</el-button>
       </div>
     </div>
     <div class="main">

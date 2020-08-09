@@ -42,6 +42,7 @@ export default {
         {name:'/Analysis',navItem:'试题分析',icon:'el-icon-s-flag'},
         {name:'/AnswerData',navItem:'学生答题数据',icon:'el-icon-s-claim'},
         {name:'/Question',navItem:'题库管理',icon:'el-icon-menu'},
+        {name:'/Examination',navItem:'考试管理',icon:'el-icon-s-help'},
       ]
     }
   },

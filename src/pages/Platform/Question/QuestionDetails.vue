@@ -1,5 +1,8 @@
 <template>
-  <div class="whole">
+  <el-main class="whole">
+    <div class="Goback">
+      <el-button type="text" icon="el-icon-arrow-left" @click="onGoBack">返回</el-button>
+    </div>
     <div class="header">
       <div class="input_box">
         <p>章节</p>
@@ -61,9 +64,67 @@
       <div class="input_box"> </div>
     </div>
     <div class="main">
-      <p></p>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
+      <div class="input_box">
+        <p>病症案例主诉</p>
+        <el-input
+          size="small"
+          placeholder="请输入内容"
+          v-model="textarea">
+        </el-input>
+      </div>
     </div>
-  </div>
+    <div class="footer">
+      <el-button type="primary">保存</el-button>
+    </div>
+  </el-main>
 </template>
 
 <script>
@@ -76,6 +137,7 @@ export default {
       input_3: '',
       value_4: '',
       value_5: '',
+      textarea: '',
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -95,17 +157,27 @@ export default {
     }
   },
   methods: {
-
+    onGoBack(){ // 点击返回
+      this.$router.back()
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.Goback .el-button{
+  padding:0;
+  color:#333;
+}
+.Goback .el-button:hover{
+  color:#2E79BA;
+}
 .header{
   display: flex;
   padding:0 20px;
   margin-bottom:30px;
+  margin-top:20px;
 }
 .header .input_box{
   flex:1;
@@ -117,7 +189,26 @@ export default {
   margin-bottom:10px;
   margin-left:5px;
 }
-.el-input{
+.header .input_box .el-input{
   width:215px;
+}
+.main{
+  width:80%;
+  padding:0 20px;
+}
+.main .input_box {
+  margin-top:20px;
+}
+.main .input_box p{
+  color:#333;
+  font-weight: bold;
+  font-size:14px;
+  margin-bottom:10px;
+  margin-left:5px;
+}
+.footer{
+  display: flex;
+  justify-content: center;
+  margin-top:100px;
 }
 </style>

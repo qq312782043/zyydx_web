@@ -4,6 +4,9 @@ import Login from '@/pages/login/login' // 登录
 import Entrance from '@/pages/Entrance/Entrance' // 选择平台
 import Platform from '@/pages/Platform/Platform' // 平台
 import Administration from '@/pages/Platform/Administration/Administration' // 课堂管理
+import FreePractice_mode from '@/pages/Platform/Administration/FreePractice_mode/FreePractice_mode' // 课堂管理>自由练习模式
+import Classrooms_mode from '@/pages/Platform/Administration/Classrooms_mode/Classrooms_mode' // 课堂管理>课堂练习模式
+import Examination_mode from '@/pages/Platform/Administration/Examination_mode/Examination_mode' // 课堂管理>考试模式
 import ScoreQuery from '@/pages/Platform/ScoreQuery/ScoreQuery' // 考试成绩查询
 import StudentList from '@/pages/Platform/ScoreQuery/StudentList' // 考试成绩查询>学生列表
 import PaperDetails from '@/pages/Platform/ScoreQuery/PaperDetails' // 考试成绩查询>学生列表>试卷详情
@@ -11,9 +14,7 @@ import Analysis from '@/pages/Platform/Analysis/Analysis' // 试题分析
 import AnswerData from '@/pages/Platform/AnswerData/AnswerData' // 学生答题数据
 import Question from '@/pages/Platform/Question/Question' // 题库管理
 import QuestionDetails from '@/pages/Platform/Question/QuestionDetails' // 题库管理>题库详情
-import FreePractice from '@/pages/Platform/Administration/FreePractice/FreePractice' // 自由练习模式
-import Classrooms from '@/pages/Platform/Administration/Classrooms/Classrooms' // 课堂练习模式
-import Examination from '@/pages/Platform/Administration/Examination/Examination' // 考试模式
+import Examination from '@/pages/Platform/Examination/Examination' // 考试管理
 
 Vue.use(Router)
 export default new Router({
@@ -36,19 +37,19 @@ export default new Router({
         name: 'Administration',
         component: Administration,
         children:[{
-          path: '/FreePractice',
-          name: 'FreePractice',
-          component: FreePractice
+          path: '/FreePractice_mode',
+          name: 'FreePractice_mode',
+          component: FreePractice_mode
         },{
-          path: '/Classrooms',
-          name: 'Classrooms',
-          component: Classrooms
+          path: '/Classrooms_mode',
+          name: 'Classrooms_mode',
+          component: Classrooms_mode
         },{
-          path: '/Examination',
-          name: 'Examination',
-          component: Examination
+          path: '/Examination_mode',
+          name: 'Examination_mode',
+          component: Examination_mode
         }],
-        redirect:'/FreePractice'
+        redirect:'/FreePractice_mode'
       },{
         path: '/ScoreQuery',
         name: 'ScoreQuery',
@@ -65,6 +66,10 @@ export default new Router({
         path: '/Question',
         name: 'Question',
         component: Question
+      },{
+        path: '/Examination',
+        name: 'Examination',
+        component: Examination
       },{
         path: '/StudentList',
         name: 'StudentList',

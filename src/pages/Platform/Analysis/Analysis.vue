@@ -8,9 +8,9 @@
           </el-date-picker>
         </div>
         <div style="float:right">
-          <el-button class="button" type="primary" size="small" plain>搜索</el-button>
-          <el-button class="button" type="primary" size="small" plain>重置</el-button>
-          <el-button class="button" type="primary" size="small" plain>导出</el-button>
+          <el-button icon="el-icon-search" class="button" type="primary" size="small" plain>搜索</el-button>
+          <el-button icon="el-icon-refresh-left" class="button" type="primary" size="small" plain>重置</el-button>
+          <el-button icon="el-icon-upload2" class="button" type="primary" size="small" plain>导出</el-button>
         </div>
       </div>
       <div class="input_box">

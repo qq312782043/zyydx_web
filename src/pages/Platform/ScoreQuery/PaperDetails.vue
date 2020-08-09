@@ -1,5 +1,8 @@
 <template>
   <div class="whole">
+    <div class="Goback">
+      <el-button type="text" icon="el-icon-arrow-left" @click="onGoBack">返回</el-button>
+    </div>
     <div class="header">
       <div class="box_1">
         <p class="text_1">姓名：<span>张宇</span></p>
@@ -50,17 +53,27 @@ export default {
     }
   },
   methods: {
-
+    onGoBack(){ // 点击返回
+      this.$router.back()
+    }
   },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.Goback .el-button{
+  padding:0;
+  color:#333;
+}
+.Goback .el-button:hover{
+  color:#2E79BA;
+}
 .header{
   width:100%;
   box-sizing: border-box;
   padding:0 20px;
+  margin-top:20px;
 }
 .header .box_1{
   width:100%;
