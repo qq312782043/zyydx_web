@@ -1,64 +1,43 @@
 <template>
   <el-main class="whole">
     <div class="Goback">
-      <el-button type="text" icon="el-icon-arrow-left" @click="onGoBack">返回</el-button>
+      <el-button type="text" icon="el-icon-arrow-left" @click="GoBack">返回</el-button>
     </div>
     <div class="header">
       <div class="input_box">
         <p>章节</p>
         <el-select v-model="value_1" size="small" clearable placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <el-option v-for="item in options" :key="item.value"
+          :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box">
         <p>病症类别</p>
         <el-select v-model="value_2" size="small" clearable placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <el-option v-for="item in options" :key="item.value"
+          :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
-      <div class="input_box"> </div>
-      <div class="input_box"> <p>编辑</p> </div>
+      <div class="input_box"></div>
+      <div class="input_box"><p>编辑</p></div>
     </div>
     <div class="header">
       <div class="input_box">
         <p>知识点</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="input_3"
-          clearable>
-        </el-input>
+        <el-input size="small" placeholder="请输入内容" v-model="input_3" clearable></el-input>
       </div>
       <div class="input_box">
         <p>年龄</p>
         <el-select v-model="value_4" size="small" clearable placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <el-option v-for="item in options" :key="item.value"
+          :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box">
         <p>性别</p>
         <el-select v-model="value_5" size="small" clearable placeholder="请选择">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <el-option v-for="item in options" :key="item.value"
+          :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box"> </div>
@@ -66,59 +45,7 @@
     <div class="main">
       <div class="input_box">
         <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
-      </div>
-      <div class="input_box">
-        <p>病症案例主诉</p>
-        <el-input
-          size="small"
-          placeholder="请输入内容"
-          v-model="textarea">
-        </el-input>
+        <el-input size="small" placeholder="请输入内容" v-model="textarea"></el-input>
       </div>
     </div>
     <div class="footer">
@@ -141,23 +68,17 @@ export default {
       options: [{
         value: '选项1',
         label: '黄金糕'
-      }, {
+      },{
         value: '选项2',
         label: '双皮奶'
-      }, {
+      },{
         value: '选项3',
         label: '蚵仔煎'
-      }, {
-        value: '选项4',
-        label: '龙须面'
-      }, {
-        value: '选项5',
-        label: '北京烤鸭'
       }],
     }
   },
   methods: {
-    onGoBack(){ // 点击返回
+    GoBack() { // 点击返回
       this.$router.back()
     }
   }

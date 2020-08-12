@@ -11,40 +11,25 @@
       </div>
       <div class="button_box">
         <el-button icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
-        <el-button icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
+        <el-button @click="clickReset()" icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
         <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main">
       <el-table :data="tableData" border style="width:100%" max-height="530" size="small">
-        <el-table-column prop="ID" align="center" label="考试ID"></el-table-column>
-        <el-table-column prop="Name" align="center" label="考试名称"></el-table-column>
-        <el-table-column prop="Pnumber" align="center" label="参考人数"></el-table-column>
-        <el-table-column prop="startTime" align="center" label="考试开始时间" width="120"></el-table-column>
-        <el-table-column prop="endTime" align="center" label="考试结束时间" width="120"></el-table-column>
-        <el-table-column prop="Qnumber" align="center" label="题数"></el-table-column>
-        <el-table-column prop="TotalScore" align="center" label="总分"></el-table-column>
-        <el-table-column prop="Highest" align="center" label="最高分"></el-table-column>
-        <el-table-column prop="Lowest" align="center" label="最低分"></el-table-column>
-        <el-table-column prop="Average" align="center" label="平均分"></el-table-column>
-        <el-table-column prop="Curriculum" align="center" label="课程"></el-table-column>
-        <el-table-column prop="Level" align="center" label="级别"></el-table-column>
-        <el-table-column prop="Chapter" align="center" label="章节" width="120"></el-table-column>
-        <el-table-column prop="Difficulty" align="center" label="难度"></el-table-column>
+        <el-table-column align="center" v-for="(item,i) in tableList"
+        :key="i" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
         <el-table-column fixed="right" align="center" label="操作">
           <template slot-scope="scope">
-            <el-button @click="handleClick(scope.row)" type="text" size="small">查看</el-button>
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <div class="footer">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 50, 100]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="100">
+        :current-page="currentPage" :page-sizes="[10, 50, 100]" :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper" :total="100">
       </el-pagination>
     </div>
     <router-view />
@@ -57,9 +42,8 @@ export default {
   data () {
     return {
       value: [],
-      startTime: '',
-      endTime: '',
       input: '',
+      currentPage: 1,
       tableData: [{
         ID: '1663',
         Name: '测试',
@@ -76,14 +60,74 @@ export default {
         Chapter: '花柳病',
         Difficulty: '1级',
       }],
-      currentPage: 1
+      tableList: [{
+        prop: 'ID',
+        label: '考试ID',
+        width: ''
+      },{
+        prop: 'Name',
+        label: '考试名称',
+        width: ''
+      },{
+        prop: 'Pnumber',
+        label: '参考人数',
+        width: ''
+      },{
+        prop: 'startTime',
+        label: '考试开始时间',
+        width: '120'
+      },{
+        prop: 'endTime',
+        label: '考试结束时间',
+        width: '120'
+      },{
+        prop: 'Qnumber',
+        label: '题数',
+        width: ''
+      },{
+        prop: 'TotalScore',
+        label: '总分',
+        width: ''
+      },{
+        prop: 'Highest',
+        label: '最高分',
+        width: ''
+      },{
+        prop: 'Lowest',
+        label: '最低分',
+        width: ''
+      },{
+        prop: 'Average',
+        label: '平均分',
+        width: ''
+      },{
+        prop: 'Curriculum',
+        label: '课程',
+        width: ''
+      },{
+        prop: 'Level',
+        label: '级别',
+        width: ''
+      },{
+        prop: 'Chapter',
+        label: '章节',
+        width: '120'
+      },{
+        prop: 'Difficulty',
+        label: '难度',
+        width: ''
+      }],
     }
   },
   methods: {
     handleSizeChange(val) {},
     handleCurrentChange(val) {},
-    handleClick(res){ // 点击查看
-      // console.log(res)
+    clickReset() { // 点击重置
+      let that = this
+      that.value = []
+      that.input = ''
+    },
+    clickToView(res) { // 点击查看
       this.$router.push({path:'/StudentList'})
     }
   },

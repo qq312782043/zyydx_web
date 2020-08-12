@@ -4,26 +4,17 @@
       <div class="Range">
         <p class="text_1">选择考试范围<span>*不勾选则视为全选</span></p>
         <div class="chapter">
-          <el-cascader
-            :options="chapter"
-            :show-all-levels="false"
-            collapse-tags
-            size="small"
-            :props="{ multiple: true, checkStrictly: true }">
+          <el-cascader :options="chapter" :show-all-levels="false" collapse-tags
+            size="small" :props="{ multiple: true, checkStrictly: true }">
           </el-cascader>
         </div>
       </div>
       <div class="Range">
         <p class="text_1">选择考试知识点<span>*不勾选则视为全选</span></p>
         <div class="knowledge">
-          <el-select v-model="value_1" filterable multiple
-            @change="handleChange"
-            collapse-tags
-            size="small"
-            placeholder="请搜索或下拉选择知识点">
-            <el-option v-for="item in knowledge"
-              :key="item.value" :label="item.label" :value="item.label">
-            </el-option>
+          <el-select v-model="value_1" filterable multiple @change="clickChoice"
+            collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
+            <el-option v-for="item in knowledge" :key="item.value" :label="item.label" :value="item.label"></el-option>
           </el-select>
         </div>
       </div>
@@ -39,13 +30,8 @@
         <p class="text_1">*选择考试难度</p>
         <div class="chapter">
           <el-select v-model="value_2" size="small" clearable placeholder="请选择试题难度">
-              <el-option
-                v-for="(item,i) in difficulty"
-                :key="i"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+            <el-option v-for="(item,i) in difficulty" :key="i" :label="item.label" :value="item.value"></el-option>
+          </el-select>
         </div>
       </div>
       <div class="Range">
@@ -72,16 +58,18 @@
           <el-main class="el_search">
             <div class="list" v-for="(item,i) in search" :key="i">
               <p class="text_1">{{item.list}}</p>
-              <p class="text_2" v-if="item.bol" @click="onAdd(item.list,i)"><i class="el-icon-circle-plus"></i></p>
+              <p class="text_2" v-if="item.bol" @click="clickAdd(item.list,i)"><i class="el-icon-circle-plus"></i></p>
             </div>
+            <div class="Tips">{{search.length==0?'没有可用题目':'共'+search.length+'道题'}}</div>
           </el-main>
         </el-tab-pane>
         <el-tab-pane :label="PointeDataL">
           <el-main class="el_search">
             <div class="list" v-for="(item,i) in PointeData" :key="i">
               <p class="text_1">{{item}}</p>
-              <p class="text_2" @click="onReduce(item)"><i class="el-icon-remove"></i></p>
+              <p class="text_2" @click="clickReduce(item)"><i class="el-icon-remove"></i></p>
             </div>
+            <div class="Tips">{{PointeData.length==0?'暂无已选试题':''}}</div>
           </el-main>
         </el-tab-pane>
       </el-tabs>
@@ -115,18 +103,6 @@ export default {
       },{
         value: '选项4',
         label: '龙须面'
-      },{
-        value: '选项5',
-        label: '北京烤鸭'
-      },{
-        value: '选项6',
-        label: 'shanxi'
-      },{
-        value: '选项7',
-        label: '临汾'
-      },{
-        value: '选项8',
-        label: '鳌鱼口'
       }],
       difficulty: [{
         value: '选项1',
@@ -137,12 +113,6 @@ export default {
       },{
         value: '选项3',
         label: '3级'
-      },{
-        value: '选项4',
-        label: '4级'
-      },{
-        value: '选项5',
-        label: '5级'
       }],
       contact: [{
         value: '选项1',
@@ -153,12 +123,6 @@ export default {
       },{
         value: '选项3',
         label: '蚵仔煎'
-      },{
-        value: '选项4',
-        label: '龙须面'
-      },{
-        value: '选项5',
-        label: '北京烤鸭'
       }],
       chapter: [{
         value: 'zhinan',
@@ -231,59 +195,40 @@ export default {
       },{
         list:'第3题',
         bol: true
-      },{
-        list:'第4题',
-        bol: true
-      },{
-        list:'第5题',
-        bol: true
-      },{
-        list:'第6题',
-        bol: true
-      },{
-        list:'第7题',
-        bol: true
-      },{
-        list:'第8题',
-        bol: true
-      },{
-        list:'第9题',
-        bol: true
       }]
     }
   },
   methods: {
-    handleChange(value) {
+    clickChoice(value) { // 选择知识点
       let that = this
       that.Selected_data = value
     },
-    onAdd(value,index){
+    clickAdd(value,index) { // 点击添加试题
       let that = this
       that.search[index].bol = false
       that.PointeData.push(value)
       let length = that.PointeData.length
       that.PointeDataL = '已选列表（'+ length +'）'
     },
-    onReduce(value){
+    clickReduce(value) { // 点击移除试题
       let that = this
       for(var j = 0; j < that.search.length; j++){
-        if(that.search[j].list == value){
+        if (that.search[j].list == value) {
           that.search[j].bol = true
         }
       }
       for(var i = 0; i < that.PointeData.length; i++){
-        if(that.PointeData[i] == value){
+        if (that.PointeData[i] == value) {
           that.PointeData.splice(i,1)
         }
       }
       let length = that.PointeData.length
       that.PointeDataL = '已选列表（'+ length +'）'
-      if(length == 0){
+      if (length == 0) {
         that.PointeDataL = '已选列表'
       } else {
         that.PointeDataL = '已选列表（'+ length +'）'
       }
-      // console.log(that.PointeData)
     }
   }
 }
@@ -291,90 +236,96 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .Examination{
-    width:100%;
-    height:87%;
-    box-sizing: border-box;
-    border:1px solid #DCDFE6;
-    margin-top:15px;
-    padding:15px;
-  }
-  .Examination .header,.main{
-    box-sizing: border-box;
-    display: flex;
-    height:100px;
-  }
-  .Examination .Range{
-    flex:1;
-  }
-  .Examination .Range .text_1{
-    color:#333;
-    font-size:17px;
-    font-weight: bold;
-  }
-  .Examination .Range .text_1 span{
-    color:#666;
-    font-weight: 400;
-    font-size:12px;
-    margin-left:10px;
-  }
-  .chapter,.knowledge{
-    margin-top:15px;
-  }
-  .el-input{
-    width:200px;
-  }
-  .el_search{
-    padding:0;
-    height: 280px;
-  }
-  .el_search .list{
-    color:#333;
-    font-size:16px;
-    padding:10px 10px 10px 0;
-    margin-right:10px;
-    border-bottom:1px solid #DCDFE6;
-    display:flex;
-    justify-content: space-between;
-  }
-  .el_search .list .text_1{
-    width:97%;
-  }
-  .el_search .list .text_2{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .el_search .list p i{
-    color: #333;
-    cursor: pointer;
-  }
-  .el_search .list p i:hover{
-    color:#41a310;
-    border-radius:50%;
-  }
-  .Question{
-    position: relative;
-  }
-  .location{
-    position: absolute;
-    top:6px;
-    right:5px;
-  }
-  .box_card{
-    margin-top:10px;
-    height:150px;
-    border:1px solid #DCDFE6;
-    padding:10px;
-  }
-  .box_card p{
-    margin-bottom:4px;
-    color:#333;
-    font-size:15px;
-  }
-  .button_box{
-    margin-top:20px;
-    display: flex;
-    justify-content: center;
-  }
+.Examination{
+  width:100%;
+  height:87%;
+  box-sizing: border-box;
+  border:1px solid #DCDFE6;
+  margin-top:15px;
+  padding:15px;
+}
+.Examination .header,.main{
+  box-sizing: border-box;
+  display: flex;
+  height:100px;
+}
+.Examination .Range{
+  flex:1;
+}
+.Examination .Range .text_1{
+  color:#333;
+  font-size:17px;
+  font-weight: bold;
+}
+.Examination .Range .text_1 span{
+  color:#666;
+  font-weight: 400;
+  font-size:12px;
+  margin-left:10px;
+}
+.chapter,.knowledge{
+  margin-top:15px;
+}
+.el-input{
+  width:200px;
+}
+.el_search{
+  padding:0;
+  max-height: 280px;
+}
+.el_search .list{
+  color:#333;
+  font-size:16px;
+  padding:10px 10px 10px 0;
+  margin-right:10px;
+  border-bottom:1px solid #DCDFE6;
+  display:flex;
+  justify-content: space-between;
+}
+.el_search .list .text_1{
+  width:97%;
+}
+.el_search .list .text_2{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.el_search .list p i{
+  color: #333;
+  cursor: pointer;
+}
+.el_search .list p i:hover{
+  color:#41a310;
+  border-radius:50%;
+}
+.el_search .Tips{
+  text-align: center;
+  color:#333;
+  font-size:12px;
+  margin-top:10px;
+}
+.Question{
+  position: relative;
+}
+.location{
+  position: absolute;
+  top:6px;
+  right:5px;
+}
+.box_card{
+  margin-top:10px;
+  height:150px;
+  border:1px solid #DCDFE6;
+  padding:10px;
+}
+.box_card p{
+  margin-bottom:4px;
+  color:#333;
+  font-size:15px;
+}
+.button_box{
+  margin-top:20px;
+  display: flex;
+  justify-content: center;
+}
 </style>

@@ -66,58 +66,58 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .whole{
-    width:100%;
-    height:100%;
-    box-sizing: border-box;
-    background-image: url(../../assets/background.jpg);
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    display:flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .whole .content{
-    width:780px;
-    height:420px;
-    background:#2E79BA;
-    border-radius:10px;
-    overflow: hidden;
-  }
-  .whole .content .right_box{
-    width:60%;
-    height:100%;
-    float: left;
-    color: #fff;
-    box-sizing: border-box;
-    padding: 30px;
-  }
-  .whole .content .right_box h4{
-    margin-top:10px;
-  }
-  .whole .content .left_box{
-    width:40%;
-    height:100%;
-    background: #fff;
-    border-radius:10px;
-    float: right;
-    box-sizing: border-box;
-    padding:0 30px;
-  }
-  .whole .content .left_box .top{
-    color:#333;
-    text-align: center;
-    box-sizing: border-box;
-    padding: 70px 0 50px;
-  }
-  .whole .content .left_box .password{
-    margin-top:5px;
-  }
-  .whole .content .left_box .checkbox{
-    margin-top:5px;
-  }
-  .whole .content .left_box .button{
-    margin-top:20px;
-    width:100%;
-  }
+.whole{
+  width:100%;
+  height:100%;
+  box-sizing: border-box;
+  background-image: url(../../assets/background.jpg);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  display:flex;
+  align-items: center;
+  justify-content: center;
+}
+.whole .content{
+  width:780px;
+  height:420px;
+  background:#2E79BA;
+  border-radius:10px;
+  overflow: hidden;
+}
+.whole .content .right_box{
+  width:60%;
+  height:100%;
+  float: left;
+  color: #fff;
+  box-sizing: border-box;
+  padding: 30px;
+}
+.whole .content .right_box h4{
+  margin-top:10px;
+}
+.whole .content .left_box{
+  width:40%;
+  height:100%;
+  background: #fff;
+  border-radius:10px;
+  float: right;
+  box-sizing: border-box;
+  padding:0 30px;
+}
+.whole .content .left_box .top{
+  color:#333;
+  text-align: center;
+  box-sizing: border-box;
+  padding: 70px 0 50px;
+}
+.whole .content .left_box .password{
+  margin-top:5px;
+}
+.whole .content .left_box .checkbox{
+  margin-top:5px;
+}
+.whole .content .left_box .button{
+  margin-top:20px;
+  width:100%;
+}
 </style>

@@ -4,10 +4,8 @@
       <h4 class="left_box">中医药大学实训平台</h4>
       <div class="right_box">
         <span class="pattern">当前模式：自由练习模式</span>
-        <el-dropdown trigger="click" @command="handleCommand">
-          <span class="el-dropdown-link">
-            下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
+        <el-dropdown trigger="click" @command="Goback">
+          <span class="el-dropdown-link">下拉菜单<i class="el-icon-arrow-down el-icon--right"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </el-dropdown-menu>
@@ -47,7 +45,7 @@ export default {
     }
   },
   methods: {
-    handleCommand () { // 返回首页
+    Goback() { // 返回首页
       this.$router.replace({path:'/Entrance'})
     }
   }

@@ -9,7 +9,7 @@
         </div>
         <div style="float:right">
           <el-button icon="el-icon-search" class="button" type="primary" size="small" plain>搜索</el-button>
-          <el-button icon="el-icon-refresh-left" class="button" type="primary" size="small" plain>重置</el-button>
+          <el-button @click="clickReset" icon="el-icon-refresh-left" class="button" type="primary" size="small" plain>重置</el-button>
           <el-button icon="el-icon-upload2" class="button" type="primary" size="small" plain>导出</el-button>
         </div>
       </div>
@@ -48,35 +48,22 @@
     </div>
     <div class="main">
       <el-table :data="tableData" border style="width:100%" max-height="480" size="small">
-        <el-table-column prop="ID" align="center" label="题库序号" width="80"></el-table-column>
-        <el-table-column prop="Time" align="center" label="时间" width="120"></el-table-column>
-        <el-table-column prop="Name" align="center" label="姓名" width="80"></el-table-column>
-        <el-table-column prop="Class" align="center" label="班级号" width="80"></el-table-column>
-        <el-table-column prop="StudentNumber" align="center" label="学号" width="80"></el-table-column>
-        <el-table-column prop="Subject" align="center" label="考试题目"></el-table-column>
-        <el-table-column prop="Result" align="center" label="结果" width="80"></el-table-column>
-        <el-table-column prop="Pattern" align="center" label="模式" width="80"></el-table-column>
-        <el-table-column prop="Curriculum" align="center" label="课程" width="120"></el-table-column>
-        <el-table-column prop="Level" align="center" label="级别" width="80"></el-table-column>
-        <el-table-column prop="Chapter" align="center" label="章节" width="120"></el-table-column>
-        <el-table-column prop="Knowledge" align="center" label="知识点" width="120"></el-table-column>
-        <el-table-column prop="Difficulty" align="center" label="难度" width="80"></el-table-column>
-        <el-table-column fixed="right" align="center" label="操作" width="80">
+        <el-table-column align="center" v-for="(item,i) in tableList" :key="i"
+        :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
-            <el-button @click="jumpDetails(scope.row)" type="text" size="small">查看</el-button>
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
     </div>
     <div class="footer">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage"
-        :page-sizes="[10, 50, 100]"
-        :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="100">
+        :current-page="currentPage" :page-sizes="[10, 50, 100]" :page-size="10"
+        layout="total, sizes, prev, pager, next, jumper" :total="100">
       </el-pagination>
     </div>
+    <router-view />
   </div>
 </template>
 
@@ -86,18 +73,6 @@ export default {
   data () {
     return {
       value: [],
-      startTime: '',
-      endTime: '',
-      options: [{
-        value: '选项1',
-        label: '黄金糕'
-      }, {
-        value: '选项2',
-        label: '双皮奶'
-      }, {
-        value: '选项3',
-        label: '蚵仔煎'
-      }],
       input_1: '',
       input_2: '',
       input_3: '',
@@ -108,6 +83,17 @@ export default {
       value_3: '',
       value_4: '',
       value_5: '',
+      currentPage: 1,
+      options: [{
+        value: '选项1',
+        label: '黄金糕'
+      },{
+        value: '选项2',
+        label: '双皮奶'
+      },{
+        value: '选项3',
+        label: '蚵仔煎'
+      }],
       tableData: [{
         ID: '1',
         Time: '2020-11-25',
@@ -122,8 +108,60 @@ export default {
         Chapter: '血小板',
         Knowledge: '浑身乏力',
         Difficulty: '1级'
+      }],
+      tableList: [{
+        prop: 'ID',
+        label: '题库ID',
+        width: '80',
+      },{
+        prop: 'Time',
+        label: '时间',
+        width: '120',
+      },{
+        prop: 'Name',
+        label: '姓名',
+        width: '80',
+      },{
+        prop: 'Class',
+        label: '班级号',
+        width: '80',
+      },{
+        prop: 'StudentNumber',
+        label: '学号',
+        width: '80',
+      },{
+        prop: 'Subject',
+        label: '考试题目',
+        width: '',
+      },{
+        prop: 'Result',
+        label: '结果',
+        width: '80',
+      },{
+        prop: 'Pattern',
+        label: '模式',
+        width: '80',
+      },{
+        prop: 'Curriculum',
+        label: '课程',
+        width: '120',
+      },{
+        prop: 'Level',
+        label: '级别',
+        width: '80',
+      },{
+        prop: 'Chapter',
+        label: '章节',
+        width: '120',
+      },{
+        prop: 'Knowledge',
+        label: '知识点',
+        width: '120',
+      },{
+        prop: 'Difficulty',
+        label: '难度',
+        width: '80',
       },],
-      currentPage: 1
     }
   },
   methods: {
@@ -132,6 +170,23 @@ export default {
     },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
+    },
+    clickReset() { // 点击重置
+      let that = this
+      that.value = ''
+      that.value_1 = ''
+      that.value_2 = ''
+      that.value_3 = ''
+      that.value_4 = ''
+      that.value_5 = ''
+      that.input_1 = ''
+      that.input_2 = ''
+      that.input_3 = ''
+      that.input_4 = ''
+      that.input_5 = ''
+    },
+    clickToView() { // 点击查看
+      this.$router.push({path:'/AnswerDetails'})
     }
   },
 }
@@ -139,32 +194,32 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-  .header{
-    box-sizing: border-box;
-    padding:10px 0;
-  }
-  .input_box{
-    margin-top:20px;
-    display: flex;
-  }
-  .input_box .input{
-    margin-right:20px;
-    flex: 1;
-  }
-  .input_box :last-child{
-    margin-right:0px;
-  }
-  .main{
-    width:100%;
-    box-sizing: border-box;
-    margin-top:20px;
-  }
-  .footer{
-    display: flex;
-    justify-content: center;
-    width:90%;
-    position: fixed;
-    left:10%;
-    bottom:20px;
-  }
+.header{
+  box-sizing: border-box;
+  padding:10px 0;
+}
+.input_box{
+  margin-top:20px;
+  display: flex;
+}
+.input_box .input{
+  margin-right:20px;
+  flex: 1;
+}
+.input_box :last-child{
+  margin-right:0px;
+}
+.main{
+  width:100%;
+  box-sizing: border-box;
+  margin-top:20px;
+}
+.footer{
+  display: flex;
+  justify-content: center;
+  width:90%;
+  position: fixed;
+  left:10%;
+  bottom:20px;
+}
 </style>

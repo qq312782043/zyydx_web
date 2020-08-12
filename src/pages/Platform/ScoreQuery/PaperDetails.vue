@@ -1,7 +1,7 @@
 <template>
   <div class="whole">
     <div class="Goback">
-      <el-button type="text" icon="el-icon-arrow-left" @click="onGoBack">返回</el-button>
+      <el-button type="text" icon="el-icon-arrow-left" @click="GoBack">返回</el-button>
     </div>
     <div class="header">
       <div class="box_1">
@@ -53,7 +53,7 @@ export default {
     }
   },
   methods: {
-    onGoBack(){ // 点击返回
+    GoBack() { // 点击返回
       this.$router.back()
     }
   },
