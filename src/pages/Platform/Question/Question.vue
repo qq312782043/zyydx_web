@@ -24,7 +24,7 @@
         </el-select>
       </div>
       <div class="button_box">
-        <el-button icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
+        <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
         <el-button icon="el-icon-download" type="primary" size="small" plain>表格导入</el-button>
         <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
@@ -33,7 +33,7 @@
       </div>
     </div>
     <div class="main">
-      <el-table :data="tableData" border style="width:100%" max-height="530" size="small">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="530" size="small">
         <el-table-column align="center" type="selection" width="50"></el-table-column>
         <el-table-column align="center" v-for="(item,i) in tableList" :key="i"
         :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
@@ -52,10 +52,19 @@
       </el-pagination>
     </div>
     <router-view />
-    <el-dialog title="试题分类管理" append-to-body :visible.sync="dialogVisible" width="70%">
+    <el-dialog title="试题分类管理" append-to-body :visible.sync="dialogVisible" width="50%">
       <div class="Dialogs">
         <el-tabs v-model="activeName" type="border-card" @tab-click="clickToSwitch">
-          <el-tab-pane label="课程" name="first">课程</el-tab-pane>
+          <el-tab-pane label="课程" name="first">
+            <el-main style="max-height:300px">
+              <div class="input_box" v-for="(item,i) in input_Data" :key="i">
+                <el-input @blur="Defocus(i)" v-model="item.input" placeholder="请输入内容" size="mini" :disabled="item.disabled"></el-input>
+                <el-button @click="clickEdit(i)" type="text">{{item.btn_text}}</el-button>
+                <el-button @click="clickDeleteIpt(i)" type="text">删除</el-button>
+              </div>
+              <el-button @click="clickAdded()" class="added" type="text">新增</el-button>
+            </el-main>
+          </el-tab-pane>
           <el-tab-pane label="级别" name="second">级别</el-tab-pane>
           <el-tab-pane label="章节" name="third">章节</el-tab-pane>
           <el-tab-pane label="知识点" name="fourth">知识点</el-tab-pane>
@@ -77,6 +86,7 @@ export default {
       value_2: '',
       value_3: '',
       value_4: '',
+      loading: false,
       currentPage: 1,
       dialogVisible: false,
       activeName: 'first',
@@ -129,6 +139,19 @@ export default {
         label: '病症案例主诉',
         width: '',
       }],
+      input_Data: [{
+        input: '章节1',
+        disabled: true,
+        btn_text: '编辑'
+      },{
+        input: '章节2',
+        disabled: true,
+        btn_text: '编辑'
+      },{
+        input: '章节3',
+        disabled: true,
+        btn_text: '编辑'
+      }]
     }
   },
   methods: {
@@ -138,45 +161,93 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
+    clickSearch() { // 点击搜索
+      let that = this
+      that.loading = true
+      setTimeout(function(){
+        that.loading = false
+      },1000)
+    },
     clickReset() { // 点击重置
       let that = this
       that.value_1 = ''
       that.value_2 = ''
       that.value_3 = ''
       that.value_4 = ''
+      that.$message({
+        message: '重置成功~',
+        type: 'success',
+        duration: '1000'
+      })
     },
     clickToView() { // 点击查看题库详情
       this.$router.push({path:'/QuestionDetails'})
     },
     clickToSwitch(tab, event) { // 点击切换
-      console.log(tab, event);
+      console.log(tab, event)
     },
-    clickDetails() { // 点击删除
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+    clickDetails(e) { // 点击删除
+      let that = this
+      that.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
+        that.$message({
           type: 'success',
           message: '删除成功!',
           duration: 1000
-        });
-      });
+        })
+      }).catch(() => {})
     },
     BatchDeletion() { // 批量删除
-      this.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
+      let that = this
+      that.$confirm('此操作将永久删除该数据, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.$message({
+        that.$message({
           type: 'success',
           message: '删除成功!',
           duration: 1000
-        });
-      });
+        })
+      }).catch(() => {})
     },
+    clickEdit(e) { // 点击编辑
+      let that = this
+      if(that.input_Data[e].btn_text == '编辑'){
+        that.input_Data[e].disabled = false
+        that.input_Data[e].btn_text = '确定'
+      } else {
+        that.input_Data[e].disabled = true
+        that.input_Data[e].btn_text = '编辑'
+      }
+    },
+    clickDeleteIpt(e) { // 点击删除input
+      let that = this
+      that.$confirm('确认要删除吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.input_Data.splice(e, 1)
+        that.$message({
+          type: 'success',
+          message: '删除成功!',
+          duration: '1000'
+        })
+      }).catch(() => {})
+    },
+    clickAdded() { // 点击新增
+      let that = this
+      let obj = {
+        input: '',
+        disabled: false,
+        btn_text: '确定'
+      }
+      that.input_Data.push(obj)
+    }
   },
 }
 </script>
@@ -209,5 +280,17 @@ export default {
   position: fixed;
   left:10%;
   bottom:20px;
+}
+
+.input_box{
+  display: flex;
+  align-items: center;
+}
+.input_box .el-input{
+  width:150px;
+  margin-right:15px;
+}
+.added{
+  margin-left:10px;
 }
 </style>

@@ -33,15 +33,26 @@ export default {
   },
   methods: {
     onValue(value,i) { // 输入框失焦监听事件
-      console.log(value,i)
+      // console.log(value,i)
     },
     clickPreservation() { // 点击保存
       let that = this
-      // console.log(that.dataList)
-      that.$alert('四项分数总和必须为10分~', '提示', {
-        confirmButtonText: '好的',
-        callback: action => {}
-      })
+      // for(var i = 0; i < that.dataList.length; i++){
+      //   console.log(that.dataList[i].value)
+      // }
+      let number = parseInt(that.dataList[0].value) + parseInt(that.dataList[1].value) + parseInt(that.dataList[2].value) + parseInt(that.dataList[3].value)
+      if(number == 10){
+        that.$message({
+          message: '保存成功~',
+          type: 'success',
+          duration: '1000'
+        })
+      } else {
+        that.$alert('四项分数总和必须为10分~', '提示', {
+          confirmButtonText: '好的',
+          callback: action => {}
+        })
+      }
     }
   },
 }
@@ -57,7 +68,7 @@ export default {
   padding:20px;
 }
 .title span{
-  color:#666;
+  color:#333;
   font-size:12px;
   font-weight:400;
   margin-left:10px;
@@ -69,8 +80,8 @@ export default {
   padding:15px 20px;
 }
 .input_box p{
-  font-size:15px;
-  color:#666;
+  font-size:14px;
+  color:#333;
   margin-right:10px;
 }
 .input_box .el-input{

@@ -28,11 +28,11 @@
     </div>
     <div class="ipt_box">
       <el-input placeholder="输入班级号、学号、姓名" size="small" v-model="input" clearable></el-input>
-      <el-button icon="el-icon-search" type="primary" size="small">搜索</el-button>
+      <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small">搜索</el-button>
       <el-button icon="el-icon-upload2" type="primary" size="small">导出</el-button>
     </div>
     <div class="main">
-      <el-table :data="tableData" border style="width:100%" max-height="400" size="small"
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="400" size="small"
         :default-sort="{prop: 'Ranking', order: 'descending'}">
         <el-table-column prop="Name" align="center" label="姓名" width="150"></el-table-column>
         <el-table-column prop="Fraction" align="center" label="分数" width="200"></el-table-column>
@@ -62,6 +62,7 @@ export default {
   data () {
     return {
       input: '',
+      loading: false,
       currentPage: 1,
       tableData: [{
         Name: '张宇1',
@@ -91,8 +92,19 @@ export default {
     }
   },
   methods: {
-    handleSizeChange(val) {},
-    handleCurrentChange(val) {},
+    handleSizeChange(val) {
+      console.log(val)
+    },
+    handleCurrentChange(val) {
+      console.log(val)
+    },
+    clickSearch() { // 点击搜索
+      let that = this
+      that.loading = true
+      setTimeout(function(){
+        that.loading = false
+      },1000)
+    },
     clickToView(res) { // 点击查看
       this.$router.push({path:'/PaperDetails'})
     },

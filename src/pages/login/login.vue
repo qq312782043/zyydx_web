@@ -7,17 +7,15 @@
       </div>
       <div class="left_box">
         <h2 class="top">登录</h2>
-        <el-form ref="form" :model="form" :rules="rules">
-          <el-form-item prop="account">
-            <el-input class="input" placeholder="请输入账号" v-model="form.account" prefix-icon="el-icon-user" clearable></el-input>
+        <el-form ref="ruleForm" :model="ruleForm" :rules="rules">
+          <el-form-item prop="user">
+            <el-input class="input" placeholder="请输入账号" v-model="ruleForm.user" prefix-icon="el-icon-user" clearable></el-input>
           </el-form-item>
           <el-form-item prop="password">
-            <el-input class="password" placeholder="请输入密码" v-model="form.password" prefix-icon="el-icon-lock" show-password></el-input>
+            <el-input class="password" placeholder="请输入密码" v-model="ruleForm.password" prefix-icon="el-icon-lock" show-password></el-input>
           </el-form-item>
-          <el-checkbox-group class="checkbox" v-model="form.type">
-            <el-checkbox label="记住密码" name="type"></el-checkbox>
-          </el-checkbox-group>
-          <el-button class="button" type="primary" @click="onSubmit(form)">登录</el-button>
+          <el-checkbox v-model="ruleForm.checked">记住密码</el-checkbox>
+          <el-button class="button" type="primary" @click="submitForm('ruleForm',ruleForm)">登录</el-button>
         </el-form>
       </div>
     </div>
@@ -28,37 +26,53 @@
 export default {
   name: 'whole',
   data () {
-    var checkUser = (rule, value, callback) => {
-      if (!value) {
-        return callback(new Error('账号不能为空'));
-      } else {
-        alert('wawo')
-      }
-    };
-    var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        return callback(new Error('密码不能为空'));
-      }
-    };
     return {
-      form: {
-        account: '',
+      ruleForm: {
+        user: '',
         password: '',
-        type: [],
+        checked: false
       },
       rules: {
-        account: [
-          { validator: checkUser, trigger: 'blur' }
+        user: [
+          { required: true, message: '账号不能为空', trigger: 'blur' },
         ],
         password: [
-          { validator: validatePass, trigger: 'blur' }
-        ]
+          { required: true, message: '密码不能为空', trigger: 'blur' }
+        ],
+      }
+    }
+  },
+  created() {
+    let that = this
+    var ruleForm = JSON.parse(localStorage.getItem('ruleForm'))
+    if (ruleForm) {
+      if (ruleForm.user && ruleForm.password) {
+        that.ruleForm.user = ruleForm.user
+        that.ruleForm.password = ruleForm.password
+        that.ruleForm.checked = ruleForm.checked
       }
     }
   },
   methods: {
-    onSubmit(e) {
-      this.$router.replace({path:'/entrance'})
+    submitForm(formName,ruleForm) { // 登录
+      let that = this
+      that.$refs[formName].validate((valid) => {
+        if (valid) {
+          if(ruleForm.checked == true){
+            let ruleForm = {
+              user: that.ruleForm.user,
+              password: that.ruleForm.password,
+              checked: true
+            }
+            localStorage.setItem('ruleForm', JSON.stringify(ruleForm))
+          } else {
+            localStorage.removeItem('ruleForm')
+          }
+          that.$router.replace({path:'/entrance'})
+        } else {
+          return false;
+        }
+      })
     }
   }
 }

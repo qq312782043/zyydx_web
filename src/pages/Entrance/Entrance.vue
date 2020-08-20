@@ -4,9 +4,7 @@
       <h4 class="left_box">中医药大学实训平台</h4>
       <div class="right_box">
         <el-dropdown trigger="click" @command="GoLogin">
-          <span class="el-dropdown-link">
-            下拉菜单<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
+          <span class="el-dropdown-link">张宇<i class="el-icon-arrow-down el-icon--right"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>退出账号</el-dropdown-item>
           </el-dropdown-menu>
@@ -55,7 +53,23 @@ export default {
   },
   methods: {
     jumpPlatform(e) { // 跳转平台页面
-      this.$router.replace({path:'/Platform'})
+      let that = this
+      let navList = [
+        {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice'},
+        {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice'},
+        {text:'考试模式',route:'/Examination_mode',class:'NoChoice'}
+      ]
+      let tabList = [
+        {text:'课堂练习',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
+        {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+        {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+        {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
+        {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+        {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
+      ]
+      localStorage.setItem('navList', JSON.stringify(navList))
+      localStorage.setItem('tabList', JSON.stringify(tabList))
+      that.$router.replace({path:'/Platform'})
     },
     GoLogin(e) { // 返回登录页
       this.$router.replace({path:'/'})
@@ -116,11 +130,11 @@ export default {
 .el-main .content{
   margin-top:70px;
   display: flex;
-  padding:0 300px;
+  padding:0 20%;
 }
 .el-main .content .btn_box{
   flex: 1;
-  margin: 30px 70px;
+  margin:30px 70px;
 }
 .el-main .content .btn_box .item{
   text-align: center;

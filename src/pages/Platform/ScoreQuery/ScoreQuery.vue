@@ -10,13 +10,13 @@
         <el-input placeholder="输入考试ID或考试名称" v-model="input" size="small" clearable></el-input>
       </div>
       <div class="button_box">
-        <el-button icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
+        <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
         <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main">
-      <el-table :data="tableData" border style="width:100%" max-height="530" size="small">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="530" size="small">
         <el-table-column align="center" v-for="(item,i) in tableList"
         :key="i" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
         <el-table-column fixed="right" align="center" label="操作">
@@ -43,6 +43,7 @@ export default {
     return {
       value: [],
       input: '',
+      loading: false,
       currentPage: 1,
       tableData: [{
         ID: '1663',
@@ -120,12 +121,28 @@ export default {
     }
   },
   methods: {
-    handleSizeChange(val) {},
-    handleCurrentChange(val) {},
+    handleSizeChange(val) {
+      console.log(val)
+    },
+    handleCurrentChange(val) {
+      console.log(val)
+    },
+    clickSearch() { // 点击搜索
+      let that = this
+      that.loading = true
+      setTimeout(function(){
+        that.loading = false
+      },1000)
+    },
     clickReset() { // 点击重置
       let that = this
       that.value = []
       that.input = ''
+      that.$message({
+        message: '重置成功~',
+        type: 'success',
+        duration: '1000'
+      })
     },
     clickToView(res) { // 点击查看
       this.$router.push({path:'/StudentList'})

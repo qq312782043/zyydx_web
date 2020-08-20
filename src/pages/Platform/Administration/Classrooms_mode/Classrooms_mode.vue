@@ -253,17 +253,15 @@ export default {
     clickExamination() { // 开始考试
       let that = this
       if (!that.value_3) {
-        that.$alert('请选择练习难度~', '提示', {
-          confirmButtonText: '好的',
-          callback: action => {}
+        that.$message.error({
+          message: '请选择练习难度~'
         })
         return
       }
       if(that.PointeData.length == 0){
         if (!that.value_4) {
-          that.$alert('请填写练习题数~', '提示', {
-            confirmButtonText: '好的',
-            callback: action => {}
+          that.$message.error({
+            message: '请填写练习题数~'
           })
           return
         }
@@ -310,7 +308,7 @@ export default {
   font-weight: bold;
 }
 .Classrooms .Range .text_1 span{
-  color:#666;
+  color:#333;
   font-weight: 400;
   font-size:12px;
   margin-left:10px;
@@ -427,7 +425,7 @@ export default {
   overflow: hidden;
 }
 .Answer_crad p span{
-  color:#666;
+  color:#333;
   font-weight: 400;
   font-size:12px;
 }

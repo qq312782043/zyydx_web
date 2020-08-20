@@ -8,8 +8,8 @@
           </el-date-picker>
         </div>
         <div style="float:right">
-          <el-button icon="el-icon-search" class="button" type="primary" size="small" plain>搜索</el-button>
-          <el-button @click="clickReset" icon="el-icon-refresh-left" class="button" type="primary" size="small" plain>重置</el-button>
+          <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="primary" size="small" plain>搜索</el-button>
+          <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="primary" size="small" plain>重置</el-button>
           <el-button icon="el-icon-upload2" class="button" type="primary" size="small" plain>导出</el-button>
         </div>
       </div>
@@ -47,7 +47,7 @@
       </div>
     </div>
     <div class="main">
-      <el-table :data="tableData" border style="width:100%" max-height="480" size="small">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="480" size="small">
         <el-table-column align="center" v-for="(item,i) in tableList" :key="i"
         :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
@@ -82,6 +82,7 @@ export default {
       value_3: '',
       value_4: '',
       value_5: '',
+      loading: false,
       currentPage: 1,
       options: [{
         value: '选项1',
@@ -150,6 +151,13 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
+    clickSearch() { // 点击搜索
+      let that = this
+      that.loading = true
+      setTimeout(function(){
+        that.loading = false
+      },1000)
+    },
     clickReset() { // 点击重置
       let that = this
       that.value = []
@@ -163,6 +171,11 @@ export default {
       that.input_3 = ''
       that.input_4 = ''
       that.input_5 = ''
+      that.$message({
+        message: '重置成功~',
+        type: 'success',
+        duration: '1000'
+      })
     },
     clickToView() { // 点击查看
       this.$router.push({path:'/AnswerDetails'})

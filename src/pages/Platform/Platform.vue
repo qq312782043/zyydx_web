@@ -3,9 +3,9 @@
     <el-header class="clear">
       <h4 class="left_box">中医药大学实训平台</h4>
       <div class="right_box">
-        <span class="pattern">当前模式：自由练习模式</span>
+        <span class="pattern">当前模式：{{title}}</span>
         <el-dropdown trigger="click" @command="Goback">
-          <span class="el-dropdown-link">下拉菜单<i class="el-icon-arrow-down el-icon--right"></i></span>
+          <span class="el-dropdown-link">张宇<i class="el-icon-arrow-down el-icon--right"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </el-dropdown-menu>
@@ -13,17 +13,10 @@
       </div>
     </el-header>
     <el-aside style="width:10%">
-      <el-col>
-        <el-menu router mode="vertical" class="el-menu-vertical-demo"
-          background-color="#fff" text-color="#333" active-text-color="#409EFF">
-          <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.name">
-            <template slot="title">
-              <i :class="item.icon"></i>
-              <span>{{item.navItem}}</span>
-            </template>
-          </el-menu-item>
-        </el-menu>
-      </el-col>
+      <div @click="clickTabBar(i)" class="TabBarBox"
+      :class="item.class" v-for="(item,i) in tabList" :key="i">
+        <i :class="item.icon"></i><p>{{item.text}}</p>
+      </div>
     </el-aside>
     <router-view />
   </el-container>
@@ -34,19 +27,53 @@ export default {
   name: 'Platform',
   data () {
     return {
-      navList:[
-        {name:'/Administration',navItem:'课堂练习',icon:'el-icon-s-home'},
-        {name:'/ScoreQuery',navItem:'考试成绩查询',icon:'el-icon-s-data'},
-        {name:'/Analysis',navItem:'试题分析',icon:'el-icon-s-flag'},
-        {name:'/AnswerData',navItem:'学生答题数据',icon:'el-icon-s-claim'},
-        {name:'/Question',navItem:'题库管理',icon:'el-icon-menu'},
-        {name:'/Examination',navItem:'考试管理',icon:'el-icon-s-help'},
-      ]
+      title: '',
+      tabList: ''
+    }
+  },
+  created() {
+    let that = this
+    that.appendData()
+    that.tabList = JSON.parse(localStorage.getItem('tabList'))
+  },
+  provide() {
+    return{
+      appendData: this.appendData
     }
   },
   methods: {
     Goback() { // 返回首页
       this.$router.replace({path:'/Entrance'})
+    },
+    appendData() { // 获取当前模式
+      let that = this
+      let navList = JSON.parse(localStorage.getItem('navList'))
+      for(var i = 0; i < navList.length; i++){
+        if (navList[i].class == 'Choice') {
+          that.title = navList[i].text
+        }
+      }
+    },
+    clickTabBar(e) { // 点击切换路由
+      let that = this
+      for(var i = 0; i < that.tabList.length; i++){
+        that.tabList[i].class = 'NoChoice'
+      }
+      if (e == 0) {
+        that.tabList[0].class = 'Choice'
+      } else if (e == 1) {
+        that.tabList[1].class = 'Choice'
+      } else if (e == 2) {
+        that.tabList[2].class = 'Choice'
+      } else if (e == 3) {
+        that.tabList[3].class = 'Choice'
+      } else if (e == 4) {
+        that.tabList[4].class = 'Choice'
+      } else if (e == 5) {
+        that.tabList[5].class = 'Choice'
+      }
+      that.$router.replace({path:that.tabList[e].route})
+      localStorage.setItem('tabList', JSON.stringify(that.tabList))
     }
   }
 }
@@ -115,5 +142,25 @@ export default {
   box-sizing: border-box;
   padding:15px;
   z-index:50;
+}
+
+/* 导航样式 */
+.TabBarBox{
+  padding:18px 10px 18px 18px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.TabBarBox p{
+  font-size:14px;
+  margin-left:5px;
+}
+.Choice{
+  background:#eee;
+  color:#409EFF;
+}
+.NoChoice{
+  background:#fff;
+  color:#444;
 }
 </style>

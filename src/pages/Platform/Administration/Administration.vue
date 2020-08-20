@@ -3,9 +3,9 @@
     <p class="title">请选择以下模式来控制学生电脑</p>
     <div class="SmallBox">
       <div class="tabBar">
-        <router-link style="text-decoration:none" :to="item.route" v-for="(item,i) in navList" :key="i">
-          <p :class="item.class" @click="clickTabBar(i)">{{item.text}}</p>
-        </router-link>
+        <div v-for="(item,i) in navList" :key="i">
+          <p :class="item.class" @click="clickTabBar(i)">开启{{item.text}}</p>
+        </div>
       </div>
       <router-view />
     </div>
@@ -15,39 +15,32 @@
 <script>
 export default {
   name: 'whole',
+  inject:['appendData'],
   data () {
     return {
-      navList:[{
-        text: '开启自由练习模式',
-        route: '/FreePractice_mode',
-        class: 'Choice'
-      },{
-        text: '开启课堂练习模式',
-        route: '/Classrooms_mode',
-        class: 'NoChoice'
-      },{
-        text: '开启考试模式',
-        route: '/Examination_mode',
-        class: 'NoChoice'
-      }]
+      navList: ''
     }
+  },
+  created() {
+    let that = this
+    that.navList = JSON.parse(localStorage.getItem('navList'))
   },
   methods: {
     clickTabBar(e) { // 点击切换
       let that = this
+      for(var i = 0; i < that.navList.length; i++){
+        that.navList[i].class = 'NoChoice'
+      }
       if (e == 0) {
         that.navList[0].class = 'Choice'
-        that.navList[1].class = 'NoChoice'
-        that.navList[2].class = 'NoChoice'
       } else if (e == 1) {
-        that.navList[0].class = 'NoChoice'
         that.navList[1].class = 'Choice'
-        that.navList[2].class = 'NoChoice'
       } else if (e == 2) {
-        that.navList[0].class = 'NoChoice'
-        that.navList[1].class = 'NoChoice'
         that.navList[2].class = 'Choice'
       }
+      that.$router.replace({path:that.navList[e].route})
+      localStorage.setItem('navList', JSON.stringify(that.navList))
+      that.appendData()
     }
   }
 }
@@ -56,7 +49,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .title{
-  color: #666;
+  color: #333;
   font-size:13px;
 }
 .SmallBox{
@@ -68,6 +61,9 @@ export default {
   display: flex;
   justify-content: space-between;
   margin-top:15px;
+}
+.SmallBox .tabBar div{
+  cursor:pointer;
 }
 .NoChoice{
   width:300px;
@@ -89,6 +85,6 @@ export default {
   border:1px solid #4BB328;
   color: #fff;
   background:#4BB328;
-  border-radius:2px;
+  border-radius:4px;
 }
 </style>

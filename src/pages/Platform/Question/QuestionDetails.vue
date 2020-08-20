@@ -6,36 +6,36 @@
     <div class="header">
       <div class="input_box">
         <p>章节</p>
-        <el-select v-model="value_1" size="small" clearable placeholder="请选择">
+        <el-select v-model="value_1" placeholder="请选择" size="small" :disabled="disabled" clearable>
           <el-option v-for="item in options" :key="item.value"
           :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box">
         <p>病症类别</p>
-        <el-select v-model="value_2" size="small" clearable placeholder="请选择">
+        <el-select v-model="value_2" placeholder="请选择" size="small" :disabled="disabled" clearable>
           <el-option v-for="item in options" :key="item.value"
           :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box"></div>
-      <div class="input_box"><p>编辑</p></div>
+      <div class="input_box"><p style="color:#2E79BA;cursor:pointer" @click="clickEdit()">编辑</p></div>
     </div>
     <div class="header">
       <div class="input_box">
         <p>知识点</p>
-        <el-input size="small" placeholder="请输入内容" v-model="input_3" clearable></el-input>
+        <el-input v-model="input_3" placeholder="请输入内容" size="small" :disabled="disabled" clearable></el-input>
       </div>
       <div class="input_box">
         <p>年龄</p>
-        <el-select v-model="value_4" size="small" clearable placeholder="请选择">
+        <el-select v-model="value_4" placeholder="请选择" size="small" :disabled="disabled" clearable>
           <el-option v-for="item in options" :key="item.value"
           :label="item.label" :value="item.value"></el-option>
         </el-select>
       </div>
       <div class="input_box">
         <p>性别</p>
-        <el-select v-model="value_5" size="small" clearable placeholder="请选择">
+        <el-select v-model="value_5" placeholder="请选择" size="small" :disabled="disabled" clearable>
           <el-option v-for="item in options" :key="item.value"
           :label="item.label" :value="item.value"></el-option>
         </el-select>
@@ -45,11 +45,11 @@
     <div class="main">
       <div class="input_box">
         <p>病症案例主诉</p>
-        <el-input size="small" placeholder="请输入内容" v-model="textarea"></el-input>
+        <el-input v-model="textarea" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
       </div>
     </div>
     <div class="footer">
-      <el-button type="primary">保存</el-button>
+      <el-button type="primary" @click="clickPreserva()">保存</el-button>
     </div>
   </el-main>
 </template>
@@ -59,12 +59,13 @@ export default {
   name: 'whole',
   data () {
     return {
-      value_1: '',
-      value_2: '',
-      input_3: '',
-      value_4: '',
-      value_5: '',
-      textarea: '',
+      value_1: '章节',
+      value_2: '类别',
+      input_3: '知识点',
+      value_4: '18岁',
+      value_5: '男',
+      textarea: '病症案例主诉',
+      disabled: true,
       options: [{
         value: '选项1',
         label: '黄金糕'
@@ -80,6 +81,19 @@ export default {
   methods: {
     GoBack() { // 点击返回
       this.$router.back()
+    },
+    clickEdit() { // 点击编辑
+      let that = this
+      that.disabled = false
+    },
+    clickPreserva() { // 点击保存
+      let that = this
+      that.disabled = true
+      this.$message({
+        message: '保存成功！',
+        type: 'success',
+        duration: '1000'
+      })
     }
   }
 }

@@ -50,7 +50,14 @@ export default new Router({
           name: 'Examination_mode',
           component: Examination_mode
         }],
-        redirect:'/FreePractice_mode'
+        redirect:function () {
+          let navList = JSON.parse(localStorage.getItem('navList'))
+          for(var i = 0; i < navList.length; i++){
+            if (navList[i].class == 'Choice') {
+              return navList[i].route
+            }
+          }
+        }
       },{ // 考试成绩查询（一级tab路由）
         path: '/ScoreQuery',
         name: 'ScoreQuery',

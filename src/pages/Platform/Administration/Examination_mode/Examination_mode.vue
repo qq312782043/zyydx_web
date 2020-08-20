@@ -258,7 +258,7 @@ export default {
   font-weight: bold;
 }
 .Examination .Range .text_1 span{
-  color:#666;
+  color:#333;
   font-weight: 400;
   font-size:12px;
   margin-left:10px;

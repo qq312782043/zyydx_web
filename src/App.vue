@@ -24,7 +24,7 @@ body,html{
   width:100%;
   height:100%;
 }
-#app {
+#app{
   width:100%;
   height:100%;
   box-sizing: border-box;
