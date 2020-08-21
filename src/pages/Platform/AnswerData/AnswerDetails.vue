@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     GoBack() { // 点击返回
-      this.$router.back()
+      this.$router.replace({path:'/AnswerData'})
     }
   },
   created: function () {

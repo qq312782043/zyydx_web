@@ -83,7 +83,7 @@ export default {
 <style scoped>
 .el-container {
   width:100%;
-  height:100%;
+  height: calc(100vh);
   box-sizing: border-box;
   position: relative;
   overflow: hidden;
@@ -95,6 +95,9 @@ export default {
   box-sizing: border-box;
   background: #2E79BA;
   padding:0 40px 0 20px;
+  position: absolute;
+  top:0;
+  left:0;
 }
 .el-container .el-header .left_box{
   float: left;
@@ -118,7 +121,11 @@ export default {
 }
 .el-container .el-aside{
   height:100%;
+  height: calc(100vh - 60px);
   border-right:1px solid #DCDFE6;
+  position: absolute;
+  top:60px;
+  left:0;
 }
 .el-menu-vertical-demo{
   border:none;
@@ -134,13 +141,13 @@ export default {
   border:none;
 }
 .el-container .whole{
-  width:90%;
-  height:92%;
+  width: 90%;
+  height: calc(100vh - 60px);
+  box-sizing: border-box;
+  padding:15px;
   position: absolute;
   top:60px;
   left:10%;
-  box-sizing: border-box;
-  padding:15px;
   z-index:50;
 }
 

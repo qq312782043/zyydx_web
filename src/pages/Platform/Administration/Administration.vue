@@ -1,14 +1,14 @@
 <template>
   <div class="whole">
-    <p class="title">请选择以下模式来控制学生电脑</p>
-    <div class="SmallBox">
+    <div class="header">
+      <p class="title">请选择以下模式来控制学生电脑</p>
       <div class="tabBar">
         <div v-for="(item,i) in navList" :key="i">
           <p :class="item.class" @click="clickTabBar(i)">开启{{item.text}}</p>
         </div>
       </div>
-      <router-view />
     </div>
+    <router-view />
   </div>
 </template>
 
@@ -52,18 +52,21 @@ export default {
   color: #333;
   font-size:13px;
 }
-.SmallBox{
-  width:100%;
-  height:100%;
-  box-sizing: border-box;
-}
-.SmallBox .tabBar{
+.header .tabBar{
   display: flex;
   justify-content: space-between;
   margin-top:15px;
 }
-.SmallBox .tabBar div{
+.header .tabBar div{
   cursor:pointer;
+}
+.SmallBox{
+  width:100%;
+  height: calc(100vh - 180px);
+  box-sizing: border-box;
+  border:1px solid #DCDFE6;
+  margin-top:15px;
+  padding:15px;
 }
 .NoChoice{
   width:300px;

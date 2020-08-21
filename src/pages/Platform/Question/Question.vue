@@ -32,8 +32,8 @@
         <el-button @click="BatchDeletion()" icon="el-icon-delete" type="primary" size="small" plain>批量删除</el-button>
       </div>
     </div>
-    <div class="main">
-      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="530" size="small">
+    <div class="main" ref="heights">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="50"></el-table-column>
         <el-table-column align="center" v-for="(item,i) in tableList" :key="i"
         :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
@@ -82,6 +82,7 @@ export default {
   name: 'whole',
   data () {
     return {
+      heightCss: '',
       value_1: '',
       value_2: '',
       value_3: '',
@@ -154,6 +155,10 @@ export default {
       }]
     }
   },
+  mounted() {
+    let that = this
+    that.heightCss = parseInt(window.getComputedStyle(that.$refs.heights).height)
+  },
   methods: {
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
@@ -181,7 +186,7 @@ export default {
       })
     },
     clickToView() { // 点击查看题库详情
-      this.$router.push({path:'/QuestionDetails'})
+      this.$router.replace({path:'/QuestionDetails'})
     },
     clickToSwitch(tab, event) { // 点击切换
       console.log(tab, event)
@@ -270,16 +275,14 @@ export default {
 }
 .main{
   width:100%;
+  height: calc(100vh - 230px);
   box-sizing: border-box;
   margin-top:20px;
 }
 .footer{
-  display: flex;
-  justify-content: center;
-  width:90%;
-  position: fixed;
-  left:10%;
-  bottom:20px;
+  position:fixed;
+  left:34%;
+  bottom:10px;
 }
 
 .input_box{

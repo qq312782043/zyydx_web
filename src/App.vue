@@ -20,14 +20,7 @@ export default {
   clear: both;
   content: '';
 }
-body,html{
-  width:100%;
-  height:100%;
-}
 #app{
-  width:100%;
-  height:100%;
-  box-sizing: border-box;
   font-family: "Helvetica Neue";
 }
 </style>

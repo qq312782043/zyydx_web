@@ -1,13 +1,5 @@
 <template>
-  <div class="Commodity">
-    <p v-if="bol">{{msg}}</p>
-    <img :src="AllData.displayPic" />
-    <p>{{counter}}</p>
-    <p v-html="AllData.visitorNotice"></p>
-    <button v-on:click="counter += 1">Add</button>
-    <button v-on:click="counter -= 1">reduce</button>
-    <button v-on:click="greet">开关</button>
-  </div>
+  <div class="Commodity"></div>
 </template>
 
 <script>

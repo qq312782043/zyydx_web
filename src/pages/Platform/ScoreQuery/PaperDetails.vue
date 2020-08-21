@@ -18,27 +18,13 @@
           <p class="nth_5">错误</p>
         </div>
         <div class="TheBall">
-          <P>1</P>
-          <P>2</P>
-          <P>3</P>
-          <P>4</P>
-          <P>5</P>
-          <P>6</P>
-          <P>7</P>
-          <P>8</P>
-          <P>9</P>
-          <P>10</P>
+          <P v-for="(item,i) in TheBall" :key="i" :style="{background:item.color}"><a :href="'#c' + i">{{item.text}}</a></P>
         </div>
       </div>
     </div>
     <div class="main">
       <el-main class="card_box">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+        <div :id="'c' + i" class="card" v-for="(item,i) in TheBall" :key="i">{{item.text}}</div>
       </el-main>
     </div>
   </div>
@@ -49,12 +35,38 @@ export default {
   name: 'whole',
   data () {
     return {
-
+      TheBall: [{
+        text: '1',
+        color: 'green'
+      },{
+        text: '2',
+        color: 'green'
+      },{
+        text: '3',
+        color: 'red'
+      },{
+        text: '4',
+        color: 'green'
+      },{
+        text: '5',
+        color: 'red'
+      }],
+      card_box: [{
+        text: '1'
+      },{
+        text: '2'
+      },{
+        text: '3'
+      },{
+        text: '4'
+      },{
+        text: '5'
+      },]
     }
   },
   methods: {
     GoBack() { // 点击返回
-      this.$router.back()
+      this.$router.replace({path:'/StudentList'})
     }
   },
 }
@@ -134,16 +146,20 @@ export default {
   margin-top:20px;
 }
 .header .box_2 .TheBall p{
+  margin-right:20px;
+  border-radius:15px;
+  overflow: hidden;
+}
+.header .box_2 .TheBall p a{
   width:30px;
   height:30px;
-  border-radius:15px;
-  background:green;
-  margin-right:20px;
+  font-size:12px;
   text-align: center;
   line-height:30px;
-  font-size:12px;
   color:#fff;
   cursor: pointer;
+  text-decoration: none;
+  display: block;
 }
 .main{
   padding:20px;
@@ -152,12 +168,15 @@ export default {
   padding:10px 10px 10px 2px;
   box-sizing: border-box;
   width:100%;
-  max-height:450px;
+  max-height: calc(100vh - 350px);
 }
 .main .card{
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1);
   background:#f5f5f5;
   height:300px;
   margin-bottom:20px;
+  text-align: center;
+  line-height:300px;
+  font-size:30px;
 }
 </style>

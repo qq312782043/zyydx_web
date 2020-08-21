@@ -31,8 +31,8 @@
       <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small">搜索</el-button>
       <el-button icon="el-icon-upload2" type="primary" size="small">导出</el-button>
     </div>
-    <div class="main">
-      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="400" size="small"
+    <div class="main" ref="heights">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" :max-height="heightCss" size="small"
         :default-sort="{prop: 'Ranking', order: 'descending'}">
         <el-table-column prop="Name" align="center" label="姓名" width="150"></el-table-column>
         <el-table-column prop="Fraction" align="center" label="分数" width="200"></el-table-column>
@@ -61,6 +61,7 @@ export default {
   name: 'whole',
   data () {
     return {
+      heightCss: '',
       input: '',
       loading: false,
       currentPage: 1,
@@ -70,26 +71,13 @@ export default {
         Ranking: '1',
         StudentNumber: '001',
         ClassNumber: '1703',
-      },{
-        Name: '张宇2',
-        Fraction: '90分',
-        Ranking: '2',
-        StudentNumber: '001',
-        ClassNumber: '1703',
-      },{
-        Name: '张宇3',
-        Fraction: '80分',
-        Ranking: '3',
-        StudentNumber: '001',
-        ClassNumber: '1703',
-      },{
-        Name: '张宇4',
-        Fraction: '70分',
-        Ranking: '4',
-        StudentNumber: '001',
-        ClassNumber: '1703',
       }],
     }
+  },
+  mounted() {
+    let that = this
+    let arr = parseInt(window.getComputedStyle(that.$refs.heights).height)
+    that.heightCss = arr - 50
   },
   methods: {
     handleSizeChange(val) {
@@ -106,10 +94,10 @@ export default {
       },1000)
     },
     clickToView(res) { // 点击查看
-      this.$router.push({path:'/PaperDetails'})
+      this.$router.replace({path:'/PaperDetails'})
     },
     GoBack() { // 点击返回
-      this.$router.back()
+      this.$router.replace({path:'/ScoreQuery'})
     },
   }
 }
@@ -157,16 +145,14 @@ export default {
   margin-right:10px;
 }
 .main{
-  box-sizing: border-box;
   width:100%;
+  height: calc(100vh - 330px);
+  box-sizing: border-box;
   padding:20px;
 }
 .footer{
-  display: flex;
-  justify-content: center;
-  width:90%;
-  position: fixed;
-  left:10%;
-  bottom:20px;
+  position:fixed;
+  left:34%;
+  bottom:10px;
 }
 </style>

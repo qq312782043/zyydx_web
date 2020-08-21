@@ -46,8 +46,8 @@
         </el-select>
       </div>
     </div>
-    <div class="main">
-      <el-table v-loading="loading" :data="tableData" border style="width:100%" max-height="480" size="small">
+    <div class="main" ref="heights">
+      <el-table v-loading="loading" :data="tableData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" v-for="(item,i) in tableList" :key="i"
         :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
@@ -72,6 +72,7 @@ export default {
   name: 'whole',
   data () {
     return {
+      heightCss: '',
       value: [],
       input_1: '',
       input_2: '',
@@ -165,6 +166,10 @@ export default {
       },],
     }
   },
+  mounted() {
+    let that = this
+    that.heightCss = parseInt(window.getComputedStyle(that.$refs.heights).height)
+  },
   methods: {
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
@@ -199,7 +204,7 @@ export default {
       })
     },
     clickToView() { // 点击查看
-      this.$router.push({path:'/AnswerDetails'})
+      this.$router.replace({path:'/AnswerDetails'})
     }
   },
 }
@@ -224,15 +229,13 @@ export default {
 }
 .main{
   width:100%;
+  height: calc(100vh - 285px);
   box-sizing: border-box;
   margin-top:20px;
 }
 .footer{
-  display: flex;
-  justify-content: center;
-  width:90%;
-  position: fixed;
-  left:10%;
-  bottom:20px;
+  position:fixed;
+  left:34%;
+  bottom:10px;
 }
 </style>

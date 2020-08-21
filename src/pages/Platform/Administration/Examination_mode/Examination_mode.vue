@@ -1,5 +1,5 @@
 <template>
-  <el-main class="Examination">
+  <el-main class="SmallBox">
     <div class="header">
       <div class="Range">
         <p class="text_1">选择考试范围<span>*不勾选则视为全选</span></p>
@@ -75,15 +75,16 @@
       </el-tabs>
       <el-button class="location" type="success" size="mini" round icon="el-icon-search">搜索题库</el-button>
     </div>
-    <div class="button_box"><el-button type="primary">开始考试</el-button></div>
+    <div class="button_box"><el-button type="primary" size="small">开始考试</el-button></div>
   </el-main>
 </template>
 
 <script>
 export default {
-  name: 'Examination',
+  name: 'SmallBox',
   data () {
     return {
+      screenHeight: '',
       value_1: [],
       value_2: [],
       value_3: '',
@@ -195,6 +196,24 @@ export default {
       },{
         list:'第3题',
         bol: true
+      },{
+        list:'第4题',
+        bol: true
+      },{
+        list:'第5题',
+        bol: true
+      },{
+        list:'第6题',
+        bol: true
+      },{
+        list:'第7题',
+        bol: true
+      },{
+        list:'第8题',
+        bol: true
+      },{
+        list:'第9题',
+        bol: true
       }]
     }
   },
@@ -236,28 +255,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.Examination{
-  width:100%;
-  height:87%;
-  box-sizing: border-box;
-  border:1px solid #DCDFE6;
-  margin-top:15px;
-  padding:15px;
-}
-.Examination .header,.main{
+.SmallBox .header,.main{
   box-sizing: border-box;
   display: flex;
   height:100px;
 }
-.Examination .Range{
+.SmallBox .Range{
   flex:1;
 }
-.Examination .Range .text_1{
+.SmallBox .Range .text_1{
   color:#333;
   font-size:17px;
   font-weight: bold;
 }
-.Examination .Range .text_1 span{
+.SmallBox .Range .text_1 span{
   color:#333;
   font-weight: 400;
   font-size:12px;
@@ -271,7 +282,7 @@ export default {
 }
 .el_search{
   padding:0;
-  max-height: 280px;
+  max-height: calc(100vh - 400px);
 }
 .el_search .list{
   color:#333;

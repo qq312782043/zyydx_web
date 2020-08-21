@@ -28,6 +28,7 @@ export default {
   data () {
     return {
       ruleForm: {
+        msg: '',
         user: '',
         password: '',
         checked: false
@@ -52,6 +53,9 @@ export default {
         that.ruleForm.checked = ruleForm.checked
       }
     }
+    console.log(that.$store.state.text)
+    that.msg = that.$store.state.text
+    console.log(that.msg)
   },
   methods: {
     submitForm(formName,ruleForm) { // 登录
@@ -82,7 +86,7 @@ export default {
 <style scoped>
 .whole{
   width:100%;
-  height:100%;
+  height: calc(100vh);
   box-sizing: border-box;
   background-image: url(../../assets/background.jpg);
   background-repeat: no-repeat;

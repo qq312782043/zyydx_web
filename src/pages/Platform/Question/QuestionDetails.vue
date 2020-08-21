@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     GoBack() { // 点击返回
-      this.$router.back()
+      this.$router.replace({path:'/Question'})
     },
     clickEdit() { // 点击编辑
       let that = this

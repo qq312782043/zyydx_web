@@ -91,8 +91,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .el-container{
-  width:100%;
-  box-sizing: border-box;
+  position: relative;
 }
 .el-header{
   width:100%;
@@ -101,6 +100,7 @@ export default {
   box-sizing: border-box;
   background: #2E79BA;
   padding:0 40px 0 20px;
+  position: fixed;
 }
 .el-header .left_box{
   float: left;
@@ -119,8 +119,8 @@ export default {
 }
 .el-main{
   width:100%;
-  box-sizing: border-box;
-  margin-top:170px;
+  position: fixed;
+  top:30%;
 }
 .el-main .title{
   font-size:18px;
@@ -151,8 +151,11 @@ export default {
   margin-top:10px;
 }
 .el-footer{
+  width:100%;
   text-align: center;
   color:#666;
   font-size:12px;
+  position: fixed;
+  bottom:10px;
 }
 </style>

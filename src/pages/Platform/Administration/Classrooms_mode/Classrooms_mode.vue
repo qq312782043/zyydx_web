@@ -1,5 +1,5 @@
 <template>
-  <el-main class="Classrooms">
+  <el-main class="SmallBox">
     <div v-show="modular_1">
       <div class="header">
         <div class="Range">
@@ -68,7 +68,7 @@
         </el-tabs>
         <el-button class="location" type="success" size="mini" round icon="el-icon-search">搜索题库</el-button>
       </div>
-      <div class="button_box"><el-button type="primary" @click="clickExamination()">开始课堂练习</el-button></div>
+      <div class="button_box"><el-button type="primary" size="small" @click="clickExamination()">开始课堂练习</el-button></div>
     </div>
     <div v-show="modular_2" class="Answer_sheet">
       <p class="gestive">正在进行的课堂练习...</p>
@@ -93,7 +93,7 @@
 
 <script>
 export default {
-  name: 'Classrooms',
+  name: 'SmallBox',
   data () {
     return {
       modular_1: false,
@@ -207,6 +207,51 @@ export default {
       },{
         list:'第3题',
         bol: true
+      },{
+        list:'第4题',
+        bol: true
+      },{
+        list:'第5题',
+        bol: true
+      },{
+        list:'第6题',
+        bol: true
+      },{
+        list:'第7题',
+        bol: true
+      },{
+        list:'第8题',
+        bol: true
+      },{
+        list:'第9题',
+        bol: true
+      },{
+        list:'第10题',
+        bol: true
+      },{
+        list:'第11题',
+        bol: true
+      },{
+        list:'第12题',
+        bol: true
+      },{
+        list:'第13题',
+        bol: true
+      },{
+        list:'第14题',
+        bol: true
+      },{
+        list:'第15题',
+        bol: true
+      },{
+        list:'第16题',
+        bol: true
+      },{
+        list:'第17题',
+        bol: true
+      },{
+        list:'第18题',
+        bol: true
       }]
     }
   },
@@ -286,28 +331,20 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.Classrooms{
-  width:100%;
-  height:87%;
-  box-sizing: border-box;
-  border:1px solid #DCDFE6;
-  margin-top:15px;
-  padding:15px;
-}
-.Classrooms .header,.main{
+.SmallBox .header,.main{
   box-sizing: border-box;
   display: flex;
   height:100px;
 }
-.Classrooms .Range{
+.SmallBox .Range{
   flex:1;
 }
-.Classrooms .Range .text_1{
+.SmallBox .Range .text_1{
   color:#333;
   font-size:17px;
   font-weight: bold;
 }
-.Classrooms .Range .text_1 span{
+.SmallBox .Range .text_1 span{
   color:#333;
   font-weight: 400;
   font-size:12px;
@@ -321,7 +358,7 @@ export default {
 }
 .el_search{
   padding:0;
-  max-height: 280px;
+  max-height: calc(100vh - 400px);
 }
 .el_search .list{
   color:#333;
