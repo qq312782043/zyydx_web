@@ -15,32 +15,30 @@
           <div class="knowledge">
             <el-select v-model="value_2" filterable multiple
               @change="clickChoice" collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
-              <el-option v-for="item in knowledge" :key="item.value" :label="item.label" :value="item.label"></el-option>
+              <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
           </div>
         </div>
         <div class="Range">
           <p class="text_1">已选知识点</p>
           <el-main class="box_card">
-            <p v-for="(item,i) in Selected_data" :key="i">{{item}}</p>
+            <p v-for="(item,i) in knowledgeData" :key="i">{{item}}</p>
           </el-main>
         </div>
       </div>
       <div class="main">
         <div class="Range">
-          <p class="text_1">*选择练习难度</p>
-          <div class="chapter">
-            <el-select v-model="value_3" size="small" clearable placeholder="请选择试题难度">
-                <el-option v-for="(item,i) in difficulty"
-                  :key="i" :label="item.label" :value="item.value">
-                </el-option>
-              </el-select>
-          </div>
+          <!-- <p class="text_1">*选择联系难度</p>
+          <div class="knowledge">
+            <el-select v-model="value_4" size="small" clearable placeholder="请选择试题难度">
+              <el-option v-for="(item,i) in difficulty" :key="i" :label="item.label" :value="item.value"></el-option>
+            </el-select>
+          </div> -->
         </div>
         <div class="Range">
           <p class="text_1">*练习题数<span>*如选择指定试题，该项配置失效</span></p>
           <div class="knowledge">
-            <el-input v-model="value_4" :disabled="practice" size="small" clearable placeholder="请输入练习题数"></el-input>
+            <el-input v-model="value_3" :disabled="practice" size="small" clearable placeholder="请输入练习题数"></el-input>
           </div>
         </div>
         <div class="Range"></div>
@@ -50,8 +48,8 @@
           <el-tab-pane label="题库列表">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in search" :key="i">
-                <p class="text_1">{{item.list}}</p>
-                <p class="text_2" v-if="item.bol" @click="clickAdd(item.list,i)"><i class="el-icon-circle-plus"></i></p>
+                <p class="text_1">{{item.chiefComplaint}}</p>
+                <p class="text_2" v-if="item.flag" @click="clickAdd(item,i)"><i class="el-icon-circle-plus"></i></p>
               </div>
               <div class="Tips">{{search.length==0?'没有可用题目':'共'+search.length+'道题'}}</div>
             </el-main>
@@ -59,14 +57,14 @@
           <el-tab-pane :label="PointeDataL">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in PointeData" :key="i">
-                <p class="text_1">{{item}}</p>
-                <p class="text_2" @click="clickReduce(item)"><i class="el-icon-remove"></i></p>
+                <p class="text_1">{{item.chiefComplaint}}</p>
+                <p class="text_2" @click="clickReduce(item.id)"><i class="el-icon-remove"></i></p>
               </div>
               <div class="Tips">{{PointeData.length==0?'暂无已选试题':''}}</div>
             </el-main>
           </el-tab-pane>
         </el-tabs>
-        <el-button class="location" type="success" size="mini" round icon="el-icon-search">搜索题库</el-button>
+        <el-button class="location" type="success" size="mini" round icon="el-icon-search" @click="clickSearch()">搜索题库</el-button>
       </div>
       <div class="button_box"><el-button type="primary" size="small" @click="clickExamination()">开始课堂练习</el-button></div>
     </div>
@@ -96,46 +94,18 @@ export default {
   name: 'SmallBox',
   data () {
     return {
-      modular_1: false,
-      modular_2: true,
+      modular_1: true,
+      modular_2: false,
       value_1: '',
       value_2: [],
       value_3: '',
-      value_4: '',
       practice: false,
-      Selected_data: [],
-      PointeData: [],
+      knowledge: '', // 知识点
+      knowledgeData: [], // 已选知识点
+      search: '', // 题库
+      PointeData: [], // 已选题库
       PointeDataL: '已选列表',
-      knowledge: [{
-        value: '选项1',
-        label: '黄金糕'
-      },{
-        value: '选项2',
-        label: '双皮奶'
-      },{
-        value: '选项3',
-        label: '蚵仔煎'
-      }],
-      difficulty: [{
-        value: '选项1',
-        label: '1级'
-      },{
-        value: '选项2',
-        label: '2级'
-      },{
-        value: '选项3',
-        label: '3级'
-      }],
-      contact: [{
-        value: '选项1',
-        label: '黄金糕'
-      },{
-        value: '选项2',
-        label: '双皮奶'
-      },{
-        value: '选项3',
-        label: '蚵仔煎'
-      }],
+      knowledgeId: '', // 知识点ID
       chapter: [{
         value: 'zhinan',
         label: '指南',
@@ -198,86 +168,80 @@ export default {
           }]
         }]
       }],
-      search: [{
-        list:'第1题',
-        bol: true
-      },{
-        list:'第2题',
-        bol: true
-      },{
-        list:'第3题',
-        bol: true
-      },{
-        list:'第4题',
-        bol: true
-      },{
-        list:'第5题',
-        bol: true
-      },{
-        list:'第6题',
-        bol: true
-      },{
-        list:'第7题',
-        bol: true
-      },{
-        list:'第8题',
-        bol: true
-      },{
-        list:'第9题',
-        bol: true
-      },{
-        list:'第10题',
-        bol: true
-      },{
-        list:'第11题',
-        bol: true
-      },{
-        list:'第12题',
-        bol: true
-      },{
-        list:'第13题',
-        bol: true
-      },{
-        list:'第14题',
-        bol: true
-      },{
-        list:'第15题',
-        bol: true
-      },{
-        list:'第16题',
-        bol: true
-      },{
-        list:'第17题',
-        bol: true
-      },{
-        list:'第18题',
-        bol: true
-      }]
     }
+  },
+  created() {
+    let that = this
+    that.$axios({
+      url: that.$store.state.Q_http + 'caseExamination/caseMainInformation',
+      method: 'post',
+      data: {
+        patternType: 2,
+      }
+    }).then((res) =>{
+      // console.log(res.data)
+      if (res.data.code == 200) {
+        that.knowledge = res.data.data.KnowledgePoints
+      }
+    }).catch((err) =>{
+      that.$message.error('请求失败!')
+    })
   },
   methods: {
     clickChoice(value) { // 选择知识点
       let that = this
-      that.Selected_data = value
+      let knowledgeId = []
+      that.knowledgeData = value
+      for(var i = 0; i < that.knowledgeData.length; i++){
+        for(var j = 0; j < that.knowledge.length; j++){
+          if (that.knowledge[j].name == that.knowledgeData[i]) {
+            knowledgeId.push(that.knowledge[j].id)
+            that.knowledgeId = knowledgeId.toString()
+          }
+        }
+      }
+      if(that.knowledgeData.length == 0){
+        that.knowledgeId = ''
+      }
+    },
+    clickSearch() { // 搜索题库
+      let that = this
+      that.$axios({
+        // url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
+        url: 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryCaseExamQuestion',
+        method: 'post',
+        data: {
+          chapterIds: '',
+          categoryIds: '',
+          knowledgePointsIds: that.knowledgeId
+        }
+      }).then((res) =>{
+        // console.log(res.data.data)
+        if (res.data.code == 200) {
+          that.search = res.data.data.data
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
     },
     clickAdd(value,index) { // 添加题库
       let that = this
-      that.value_4 = ''
+      that.value_3 = ''
       that.practice = true
-      that.search[index].bol = false
+      that.search[index].flag = false
       that.PointeData.push(value)
       let length = that.PointeData.length
       that.PointeDataL = '已选列表（'+ length +'）'
     },
-    clickReduce(value) { // 移除题库
+    clickReduce(id) { // 移除题库
       let that = this
       for(var j = 0; j < that.search.length; j++){
-        if (that.search[j].list == value) {
-          that.search[j].bol = true
+        if (that.search[j].id == id) {
+          that.search[j].flag = true
         }
       }
       for(var i = 0; i < that.PointeData.length; i++){
-        if (that.PointeData[i] == value) {
+        if (that.PointeData[i].id == id) {
           that.PointeData.splice(i,1)
         }
       }
@@ -297,14 +261,8 @@ export default {
     },
     clickExamination() { // 开始考试
       let that = this
-      if (!that.value_3) {
-        that.$message.error({
-          message: '请选择练习难度~'
-        })
-        return
-      }
       if(that.PointeData.length == 0){
-        if (!that.value_4) {
+        if (!that.value_3) {
           that.$message.error({
             message: '请填写练习题数~'
           })
@@ -316,9 +274,8 @@ export default {
       that.value_1 = ''
       that.value_2 = []
       that.value_3 = ''
-      that.value_4 = ''
       that.practice = false
-      that.Selected_data = []
+      that.knowledgeData = []
       that.PointeData = []
       that.PointeDataL = '已选列表（'+ length +'）'
       for(var i = 0; i < that.search.length; i++){

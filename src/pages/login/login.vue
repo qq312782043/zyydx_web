@@ -21,21 +21,19 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   name: 'whole',
   data () {
     return {
       ruleForm: {
-        msg: '',
         user: '',
         password: '',
         checked: false
       },
       rules: {
         user: [
-          { required: true, message: '账号不能为空', trigger: 'blur' },
+          { required: true, message: '账号不能为空', trigger: 'blur' }
         ],
         password: [
           { required: true, message: '密码不能为空', trigger: 'blur' }
@@ -45,7 +43,7 @@ export default {
   },
   created() {
     let that = this
-    var ruleForm = JSON.parse(localStorage.getItem('ruleForm'))
+    let ruleForm = JSON.parse(localStorage.getItem('ruleForm'))
     if (ruleForm) {
       if (ruleForm.user && ruleForm.password) {
         that.ruleForm.user = ruleForm.user
@@ -53,26 +51,53 @@ export default {
         that.ruleForm.checked = ruleForm.checked
       }
     }
-    console.log(that.$store.state.text)
-    that.msg = that.$store.state.text
-    console.log(that.msg)
   },
   methods: {
     submitForm(formName,ruleForm) { // 登录
       let that = this
       that.$refs[formName].validate((valid) => {
         if (valid) {
-          if(ruleForm.checked == true){
-            let ruleForm = {
-              user: that.ruleForm.user,
-              password: that.ruleForm.password,
-              checked: true
+          that.$axios({
+            url: that.$store.state.Q_http + 'user/login',
+            method: 'post',
+            data: {
+              phone: ruleForm.user,
+              password: ruleForm.password,
+              type: 1
             }
-            localStorage.setItem('ruleForm', JSON.stringify(ruleForm))
-          } else {
-            localStorage.removeItem('ruleForm')
-          }
-          that.$router.replace({path:'/entrance'})
+          }).then((res) =>{
+            // console.log(res.data.data)
+            if (res.data.code == 200) {
+              let message = res.data.data
+              if(message.user) {
+                if (ruleForm.checked == true) {
+                  let ruleForm = {
+                    user: that.ruleForm.user,
+                    password: that.ruleForm.password,
+                    checked: true
+                  }
+                  localStorage.setItem('ruleForm', JSON.stringify(ruleForm))
+                } else {
+                  localStorage.removeItem('ruleForm')
+                }
+                for(var i = 0; i < message.systemStatusList.length; i++) {
+                  if (message.systemStatusList[i].systemStatus == 1) {
+                    message.systemStatusList[i].systemStatus = true
+                  } else {
+                    message.systemStatusList[i].systemStatus = false
+                  }
+                }
+                that.$store.state.loginData = message
+                that.$router.replace({path:'/entrance'})
+              } else {
+                that.$message.error(message.msg)
+              }
+            } else {
+              that.$message.error(res.data.message)
+            }
+          }).catch((err) =>{
+            that.$message.error('请求失败!')
+          })
         } else {
           return false;
         }

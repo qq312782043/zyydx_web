@@ -1,9 +1,30 @@
 <template>
   <div class="whole">
-    <div class="title">经典案例实训考试分数比例设置<span>*四项分数的总和必须为10分</span></div>
-    <div class="input_box" v-for="(item,i) in dataList" :key="i">
-      <p>{{item.text}}</p>
-      <el-input placeholder="请输入" v-model="item.value" clearable size="small" @blur="onValue(item.value,i)" maxlength="1"> </el-input>
+    <div class="title">经典案例实训考试分数比例设置<span>*五项分数的总和必须为10分</span></div>
+    <div class="input_box">
+      <p>诊断分数</p>
+      <el-input v-model="dataList.diagnosisScore" clearable size="small" maxlength="1"></el-input>
+      <p>分</p>
+    </div>
+    <div class="input_box">
+      <p>病机分数</p>
+      <el-input v-model="dataList.pathogenesisScore" clearable size="small" maxlength="1"></el-input>
+      <p>分</p>
+    </div>
+    <div class="input_box">
+      <p>治法分数</p>
+      <el-input v-model="dataList.treatmentScore" clearable size="small" maxlength="1"></el-input>
+      <p>分</p>
+    </div>
+    <div class="input_box">
+      <p>处方分数</p>
+      <el-input v-model="dataList.drugScore" clearable size="small" maxlength="1"></el-input>
+      <p>分</p>
+    </div>
+    <div class="input_box">
+      <p>方药分数</p>
+      <el-input v-model="dataList.prescriptionScore" clearable size="small" maxlength="1"></el-input>
+      <p>分</p>
     </div>
     <div class="footer">
       <el-button type="primary" size="small" @click="clickPreservation()">保存</el-button>
@@ -16,36 +37,56 @@ export default {
   name: 'whole',
   data () {
     return {
-      dataList:[{
-        text: '诊断分数：',
-        value: ''
-      },{
-        text: '病机分数：',
-        value: ''
-      },{
-        text: '治法分数：',
-        value: ''
-      },{
-        text: '方药分数：',
-        value: ''
-      }]
+      dataList: ''
     }
   },
+  created() {
+    let that = this
+    that.$axios({
+      url: that.$store.state.Q_http + 'interroType/getInterroScore',
+      method: 'post',
+      data: {
+        id: 1,
+      }
+    }).then((res) =>{
+      // console.log(res.data)
+      if(res.data.code == 200){
+        that.dataList = res.data.data
+      }
+    }).catch((err) =>{
+      that.$message.error('请求失败!')
+    })
+  },
   methods: {
-    onValue(value,i) { // 输入框失焦监听事件
-      // console.log(value,i)
-    },
     clickPreservation() { // 点击保存
       let that = this
-      // for(var i = 0; i < that.dataList.length; i++){
-      //   console.log(that.dataList[i].value)
-      // }
-      let number = parseInt(that.dataList[0].value) + parseInt(that.dataList[1].value) + parseInt(that.dataList[2].value) + parseInt(that.dataList[3].value)
+      let number = parseInt(that.dataList.diagnosisScore)
+      + parseInt(that.dataList.pathogenesisScore)
+      + parseInt(that.dataList.treatmentScore)
+      + parseInt(that.dataList.drugScore)
+      + parseInt(that.dataList.prescriptionScore)
       if(number == 10){
-        that.$message({
-          message: '保存成功~',
-          type: 'success',
-          duration: '1000'
+        that.$axios({
+          url: that.$store.state.Q_http + 'interroType/setInterroScore',
+          method: 'post',
+          data: {
+            id: 1,
+            diagnosisScore: that.dataList.diagnosisScore,
+            pathogenesisScore: that.dataList.pathogenesisScore,
+            treatmentScore: that.dataList.treatmentScore,
+            drugScore: that.dataList.drugScore,
+            prescriptionScore: that.dataList.prescriptionScore
+          }
+        }).then((res) =>{
+          if(res.data.code == 200){
+            that.$message({
+              message: '保存成功~',
+              type: 'success',
+              duration: '1000'
+            })
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
         })
       } else {
         that.$alert('四项分数总和必须为10分~', '提示', {
@@ -82,14 +123,14 @@ export default {
 .input_box p{
   font-size:14px;
   color:#333;
-  margin-right:10px;
 }
 .input_box .el-input{
-  width:120px;
+  width:70px;
+  margin:0 10px;
 }
 .footer{
   display: flex;
   justify-content: center;
-  margin-top:250px;
+  margin-top:200px;
 }
 </style>

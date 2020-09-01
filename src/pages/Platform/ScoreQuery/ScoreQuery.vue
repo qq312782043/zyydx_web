@@ -61,7 +61,7 @@ export default {
         Level: '一级',
         Chapter: '花柳病',
         Difficulty: '1级',
-      }],
+      },],
       tableList: [{
         prop: 'ID',
         label: '考试ID',
@@ -120,6 +120,24 @@ export default {
         width: ''
       }],
     }
+  },
+  created() {
+    let that = this
+    that.$axios({
+      url: that.$store.state.Q_http + 'originalReport/queryOriginalScorePage',
+      method: 'post',
+      data: {
+        curPage: 1,
+        pageSize: 10,
+        examText: 3,
+        startDate: '',
+        endDate: ''
+      }
+    }).then((res) =>{
+      // console.log(res.data)
+    }).catch((err) =>{
+      that.$message.error('请求失败!')
+    })
   },
   mounted() {
     let that = this

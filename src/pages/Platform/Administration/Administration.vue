@@ -23,7 +23,7 @@ export default {
   },
   created() {
     let that = this
-    that.navList = JSON.parse(localStorage.getItem('navList'))
+    that.navList = that.$store.state.navList
   },
   methods: {
     clickTabBar(e) { // 点击切换
@@ -38,8 +38,10 @@ export default {
       } else if (e == 2) {
         that.navList[2].class = 'Choice'
       }
-      that.$router.replace({path:that.navList[e].route})
-      localStorage.setItem('navList', JSON.stringify(that.navList))
+      if (that.$route.path!==that.navList[e].route) {
+        that.$router.replace({path:that.navList[e].route})
+      }
+      that.$store.state.navList = that.navList
       that.appendData()
     }
   }

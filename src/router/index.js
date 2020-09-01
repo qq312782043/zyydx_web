@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import store from '../store'
 import Router from 'vue-router'
 import Login from '@/pages/login/login' // 登录
 import Entrance from '@/pages/Entrance/Entrance' // 选择平台
@@ -51,7 +52,7 @@ export default new Router({
           component: Examination_mode
         }],
         redirect:function () {
-          let navList = JSON.parse(localStorage.getItem('navList'))
+          let navList = store.state.navList
           for(var i = 0; i < navList.length; i++){
             if (navList[i].class == 'Choice') {
               return navList[i].route

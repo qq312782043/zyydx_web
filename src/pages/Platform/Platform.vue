@@ -5,7 +5,7 @@
       <div class="right_box">
         <span class="pattern">当前模式：{{title}}</span>
         <el-dropdown trigger="click" @command="Goback">
-          <span class="el-dropdown-link">张宇<i class="el-icon-arrow-down el-icon--right"></i></span>
+          <span class="el-dropdown-link">{{loginData.user.userName}}<i class="el-icon-arrow-down el-icon--right"></i></span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>返回首页</el-dropdown-item>
           </el-dropdown-menu>
@@ -28,13 +28,15 @@ export default {
   data () {
     return {
       title: '',
-      tabList: ''
+      tabList: '',
+      loginData: '',
     }
   },
   created() {
     let that = this
     that.appendData()
-    that.tabList = JSON.parse(localStorage.getItem('tabList'))
+    that.tabList = that.$store.state.tabList
+    that.loginData = that.$store.state.loginData
   },
   provide() {
     return{
@@ -43,11 +45,20 @@ export default {
   },
   methods: {
     Goback() { // 返回首页
-      this.$router.replace({path:'/Entrance'})
+      let that = this
+      that.$store.state.tabList = [
+        {text:'课堂练习',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
+        {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+        {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+        {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
+        {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+        {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
+      ]
+      that.$router.replace({path:'/Entrance'})
     },
     appendData() { // 获取当前模式
       let that = this
-      let navList = JSON.parse(localStorage.getItem('navList'))
+      let navList = that.$store.state.navList
       for(var i = 0; i < navList.length; i++){
         if (navList[i].class == 'Choice') {
           that.title = navList[i].text
@@ -72,8 +83,16 @@ export default {
       } else if (e == 5) {
         that.tabList[5].class = 'Choice'
       }
-      that.$router.replace({path:that.tabList[e].route})
-      localStorage.setItem('tabList', JSON.stringify(that.tabList))
+      if (that.$route.path!==that.tabList[e].route) {
+        if (that.$route.path=='/FreePractice_mode'||that.$route.path=='/Classrooms_mode'||that.$route.path=='/Examination_mode') {
+          if (that.tabList[e].route!=='/Administration') {
+            that.$router.replace({path:that.tabList[e].route})
+          }
+        } else {
+          that.$router.replace({path:that.tabList[e].route})
+        }
+      }
+      that.$store.state.tabList = that.tabList
     }
   }
 }

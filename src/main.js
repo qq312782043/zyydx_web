@@ -1,7 +1,6 @@
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
 import Vue from 'vue'
-import Vuex from 'vuex'
 import App from './App'
 import router from './router'
 import store from './store'
@@ -10,7 +9,6 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import { Button, Select } from 'element-ui'
 
-Vue.use(Vuex)
 Vue.use(ElementUI)
 Vue.component(Button.name, Button)
 Vue.component(Select.name, Select)
@@ -22,11 +20,11 @@ Object.defineProperty(Vue.prototype, "$axios", {
 Vue.config.productionTip = false
 
 //vue router连续点击多次路由报错解决方法
-import Router from 'vue-router'
-const originalPush = Router.prototype.push
-Router.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err)
-}
+// import Router from 'vue-router'
+// const originalPush = Router.prototype.push
+// Router.prototype.push = function push(location) {
+//   return originalPush.call(this, location).catch(err => err)
+// }
 
 /* eslint-disable no-new */
 new Vue({

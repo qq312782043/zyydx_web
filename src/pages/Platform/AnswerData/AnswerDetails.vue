@@ -45,14 +45,15 @@ export default {
     }
   },
   created: function () {
-    this.$axios({
-      url: 'https://visit-api.tamiyun.com/visit/mini/system/getSystem',
+    let that = this
+    that.$axios({
+      url: that.$store.state.Q_http + 'visit/mini/system/getSystem',
       method: 'post',
       data: {
         id: 11
       }
     }).then((res) =>{
-      // console.log(res)
+      console.log(res)
     })
   }
 }

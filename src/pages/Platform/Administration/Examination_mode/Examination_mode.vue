@@ -73,7 +73,7 @@
           </el-main>
         </el-tab-pane>
       </el-tabs>
-      <el-button class="location" type="success" size="mini" round icon="el-icon-search">搜索题库</el-button>
+      <el-button class="location" type="success" size="mini" round icon="el-icon-search" @click="clickSearch()">搜索题库</el-button>
     </div>
     <div class="button_box"><el-button type="primary" size="small">开始考试</el-button></div>
   </el-main>
