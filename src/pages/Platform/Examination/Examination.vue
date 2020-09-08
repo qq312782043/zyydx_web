@@ -27,7 +27,7 @@
       <p>分</p>
     </div>
     <div class="footer">
-      <el-button type="primary" size="small" @click="clickPreservation()">保存</el-button>
+      <el-button type="warning" size="small" @click="clickPreservation()">保存</el-button>
     </div>
   </div>
 </template>
@@ -43,7 +43,7 @@ export default {
   created() {
     let that = this
     that.$axios({
-      url: that.$store.state.Q_http + 'interroType/getInterroScore',
+      url: that.$store.state.Q_http + 'caseType/getCaseScore',
       method: 'post',
       data: {
         id: 1,
@@ -67,7 +67,7 @@ export default {
       + parseInt(that.dataList.prescriptionScore)
       if(number == 10){
         that.$axios({
-          url: that.$store.state.Q_http + 'interroType/setInterroScore',
+          url: that.$store.state.Q_http + 'caseType/setCaseScore',
           method: 'post',
           data: {
             id: 1,

@@ -7,16 +7,14 @@
           <div class="contact">
             <div class="chapter">
               <div class="text_2">章节</div>
-              <el-select v-model="ChapterData" filterable multiple @change="ChoiceChapter"
-                collapse-tags size="small" placeholder="请选择">
-                <el-option v-for="item in Chapter" :key="item.id" :label="item.name" :value="item.name"></el-option>
+              <el-select v-model="ChapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in Chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter">
               <div class="text_2">病症类别</div>
-              <el-select v-model="CategoryData" filterable multiple @change="ChoiceCategory"
-                collapse-tags size="small" placeholder="请选择">
-                <el-option v-for="item in Category" :key="item.id" :label="item.name" :value="item.name"></el-option>
+              <el-select v-model="CategoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in Category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
           </div>
@@ -38,7 +36,7 @@
         </div>
       </div>
       <div class="main">
-        <div class="Range">
+        <div class="Range" v-show="SelectSystem=='原文实训'?true:false">
           <p class="text_1">*选择练习难度</p>
           <div class="knowledge">
             <el-select v-model="difficultyData" size="small" clearable placeholder="请选择试题难度">
@@ -75,9 +73,9 @@
             </el-main>
           </el-tab-pane>
         </el-tabs>
-        <el-button class="location" type="success" size="mini" round icon="el-icon-search" @click="clickSearch()">搜索题库</el-button>
+        <el-button class="location" type="warning" size="mini" round icon="el-icon-search" @click="clickSearch()">搜索题库</el-button>
       </div>
-      <div class="button_box"><el-button type="primary" size="small" @click="clickExamination()">开始课堂练习</el-button></div>
+      <div class="button_box"><el-button type="warning" size="small" @click="clickExamination()">开始课堂练习</el-button></div>
     </div>
     <div v-show="modular_2" class="Answer_sheet">
       <p class="gestive">正在进行的课堂练习...</p>
@@ -90,7 +88,7 @@
         <p class="text_2">题数：<span>{{caseData.practiceNum}}</span></p>
         <div class="set_up clear">
           <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
-          <el-button type="success" @click="clickSetUp()">设置新的练习范围</el-button>
+          <el-button type="warning" @click="clickSetUp()">设置新的练习范围</el-button>
         </div>
       </div>
     </div>
@@ -104,12 +102,11 @@ export default {
     return {
       modular_1: false,
       modular_2: false,
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       Chapter: '', // 章节
       ChapterData: '', // 已选章节
-      ChapterId: '', // 已选章节ID
       Category: '', // 病症类别
       CategoryData: '', // 已选病症类别
-      CategoryId: '', // 已选病症类别ID
       topicNumber: '', // 练习题数
       difficulty: '', // 考试难度
       difficultyData: '', // 已选考试难度
@@ -152,38 +149,6 @@ export default {
     })
   },
   methods: {
-    ChoiceChapter(value) { // 选择章节
-      let that = this
-      let ChapterId = []
-      that.ChapterData = value
-      for(var i = 0; i < that.ChapterData.length; i++){
-        for(var j = 0; j < that.Chapter.length; j++){
-          if (that.Chapter[j].name == that.ChapterData[i]) {
-            ChapterId.push(that.Chapter[j].id)
-            that.ChapterId = ChapterId.toString()
-          }
-        }
-      }
-      if(that.ChapterData.length == 0){
-        that.ChapterId = ''
-      }
-    },
-    ChoiceCategory(value) { // 选择病症类别
-      let that = this
-      let CategoryId = []
-      that.CategoryData = value
-      for(var i = 0; i < that.CategoryData.length; i++){
-        for(var j = 0; j < that.Category.length; j++){
-          if (that.Category[j].name == that.CategoryData[i]) {
-            CategoryId.push(that.Category[j].id)
-            that.CategoryId = CategoryId.toString()
-          }
-        }
-      }
-      if(that.CategoryData.length == 0){
-        that.CategoryId = ''
-      }
-    },
     ChoiceKnowledge(value) { // 选择知识点
       let that = this
       let knowledgeId = []
@@ -230,12 +195,12 @@ export default {
     clickSearch() { // 搜索题库
       let that = this
       that.$axios({
-        // url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
-        url: 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryCaseExamQuestion',
+        url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
+        // url: 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryCaseExamQuestion',
         method: 'post',
         data: {
-          chapterIds: that.ChapterId,
-          categoryIds: that.CategoryId,
+          chapterIds: that.ChapterData.toString(),
+          categoryIds: that.CategoryData.toString(),
           knowledgePointsIds: that.knowledgeId
         }
       }).then((res) =>{
@@ -293,8 +258,8 @@ export default {
       let data = {
         patternType: 2,
         createUserId: that.$store.state.loginData.user.id,
-        chapterIds: that.ChapterId,
-        categoryIds: that.CategoryId,
+        chapterIds: that.ChapterData.toString(),
+        categoryIds: that.CategoryData.toString(),
         knowledgePointsIds: that.knowledgeId,
         practiceNum: that.topicNumber || that.searchData.length,
         questionIds: that.searchId.toString()
@@ -379,7 +344,7 @@ export default {
   cursor:pointer;
 }
 .SmallBox .Range .text_1 .empty:hover{
-  color: #409EFF;
+  color: #BF8333;
 }
 .SmallBox .Range .text_1 span{
   color:#333;

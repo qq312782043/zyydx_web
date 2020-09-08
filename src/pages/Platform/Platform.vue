@@ -1,20 +1,19 @@
 <template>
   <el-container>
     <el-header class="clear">
-      <h4 class="left_box">中医药大学实训平台</h4>
+      <div class="left_box"></div>
       <div class="right_box">
         <span class="pattern">当前模式：{{title}}</span>
-        <el-dropdown trigger="click" @command="Goback">
+        <el-dropdown trigger="click">
           <span class="el-dropdown-link">{{loginData.user.userName}}<i class="el-icon-arrow-down el-icon--right"></i></span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item>返回首页</el-dropdown-item>
+            <el-dropdown-item @click.native="Goback()">返回首页</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
     </el-header>
     <el-aside style="width:10%">
-      <div @click="clickTabBar(i)" class="TabBarBox"
-      :class="item.class" v-for="(item,i) in tabList" :key="i">
+      <div @click="clickTabBar(i)" class="TabBarBox" :class="item.class" v-for="(item,i) in tabList" :key="i">
         <i :class="item.icon"></i><p>{{item.text}}</p>
       </div>
     </el-aside>
@@ -28,37 +27,42 @@ export default {
   data () {
     return {
       title: '',
-      tabList: '',
-      loginData: '',
+      tabList: this.$store.state.tabList,
+      loginData: this.$store.state.loginData, // 用户数据
     }
   },
   created() {
     let that = this
     that.appendData()
-    that.tabList = that.$store.state.tabList
-    that.loginData = that.$store.state.loginData
   },
   provide() {
     return{
-      appendData: this.appendData
+      appendData: this.appendData,
     }
   },
   methods: {
-    Goback() { // 返回首页
+    Goback(e) { // 返回首页
       let that = this
-      that.$store.state.tabList = [
-        {text:'课堂练习',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
-        {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
-        {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
-        {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
-        {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
-        {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
-      ]
-      that.$router.replace({path:'/Entrance'})
+      that.$confirm('确定返回首页？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        that.$store.state.tabList = [
+          {text:'课堂练习',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
+          {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+          {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+          {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
+          {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+          {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
+        ]
+        that.$router.replace({path:'/Entrance'})
+      }).catch(() => {})
     },
     appendData() { // 获取当前模式
       let that = this
       let navList = that.$store.state.navList
+      that.tabList = that.$store.state.tabList
       for(var i = 0; i < navList.length; i++){
         if (navList[i].class == 'Choice') {
           that.title = navList[i].text
@@ -99,6 +103,15 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-dropdown-menu__item{
+  color:#BF8333;
+}
+.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
+  background:rgba(243, 222, 191, 0.4);
+  color: #BF8333;
+}
+</style>
 <style scoped>
 .el-container {
   width:100%;
@@ -112,15 +125,21 @@ export default {
   height:60px;
   line-height:60px;
   box-sizing: border-box;
-  background: #2E79BA;
+  background: #BF8333;
   padding:0 40px 0 20px;
   position: absolute;
   top:0;
   left:0;
 }
 .el-container .el-header .left_box{
+  width:160px;
+  height:40px;
+  box-sizing: border-box;
+  background-image: url(../../assets/logo.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  margin-top:10px;
   float: left;
-  color:#fff;
 }
 .el-container .el-header .right_box{
   float: right;
@@ -182,8 +201,8 @@ export default {
   margin-left:5px;
 }
 .Choice{
-  background:#eee;
-  color:#409EFF;
+  background:rgba(243, 222, 191, 0.4);
+  color:#BF8333;
 }
 .NoChoice{
   background:#fff;

@@ -94,10 +94,7 @@ export default new Router({
       },{ // 试题详情页（二级页面）
         path: '/AnswerDetails',
         name: 'AnswerDetails',
-        component: AnswerDetails,
-        meta:{
-          keepAlive:true
-        }
+        component: AnswerDetails
       }],
       redirect:'/Administration'
     }

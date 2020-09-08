@@ -1,23 +1,17 @@
 <template>
   <div class="whole">
-    <div class="content clear">
-      <div class="right_box">
-        <h2>欢迎使用</h2>
-        <h4>中医药大学实训平台</h4>
-      </div>
-      <div class="left_box">
-        <h2 class="top">登录</h2>
-        <el-form ref="ruleForm" :model="ruleForm" :rules="rules">
-          <el-form-item prop="user">
-            <el-input class="input" placeholder="请输入账号" v-model="ruleForm.user" prefix-icon="el-icon-user" clearable></el-input>
-          </el-form-item>
-          <el-form-item prop="password">
-            <el-input class="password" placeholder="请输入密码" v-model="ruleForm.password" prefix-icon="el-icon-lock" show-password></el-input>
-          </el-form-item>
-          <el-checkbox v-model="ruleForm.checked">记住密码</el-checkbox>
-          <el-button class="button" type="primary" @click="submitForm('ruleForm',ruleForm)">登录</el-button>
-        </el-form>
-      </div>
+    <div class="content">
+      <h3 class="top">中医药大学实训中心</h3>
+      <el-form ref="ruleForm" :model="ruleForm" :rules="rules">
+        <el-form-item prop="user">
+          <el-input placeholder="请输入账号" v-model="ruleForm.user" prefix-icon="el-icon-user" clearable></el-input>
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input placeholder="请输入密码" v-model="ruleForm.password" prefix-icon="el-icon-lock" show-password></el-input>
+        </el-form-item>
+        <el-checkbox v-model="ruleForm.checked">记住密码</el-checkbox>
+        <el-button type="warning" @click="submitForm('ruleForm',ruleForm)">登录</el-button>
+      </el-form>
     </div>
   </div>
 </template>
@@ -25,6 +19,22 @@
 export default {
   name: 'whole',
   data () {
+    var validatePass1 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('账号不能为空!'))
+      } else {
+        callback()
+      }
+    }
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('密码不能为空!'))
+      } else if (value.length <6 || value.length > 16) {
+        callback(new Error('密码长度不正确，应为6-16位!'))
+      } else {
+        callback()
+      }
+    }
     return {
       ruleForm: {
         user: '',
@@ -33,10 +43,10 @@ export default {
       },
       rules: {
         user: [
-          { required: true, message: '账号不能为空', trigger: 'blur' }
+          { validator: validatePass1, trigger: 'blur' }
         ],
         password: [
-          { required: true, message: '密码不能为空', trigger: 'blur' }
+          { validator: validatePass2, trigger: 'blur' }
         ],
       }
     }
@@ -69,7 +79,7 @@ export default {
             // console.log(res.data.data)
             if (res.data.code == 200) {
               let message = res.data.data
-              if(message.user) {
+              if (message.user) {
                 if (ruleForm.checked == true) {
                   let ruleForm = {
                     user: that.ruleForm.user,
@@ -80,7 +90,7 @@ export default {
                 } else {
                   localStorage.removeItem('ruleForm')
                 }
-                for(var i = 0; i < message.systemStatusList.length; i++) {
+                for (var i = 0; i < message.systemStatusList.length; i++) {
                   if (message.systemStatusList[i].systemStatus == 1) {
                     message.systemStatusList[i].systemStatus = true
                   } else {
@@ -99,7 +109,7 @@ export default {
             that.$message.error('请求失败!')
           })
         } else {
-          return false;
+          return false
         }
       })
     }
@@ -108,12 +118,30 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+  background-color:#BF8333;
+  border-color: #BF8333;
+}
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #BF8333;
+}
+.el-checkbox.is-bordered.is-checked{
+  border-color: #BF8333;
+}
+.el-checkbox__input.is-focus .el-checkbox__inner{
+  border-color:  #BF8333;
+}
+.el-checkbox__inner:hover{
+  border-color:  #BF8333;
+}
+</style>
 <style scoped>
 .whole{
   width:100%;
   height: calc(100vh);
   box-sizing: border-box;
-  background-image: url(../../assets/background.jpg);
+  background-image: url(../../assets/banner1.png);
   background-repeat: no-repeat;
   background-size: 100% 100%;
   display:flex;
@@ -121,45 +149,28 @@ export default {
   justify-content: center;
 }
 .whole .content{
-  width:780px;
-  height:420px;
-  background:#2E79BA;
-  border-radius:10px;
+  width:520px;
+  height:500px;
+  background-image: url(../../assets/box_background.png);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
   overflow: hidden;
-}
-.whole .content .right_box{
-  width:60%;
-  height:100%;
-  float: left;
-  color: #fff;
+  padding:50px 80px;
   box-sizing: border-box;
-  padding: 30px;
 }
-.whole .content .right_box h4{
-  margin-top:10px;
-}
-.whole .content .left_box{
-  width:40%;
-  height:100%;
-  background: #fff;
-  border-radius:10px;
-  float: right;
-  box-sizing: border-box;
-  padding:0 30px;
-}
-.whole .content .left_box .top{
-  color:#333;
+.whole .content .top{
+  color:#BF8333;
   text-align: center;
   box-sizing: border-box;
   padding: 70px 0 50px;
 }
-.whole .content .left_box .password{
+.whole .content .el-input{
+  margin-bottom:5px;
+}
+.whole .content .checkbox{
   margin-top:5px;
 }
-.whole .content .left_box .checkbox{
-  margin-top:5px;
-}
-.whole .content .left_box .button{
+.whole .content .el-button{
   margin-top:20px;
   width:100%;
 }

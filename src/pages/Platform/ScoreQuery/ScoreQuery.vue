@@ -41,7 +41,7 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '',
+      heightCss: '600',
       value: [],
       input: '',
       loading: false,
@@ -124,12 +124,12 @@ export default {
   created() {
     let that = this
     that.$axios({
-      url: that.$store.state.Q_http + 'originalReport/queryOriginalScorePage',
+      url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne',
       method: 'post',
       data: {
         curPage: 1,
         pageSize: 10,
-        examText: 3,
+        searchKey: 165,
         startDate: '',
         endDate: ''
       }

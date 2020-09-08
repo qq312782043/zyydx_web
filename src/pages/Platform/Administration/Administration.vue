@@ -76,8 +76,8 @@ export default {
   text-align: center;
   box-sizing: border-box;
   font-size:15px;
-  border:1px solid #4BB328;
-  color: #4BB328;
+  border:1px solid #BF8333;
+  color: #BF8333;
   background:#fff;
   border-radius:4px;
 }
@@ -87,9 +87,9 @@ export default {
   text-align: center;
   box-sizing: border-box;
   font-size:15px;
-  border:1px solid #4BB328;
+  border:1px solid #BF8333;
   color: #fff;
-  background:#4BB328;
+  background:#BF8333;
   border-radius:4px;
 }
 </style>

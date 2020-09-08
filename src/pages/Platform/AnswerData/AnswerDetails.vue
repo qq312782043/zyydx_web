@@ -5,28 +5,49 @@
     </div>
     <div class="header">
       <div class="box_1">
-        <p>病症案例主诉：系统提供了一个试题库建立、管理和试卷生成的完整的无纸化解决方案。</p>
+        <p>病症案例主诉：{{AllData.chiefComplaint}}</p>
       </div>
     </div>
     <div class="main">
       <div class="box_2">
-        <p>诊断：<span>感冒</span></p>
-        <p>病机：<span>感冒</span></p>
-        <p>治法：<span>感冒</span></p>
-        <p>方药：<span>感冒</span></p>
+        <p>诊断：
+          <span :style="{color:diagnosisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{diagnosisStu.rightFlag==1?diagnosisStu.name:''}}
+            <i :class="diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          </span>
+        </p>
+        <p>病机：
+          <span :style="{color:pathogenesisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{pathogenesisStu.rightFlag==1?pathogenesisStu.name:''}}
+            <i :class="pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          </span>
+        </p>
+        <p>治法：
+          <span :style="{color:treatmentStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{treatmentStu.rightFlag==1?treatmentStu.name:''}}
+            <i :class="treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          </span>
+        </p>
+        <p>处方：
+          <span :style="{color:drugStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{drugStu.rightFlag==1?drugStu.name:''}}
+            <i :class="drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          </span>
+        </p>
+        <p>药物：
+          <span :style="{color:prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" v-for="(item,i) in prescriptionStu.tipList" :key="i">{{item.name}}</span>
+          <i :style="{color:prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" :class="prescriptionStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+        </p>
       </div>
       <div class="box_2">
-        <p>正确答案<i class="el-icon-check"></i></p>
-        <p>诊断：<span>感冒</span></p>
-        <p>病机：<span>感冒</span></p>
-        <p>治法：<span>感冒</span></p>
-        <p>方药：<span>感冒</span></p>
+        <p>正确答案</p>
+        <p>诊断：<span>{{AllData.diagnosis}}</span></p>
+        <p>病机：<span>{{AllData.pathogenesis}}</span></p>
+        <p>治法：<span>{{AllData.treatment}}</span></p>
+        <p>处方：<span>{{AllData.drug}}</span></p>
+        <p>药物：<span>{{AllData.prescription}}</span></p>
       </div>
-      <div class="box_2">
+      <!-- <div class="box_2">
         <p>学生问诊记录<i class="el-icon-edit"></i></p>
         <p>学生：<span>感冒</span></p>
         <p>系统：<span>感冒</span></p>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -36,26 +57,45 @@ export default {
   name: 'whole',
   data () {
     return {
-
-    }
-  },
-  methods: {
-    GoBack() { // 点击返回
-      this.$router.replace({path:'/AnswerData'})
+      id: this.$route.query, // 页面传参ID
+      AllData: '', // 页面数据
+      diagnosisStu: '',
+      pathogenesisStu: '',
+      treatmentStu: '',
+      drugStu: '',
+      prescriptionStu: '',
     }
   },
   created: function () {
     let that = this
     that.$axios({
-      url: that.$store.state.Q_http + 'visit/mini/system/getSystem',
+      url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionThree',
       method: 'post',
       data: {
-        id: 11
+        questionId: that.id.questionId,
+        examinationId: that.id.examinationId,
+        userId: that.id.userId,
       }
     }).then((res) =>{
-      console.log(res)
+      console.log(res.data.data)
+      if (res.data.code == 200) {
+        that.AllData = res.data.data
+        that.diagnosisStu = res.data.data.diagnosisStu
+        that.pathogenesisStu = res.data.data.pathogenesisStu
+        that.treatmentStu = res.data.data.treatmentStu
+        that.drugStu = res.data.data.drugStu
+        that.prescriptionStu = res.data.data.prescriptionStu
+      }
+    }).catch((err) =>{
+      that.$message.error('请求失败!')
     })
-  }
+  },
+  methods: {
+    GoBack() { // 点击返回
+      let that = this
+      that.$router.replace({path:'/AnswerData'})
+    }
+  },
 }
 </script>
 
@@ -66,7 +106,7 @@ export default {
   color:#333;
 }
 .Goback .el-button:hover{
-  color:#2E79BA;
+  color:#BF8333;
 }
 .header{
   width:100%;
@@ -98,11 +138,9 @@ export default {
   font-weight:bold;
   margin-bottom:10px;
 }
-.main .box_2 p i{
-  margin-left:5px;
-}
 .main .box_2 p span{
   color:#666;
   font-size:13px;
+  margin-right:10px;
 }
 </style>
