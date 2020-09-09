@@ -5,9 +5,9 @@
     </div>
     <div class="header">
       <div class="box_1">
-        <p class="text_1">姓名：<span>张宇</span></p>
-        <p class="text_1">分数：<span>92</span></p>
-        <p class="text_1">排名：<span>1</span></p>
+        <p class="text_1">姓名：<span>{{StudentData.userName}}</span></p>
+        <p class="text_1">分数：<span>{{StudentData.score}}</span></p>
+        <p class="text_1">排名：<span>{{StudentData.sort}}</span></p>
       </div>
       <div class="box_2">
         <div class="AnswerSheet">
@@ -18,13 +18,47 @@
           <p class="nth_5">错误</p>
         </div>
         <div class="TheBall">
-          <P v-for="(item,i) in TheBall" :key="i" :style="{background:item.color}"><a :href="'#c' + i">{{item.text}}</a></P>
+          <P v-for="(item,i) in StudentListData" :key="i" :style="{background:item.flagRight==1?'green':'red'}"><a :href="'#c' + i">{{item.sort}}</a></P>
         </div>
       </div>
     </div>
-    <div class="main">
+    <div class="main" v-loading="loading">
       <el-main class="card_box">
-        <div :id="'c' + i" class="card" v-for="(item,i) in TheBall" :key="i">{{item.text}}</div>
+        <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
+          <p class="text_1">{{item.sort}}、病例主诉：{{item.chiefComplaint}}</p>
+          <p class="text_2">诊断：
+            <span :style="{color:item.diagnosisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.diagnosisStu.name}}
+              <i :class="item.diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+            </span>
+          </p>
+          <p class="text_2">病机：
+            <span :style="{color:item.pathogenesisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.pathogenesisStu.name}}
+              <i :class="item.pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+            </span>
+          </p>
+          <p class="text_2">治法：
+            <span :style="{color:item.treatmentStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.treatmentStu.name}}
+              <i :class="item.treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+            </span>
+          </p>
+          <p class="text_2">处方：
+            <span :style="{color:item.drugStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.drugStu.name}}
+              <i :class="item.drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+            </span>
+          </p>
+          <p class="text_2">药物：
+            <span :style="{color:item.prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">{{value.name}}</span>
+            <i :style="{color:item.prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" :class="item.prescriptionStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          </p>
+          <div class="box_3">
+            <p class="text_4">参考答案</p>
+            <p>诊断：<span>{{item.diagnosis}}</span></p>
+            <p>病机：<span>{{item.pathogenesis}}</span></p>
+            <p>治法：<span>{{item.treatment}}</span></p>
+            <p>处方：<span>{{item.drug}}</span></p>
+            <p>药物：<span>{{item.prescription}}</span></p>
+          </div>
+        </div>
       </el-main>
     </div>
   </div>
@@ -35,38 +69,52 @@ export default {
   name: 'whole',
   data () {
     return {
-      TheBall: [{
-        text: '1',
-        color: 'green'
-      },{
-        text: '2',
-        color: 'green'
-      },{
-        text: '3',
-        color: 'red'
-      },{
-        text: '4',
-        color: 'green'
-      },{
-        text: '5',
-        color: 'red'
-      }],
-      card_box: [{
-        text: '1'
-      },{
-        text: '2'
-      },{
-        text: '3'
-      },{
-        text: '4'
-      },{
-        text: '5'
-      },]
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
+      id: this.$route.query, // 页面传参ID
+      loading: false, // 页面加载
+      StudentData: '', // 学生信息数据
+      StudentListData: '', // 学生答题数据
     }
+  },
+  created() {
+    let that = this
+    that.loading = true
+    that.FnShowData()
   },
   methods: {
     GoBack() { // 点击返回
       this.$router.replace({path:'/StudentList'})
+    },
+
+    // 执行函数区域
+    FnShowData() {
+      let that = this
+      if (that.SelectSystem == '原文实训') {
+
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreThree',
+          method: 'post',
+          data: {
+            id: that.id.examinationId,
+            userId: that.id.userId,
+            typeId: that.id.typeId,
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.count
+            that.StudentData = res.data.data
+            that.StudentListData = res.data.data.dataList
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
+      }
     }
   },
 }
@@ -173,10 +221,31 @@ export default {
 .main .card{
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1);
   background:#f5f5f5;
-  height:300px;
   margin-bottom:20px;
-  text-align: center;
-  line-height:300px;
-  font-size:30px;
+  padding: 30px;
+}
+.main .card .text_1{
+  color:#666;
+  font-size:14px;
+  margin-bottom:30px;
+}
+.main .card .text_2{
+  color:#333;
+  font-size:14px;
+  margin-bottom:5px;
+}
+.main .card .box_3{
+  width:100%;
+  border:1px solid #ccc;
+  margin-top:30px;
+  padding:10px;
+  font-size:14px;
+  color:#333;
+}
+.main .card .box_3 .text_4{
+  margin-bottom:10px;
+}
+.main .card .box_3 p{
+  margin-bottom:5px;
 }
 </style>

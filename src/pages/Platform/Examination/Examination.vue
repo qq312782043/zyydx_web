@@ -3,31 +3,26 @@
     <div class="title">经典案例实训考试分数比例设置<span>*五项分数的总和必须为10分</span></div>
     <div class="input_box">
       <p>诊断分数</p>
-      <el-input v-model="dataList.diagnosisScore" clearable size="small" maxlength="1"></el-input>
-      <p>分</p>
+      <el-input v-model="dataList.diagnosisScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="input_box">
       <p>病机分数</p>
-      <el-input v-model="dataList.pathogenesisScore" clearable size="small" maxlength="1"></el-input>
-      <p>分</p>
+      <el-input v-model="dataList.pathogenesisScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="input_box">
       <p>治法分数</p>
-      <el-input v-model="dataList.treatmentScore" clearable size="small" maxlength="1"></el-input>
-      <p>分</p>
+      <el-input v-model="dataList.treatmentScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="input_box">
       <p>处方分数</p>
-      <el-input v-model="dataList.drugScore" clearable size="small" maxlength="1"></el-input>
-      <p>分</p>
+      <el-input v-model="dataList.drugScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="input_box">
       <p>方药分数</p>
-      <el-input v-model="dataList.prescriptionScore" clearable size="small" maxlength="1"></el-input>
-      <p>分</p>
+      <el-input v-model="dataList.prescriptionScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="footer">
-      <el-button type="warning" size="small" @click="clickPreservation()">保存</el-button>
+      <el-button type="warning" size="medium" @click="clickPreservation()">保存</el-button>
     </div>
   </div>
 </template>
@@ -131,6 +126,10 @@ export default {
 .footer{
   display: flex;
   justify-content: center;
-  margin-top:200px;
+  position: fixed;
+  bottom: 100px;
+  left:0;
+  width:100%;
+  box-sizing: border-box;
 }
 </style>

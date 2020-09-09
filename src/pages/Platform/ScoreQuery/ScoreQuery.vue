@@ -2,24 +2,36 @@
   <div class="whole">
     <div class="header clear">
       <div class="time_box">
-        <el-date-picker v-model="value" type="datetimerange"
+        <el-date-picker v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
           range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
         </el-date-picker>
       </div>
       <div class="input_box">
-        <el-input placeholder="输入考试ID或考试名称" v-model="input" size="small" clearable></el-input>
+        <el-input placeholder="输入考试ID或考试名称" v-model="searchKey" size="small" clearable></el-input>
       </div>
       <div class="button_box">
-        <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small" plain>搜索</el-button>
-        <el-button @click="clickReset()" icon="el-icon-refresh-left" type="primary" size="small" plain>重置</el-button>
-        <el-button icon="el-icon-upload2" type="primary" size="small" plain>导出</el-button>
+        <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
+        <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
+        <el-button icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main" ref="height">
-      <el-table v-loading="loading" :data="tableData" border style="width:100%" :max-height="heightCss" size="small">
-        <el-table-column align="center" v-for="(item,i) in tableList"
-        :key="i" :prop="item.prop" :label="item.label" :width="item.width"></el-table-column>
-        <el-table-column fixed="right" align="center" label="操作">
+      <el-table v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" prop="examinationId" label="考试ID" width="80"></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="80"></el-table-column>
+        <el-table-column align="center" prop="personNum" label="参考人数" width="80"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="开始时间" width="130"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="结束时间" width="130"></el-table-column>
+        <el-table-column align="center" prop="examTime" label="考试用时" width="110"></el-table-column>
+        <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
+        <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
+        <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
+        <el-table-column align="center" prop="minScore" label="最低分" width="70"></el-table-column>
+        <el-table-column align="center" prop="avgScore" label="平均分" width="70"></el-table-column>
+        <el-table-column align="center" prop="chapterIds" label="章节" width=""></el-table-column>
+        <el-table-column align="center" prop="categoryIds" label="病症类别" width=""></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="知识点" width=""></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
           </template>
@@ -28,8 +40,8 @@
     </div>
     <div class="footer">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage" :page-sizes="[10, 50, 100]" :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper" :total="100">
+        :current-page="curPage" :page-sizes="[10, 50, 100]" :total="totalElements"
+        layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
     </div>
     <router-view />
@@ -42,133 +54,86 @@ export default {
   data () {
     return {
       heightCss: '600',
-      value: [],
-      input: '',
-      loading: false,
-      currentPage: 1,
-      tableData: [{
-        ID: '1663',
-        Name: '测试',
-        Pnumber: '30人',
-        startTime: '2020-5-5',
-        endTime: '2020-5-5',
-        Qnumber: '30',
-        TotalScore: '100',
-        Highest: '99',
-        Lowest: '10',
-        Average: '50',
-        Curriculum: '伤寒',
-        Level: '一级',
-        Chapter: '花柳病',
-        Difficulty: '1级',
-      },],
-      tableList: [{
-        prop: 'ID',
-        label: '考试ID',
-        width: ''
-      },{
-        prop: 'Name',
-        label: '考试名称',
-        width: ''
-      },{
-        prop: 'Pnumber',
-        label: '参考人数',
-        width: ''
-      },{
-        prop: 'startTime',
-        label: '考试开始时间',
-        width: '120'
-      },{
-        prop: 'endTime',
-        label: '考试结束时间',
-        width: '120'
-      },{
-        prop: 'Qnumber',
-        label: '题数',
-        width: ''
-      },{
-        prop: 'TotalScore',
-        label: '总分',
-        width: ''
-      },{
-        prop: 'Highest',
-        label: '最高分',
-        width: ''
-      },{
-        prop: 'Lowest',
-        label: '最低分',
-        width: ''
-      },{
-        prop: 'Average',
-        label: '平均分',
-        width: ''
-      },{
-        prop: 'Curriculum',
-        label: '课程',
-        width: ''
-      },{
-        prop: 'Level',
-        label: '级别',
-        width: ''
-      },{
-        prop: 'Chapter',
-        label: '章节',
-        width: '120'
-      },{
-        prop: 'Difficulty',
-        label: '难度',
-        width: ''
-      }],
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
+      loading: false, // 页面加载
+      curPage: 1, // 第几页
+      pageSize: 10, // 每页几条
+      totalElements: 0, // 分页全部数量
+      ScoreQueryData: [], // 考试成绩数据
+      TimeData: [], // 时间数据
+      searchKey: '', // 考试ID或者考试名称
     }
   },
   created() {
     let that = this
-    that.$axios({
-      url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne',
-      method: 'post',
-      data: {
-        curPage: 1,
-        pageSize: 10,
-        searchKey: 165,
-        startDate: '',
-        endDate: ''
-      }
-    }).then((res) =>{
-      // console.log(res.data)
-    }).catch((err) =>{
-      that.$message.error('请求失败!')
-    })
+    that.clickSearch()
   },
   mounted() {
     let that = this
     that.heightCss = parseInt(window.getComputedStyle(that.$refs.height).height)
   },
   methods: {
-    handleSizeChange(val) {
-      console.log(val)
+    // 监听函数区域
+    handleSizeChange(val) { // 共多少页
+      let that = this
+      that.pageSize = val
+      that.clickSearch()
     },
-    handleCurrentChange(val) {
-      console.log(val)
+    handleCurrentChange(val) { // 每页几条
+      let that = this
+      that.curPage = val
+      that.clickSearch()
     },
+
+    // 点击函数区域
     clickSearch() { // 点击搜索
       let that = this
-      that.loading = true
-      setTimeout(function(){
-        that.loading = false
-      },1000)
+      let data = {
+        startDate: that.TimeData[0],
+        endDate: that.TimeData[1],
+        curPage: that.curPage,
+        pageSize: that.pageSize,
+        searchKey: that.searchKey,
+      }
+      // console.log(data)
+      if (that.SelectSystem == '原文实训') {
+
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne',
+          method: 'post',
+          data: data
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.count
+            that.ScoreQueryData = res.data.data.dataList
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
+      }
     },
     clickReset() { // 点击重置
       let that = this
-      that.value = []
-      that.input = ''
+      that.TimeData = [] // 清空时间筛选条件
+      that.searchKey = ''  // 考试ID或者考试名称
+      that.clickSearch()
       that.$message({
         message: '重置成功~',
         type: 'success',
         duration: '1000'
       })
     },
-    clickToView(res) { // 点击查看
-      this.$router.replace({path:'/StudentList'})
+    clickToView(e) { // 点击查看
+      this.$router.replace({
+        path:'/StudentList',
+        query: { id: e.examinationId}
+      })
     }
   },
 }
@@ -176,6 +141,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-button--text{
+  color: #BF8333;
+}
 .header{
   box-sizing: border-box;
   padding:10px 0;

@@ -23,9 +23,10 @@
       <div class="button_box">
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="warning" size="small" plain>重置</el-button>
-        <el-upload style="display:inline-block;margin:0 10px;" ref="upload" accept=".xls,.xlsx"
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-change="upload" :show-file-list="false" :auto-upload="false">
+        <el-upload style="display:inline-block;margin:0 10px;"
+          action="http://192.168.102.114:8909/hospital/admin/case/importCaseQuestion"
+          :before-upload="beforeUpload"
+          :show-file-list="false">
           <el-button @click="clickImportFile()" icon="el-icon-download" type="warning" size="small" plain>表格导入</el-button>
         </el-upload>
         <el-button icon="el-icon-upload2" type="warning" size="small" plain>导出</el-button>
@@ -582,7 +583,7 @@ export default {
             type: that.TestData[e].type
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             if (res.data.data == '包含') {
               that.$message.error('包含试题，无法删除!')
@@ -594,7 +595,7 @@ export default {
                   id: that.TestData[e].id,
                 }
               }).then((res) =>{
-                console.log(res.data)
+                // console.log(res.data)
                 if (res.data.code == 200) {
                   that.CaseTypeData(that.TestData[e].type)
                   that.$message({
@@ -619,7 +620,7 @@ export default {
             id: that.TestData[e].id,
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             that.CaseTypeData(that.TestData[e].type)
             that.$message({
@@ -639,20 +640,26 @@ export default {
         })
       }
     },
-    upload(file) {
-      console.log(file)
+    beforeUpload(file) { // 文件导入函数
       let that = this
+      const formData = new FormData()
+      formData.append('file', file)
       that.$axios({
-        url: that.$store.state.Q_http + 'case/importCaseQuestion',
+        url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
+        headers: { 'Content-Type': 'multipart/form-data' },
         method: 'post',
-        data: {
-          file: file,
-          userId: that.$store.state.loginData.user.id,
-        }
+        data: formData,
       }).then((res) =>{
         console.log(res)
         if (res.data.code == 200) {
-
+          that.clickSearch()
+          that.$message({
+            type: 'success',
+            message: '导入成功!',
+            duration: 1000
+          })
+        } else {
+          that.$message.error('导入失败!')
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')

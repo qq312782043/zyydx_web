@@ -97,6 +97,9 @@ export default {
   },
   created() {
     let that = this
+    if (that.$route.query.questionId) {
+      that.questionId = that.$route.query.questionId
+    }
     that.clickSearch()
     that.FnOptionData()
   },
@@ -143,7 +146,7 @@ export default {
           method: 'post',
           data: data
         }).then((res) =>{
-          // console.log(res.data.data)
+          console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.count

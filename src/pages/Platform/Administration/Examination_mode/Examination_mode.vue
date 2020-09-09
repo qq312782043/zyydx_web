@@ -22,7 +22,7 @@
         <div class="Range">
           <p class="text_1">选择考试知识点<span>*不勾选则视为全选</span></p>
           <div class="knowledge">
-            <el-select v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
+            <el-select style="margin-top:21px" v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
               collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
               <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
@@ -30,7 +30,7 @@
         </div>
         <div class="Range">
           <p class="text_1">已选知识点({{knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
-          <el-main class="box_card">
+          <el-main class="box_card" style="margin-top:31px">
             <p v-for="(item,i) in knowledgeData" :key="i">{{item}}<i @click="clickRemove(item)" class="el-icon-remove"></i></p>
           </el-main>
         </div>
@@ -60,10 +60,10 @@
       </div>
       <div class="Question">
         <el-tabs type="border-card">
-          <el-tab-pane label="题库列表">
+          <el-tab-pane :label="search.length==0?'题库列表':'题库列表('+search.length+')'">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in search" :key="i">
-                <p class="text_1">{{item.chiefComplaint}}</p>
+                <p class="text_1">{{i+1}}、{{item.chiefComplaint}}</p>
                 <p class="text_2" v-if="item.flag" @click="clickAdd(item,i)"><i class="el-icon-circle-plus"></i></p>
               </div>
               <div class="Tips">{{search.length==0?'没有可用题目':'共'+search.length+'道题'}}</div>
@@ -72,7 +72,7 @@
           <el-tab-pane :label="searchDataL">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in searchData" :key="i">
-                <p class="text_1">{{item.chiefComplaint}}</p>
+                <p class="text_1">{{i+1}}、{{item.chiefComplaint}}</p>
                 <p class="text_2" @click="clickReduce(item.id)"><i class="el-icon-remove"></i></p>
               </div>
               <div class="Tips">{{searchData.length==0?'暂无已选试题':''}}</div>
@@ -95,14 +95,13 @@
         <p class="text_2">最大题数：<span>{{caseData.practiceNum}}</span></p>
         <div class="set_up clear">
           <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
-          <p class="text_2 text_3">进行时间：<span>{{caseData.createOn}}</span></p>
-          <el-button type="warning" @click="clickSetUp(caseData.id)">收卷</el-button>
+          <!-- <p class="text_2 text_3">进行时间：<span>{{caseData.createOn}}</span></p> -->
+          <el-button size="medium" type="warning" @click="clickSetUp(caseData.id)">收卷</el-button>
         </div>
       </div>
     </div>
   </el-main>
 </template>
-
 <script>
 export default {
   name: 'SmallBox',
@@ -262,7 +261,7 @@ export default {
         that.searchDataL = '已选列表（'+ that.searchData.length +'）'
       }
     },
-    clickExamination() { // 开始练习
+    clickExamination() { // 开始考试
       let that = this
       let data = {
         patternType: 3,
@@ -374,7 +373,7 @@ export default {
   margin-left:10px;
 }
 .chapter,.knowledge{
-  margin-top:15px;
+  margin-top:10px;
 }
 .contact{
   display: flex;

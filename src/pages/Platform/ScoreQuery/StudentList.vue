@@ -5,40 +5,41 @@
     </div>
     <div class="header">
       <div class="box_1">
-        <p class="text_1">考试ID：<span>111</span></p>
-        <p class="text_1">考试名称：<span>测试</span></p>
-        <p class="text_1">开始时间：<span>2020-5-22 12:00</span></p>
-        <p class="text_1">结束时间：<span>2020-5-23 12:00</span></p>
+        <p class="text_1">考试ID：<span>{{StudentData.examinationId}}</span></p>
+        <p class="text_1">考试名称：<span>{{StudentData.examinationName}}</span></p>
+        <p class="text_1">开始时间：<span>{{StudentData.beginTime}}</span></p>
+        <p class="text_1">结束时间：<span>{{StudentData.endTime}}</span></p>
       </div>
       <div class="box_1">
-        <p class="text_1">总分：<span>100分</span></p>
-        <p class="text_1">最高分：<span>100分</span></p>
-        <p class="text_1">最低分：<span>20分</span></p>
-        <p class="text_1">平均分：<span>50分</span></p>
+        <p class="text_1">总分：<span>{{StudentData.fullSocre}}</span></p>
+        <p class="text_1">最高分：<span>{{StudentData.maxScore}}</span></p>
+        <p class="text_1">最低分：<span>{{StudentData.minScore}}</span></p>
+        <p class="text_1">平均分：<span>{{StudentData.avgScore}}</span></p>
       </div>
       <div class="box_1">
-        <p class="text_1">课程：<span>伤寒</span></p>
-        <p class="text_1">级别：<span>一级</span></p>
-        <p class="text_1">章节：<span>花柳病</span></p>
-        <p class="text_1">难度：<span>很难</span></p>
+        <!-- <p class="text_1">课程：<span>伤寒</span></p> -->
+        <!-- <p class="text_1">级别：<span>一级</span></p> -->
+        <p class="text_1">章节：<span>{{StudentData.chapterIds}}</span></p>
+        <p class="text_1">病症类别：<span>{{StudentData.categoryIds}}</span></p>
+        <!-- <p class="text_1">难度：<span>很难</span></p> -->
       </div>
       <div class="box_1">
-        <p class="text_1">参考人数：<span>33人</span></p>
+        <p class="text_1">参考人数：<span>{{StudentData.personNum}}</span></p>
       </div>
     </div>
     <div class="ipt_box">
-      <el-input placeholder="输入班级号、学号、姓名" size="small" v-model="input" clearable></el-input>
-      <el-button @click="clickSearch()" icon="el-icon-search" type="primary" size="small">搜索</el-button>
-      <el-button icon="el-icon-upload2" type="primary" size="small">导出</el-button>
+      <el-input placeholder="输入班级号、学号、姓名" size="small" v-model="searchKey" clearable></el-input>
+      <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small">搜索</el-button>
+      <el-button icon="el-icon-upload2" type="warning" size="small">导出</el-button>
     </div>
     <div class="main" ref="heights">
-      <el-table v-loading="loading" :data="tableData" border style="width:100%" :max-height="heightCss" size="small"
-        :default-sort="{prop: 'Ranking', order: 'descending'}">
-        <el-table-column prop="Name" align="center" label="姓名" width="150"></el-table-column>
-        <el-table-column prop="Fraction" align="center" label="分数" width="200"></el-table-column>
-        <el-table-column prop="Ranking" align="center" label="排名" width="200" sortable></el-table-column>
-        <el-table-column prop="StudentNumber" align="center" label="学号" width="250"></el-table-column>
-        <el-table-column prop="ClassNumber" align="center" label="班级号"></el-table-column>
+      <el-table v-loading="loading" :data="StudentListData" border style="width:90%" :max-height="heightCss" size="small"
+        :default-sort="{prop: 'sort', order: 'ascending'}">
+        <el-table-column align="center" prop="userName" label="姓名"></el-table-column>
+        <el-table-column align="center" prop="score" label="分数"></el-table-column>
+        <el-table-column align="center" prop="sort" label="排名" sortable></el-table-column>
+        <el-table-column align="center" prop="studentNumber"  label="学号"></el-table-column>
+        <el-table-column align="center" prop="className" label="班级号"></el-table-column>
         <el-table-column fixed="right" align="center" label="操作" width="120">
           <template slot-scope="scope">
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
@@ -48,8 +49,8 @@
     </div>
     <div class="footer">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="currentPage" :page-sizes="[10, 50, 100]" :page-size="10"
-        layout="total, sizes, prev, pager, next, jumper" :total="100">
+        :current-page="curPage" :page-sizes="[10, 50, 100]" :total="totalElements"
+        layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
     </div>
     <router-view />
@@ -61,18 +62,22 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '',
-      input: '',
-      loading: false,
-      currentPage: 1,
-      tableData: [{
-        Name: '张宇1',
-        Fraction: '100分',
-        Ranking: '1',
-        StudentNumber: '001',
-        ClassNumber: '1703',
-      }],
+      heightCss: '300',
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
+      id: this.$route.query.id, // 页面传参ID
+      loading: false, // 页面加载
+      curPage: 1, // 第几页
+      pageSize: 10, // 每页几条
+      totalElements: 0, // 分页全部数量
+      StudentData: '', // 考试查询数据
+      StudentListData: [], // 考试查询数据列表
+      searchKey: '', // 页面搜索框信息
     }
+  },
+  created() {
+    let that = this
+    that.loading = true
+    that.FnShowData()
   },
   mounted() {
     let that = this
@@ -80,37 +85,106 @@ export default {
     that.heightCss = arr - 50
   },
   methods: {
-    handleSizeChange(val) {
-      console.log(val)
+    // 监听函数区域
+    handleSizeChange(val) { // 共多少页
+      let that = this
+      that.pageSize = val
+      that.clickSearch()
     },
-    handleCurrentChange(val) {
-      console.log(val)
+    handleCurrentChange(val) { // 每页几条
+      let that = this
+      that.curPage = val
+      that.clickSearch()
     },
+
+    // 点击函数区域
     clickSearch() { // 点击搜索
       let that = this
-      that.loading = true
-      setTimeout(function(){
-        that.loading = false
-      },1000)
+      if (that.SelectSystem == '原文实训') {
+
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoSearch',
+          method: 'post',
+          data: {
+            id: that.id,
+            searchKey: that.searchKey,
+            sortColumn: '',
+            orderBy: '',
+            curPage: that.curPage,
+            pageSize: that.pageSize,
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.count
+            that.StudentListData = res.data.data.dataList
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
+      }
     },
-    clickToView(res) { // 点击查看
-      this.$router.replace({path:'/PaperDetails'})
+    clickToView(e) { // 点击查看
+      let that = this
+      console.log(e)
+      that.$router.replace({path:'/PaperDetails',
+        query: { userId: e.userId, examinationId: e.examinationId, typeId: 3 }
+      })
     },
     GoBack() { // 点击返回
       this.$router.replace({path:'/ScoreQuery'})
     },
+
+    // 执行函数区域
+    FnShowData() {
+      let that = this
+      if (that.SelectSystem == '原文实训') {
+
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwo',
+          method: 'post',
+          data: {
+            id: that.id,
+            curPage: that.curPage,
+            pageSize: that.pageSize,
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.count
+            that.StudentData = res.data.data.data
+            that.StudentListData = res.data.data.dataList
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
+      }
+    }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-button--text{
+  color: #BF8333;
+}
 .Goback .el-button{
   padding:0;
   color:#333;
 }
 .Goback .el-button:hover{
-  color:#2E79BA;
+  color: #BF8333;
 }
 .header{
   width:100%;

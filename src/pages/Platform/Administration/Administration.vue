@@ -4,7 +4,7 @@
       <p class="title">请选择以下模式来控制学生电脑</p>
       <div class="tabBar">
         <div v-for="(item,i) in navList" :key="i">
-          <p :class="item.class" @click="clickTabBar(i)">开启{{item.text}}</p>
+          <p :class="item.class" @click="clickTabBar(i,item.id)">开启{{item.text}}</p>
         </div>
       </div>
     </div>
@@ -18,32 +18,109 @@ export default {
   inject:['appendData'],
   data () {
     return {
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
+      SelectSystemID: '',
+      loginData: this.$store.state.loginData, // 用户数据
       navList: ''
     }
   },
   created() {
     let that = this
     that.navList = that.$store.state.navList
+    if (that.SelectSystem == '原文实训') {
+      that.SelectSystemID = 1
+    } else if (that.SelectSystem == '案例实训') {
+      that.SelectSystemID = 2
+    } else if (that.SelectSystem == '问诊实训') {
+      that.SelectSystemID = 3
+    }
   },
   methods: {
-    clickTabBar(e) { // 点击切换
+    clickTabBar(e,id) { // 点击切换
       let that = this
-      for(var i = 0; i < that.navList.length; i++){
-        that.navList[i].class = 'NoChoice'
-      }
-      if (e == 0) {
-        that.navList[0].class = 'Choice'
-      } else if (e == 1) {
-        that.navList[1].class = 'Choice'
-      } else if (e == 2) {
-        that.navList[2].class = 'Choice'
-      }
       if (that.$route.path!==that.navList[e].route) {
-        that.$router.replace({path:that.navList[e].route})
+        if (that.$route.path == '/FreePractice_mode' || that.$route.path == '/Classrooms_mode') {
+          that.$confirm('有学生正在练习，是否切换到其他模式？', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            that.Fnimplement(e,id)
+          }).catch(() => {})
+        } else {
+          that.$axios({
+            url: that.$store.state.Q_http + 'common/modifyPatternType',
+            method: 'post',
+            data: {
+              id: that.SelectSystemID,
+              userId: that.loginData.user.id,
+              patternType: id
+            }
+          }).then((res) =>{
+            console.log(res.data)
+            if (res.data.code == 200) {
+              if (res.data.data.errorCode == 10006) {
+                that.$alert('当前有正在进行的考试，请先收卷再切换模式', '提示', {
+                  confirmButtonText: '确定',
+                  callback: action => {return}
+                })
+              } else {
+                that.$message({
+                  type: 'success',
+                  message: res.data.data,
+                  duration: 1000
+                })
+                for(var i = 0; i < that.navList.length; i++){
+                  that.navList[i].class = 'NoChoice'
+                }
+                that.navList[e].class = 'Choice'
+                that.$router.replace({path:that.navList[e].route})
+                that.$store.state.navList = that.navList
+                that.appendData()
+              }
+            }
+          }).catch((err) =>{
+            that.$message.error('请求失败!')
+          })
+        }
       }
-      that.$store.state.navList = that.navList
-      that.appendData()
-    }
+    },
+    // 执行函数
+    Fnimplement(e,id) {
+      let that = this
+      console.log({
+        id: that.loginData.systemStatusList[1].id,
+        userId: that.loginData.user.id,
+        patternType: id,
+      })
+      that.$axios({
+        url: that.$store.state.Q_http + 'common/modifyPatternType',
+        method: 'post',
+        data: {
+          id: that.loginData.systemStatusList[1].id,
+          userId: that.loginData.user.id,
+          patternType: id,
+        }
+      }).then((res) =>{
+        console.log(res.data)
+        if (res.data.code == 200) {
+          that.$message({
+            type: 'success',
+            message: res.data.data,
+            duration: 1000
+          })
+          for(var i = 0; i < that.navList.length; i++){
+            that.navList[i].class = 'NoChoice'
+          }
+          that.navList[e].class = 'Choice'
+          that.$router.replace({path:that.navList[e].route})
+          that.$store.state.navList = that.navList
+          that.appendData()
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
+    },
   }
 }
 </script>

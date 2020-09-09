@@ -20,7 +20,6 @@ import Examination from '@/pages/Platform/Examination/Examination' // 考试管�
 
 Vue.use(Router)
 export default new Router({
-  mode: "history",
   routes: [
     { // 登录页面
       path: '/',

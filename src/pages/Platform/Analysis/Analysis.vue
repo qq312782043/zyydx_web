@@ -172,7 +172,7 @@ export default {
     clickToView(e) { // 点击查看
       let that = this
       that.$store.state.tabList = [
-        {text:'课堂练习',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
+        {text:'课堂管理',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
         {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
         {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
         {text:'学生答题数据',route:'/AnswerData',class:'Choice',icon:'el-icon-s-claim'},
@@ -180,7 +180,10 @@ export default {
         {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
       ]
       that.appendData()
-      that.$router.replace({path:'/AnswerData'})
+      that.$router.replace({
+        path:'/AnswerData',
+        query: { questionId: e.questionId }
+      })
     },
 
     // 执行函数区域
@@ -204,6 +207,9 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.el-button--text{
+  color: #BF8333;
+}
 .header{
   box-sizing: border-box;
   padding:10px 0;

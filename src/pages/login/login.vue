@@ -90,13 +90,6 @@ export default {
                 } else {
                   localStorage.removeItem('ruleForm')
                 }
-                for (var i = 0; i < message.systemStatusList.length; i++) {
-                  if (message.systemStatusList[i].systemStatus == 1) {
-                    message.systemStatusList[i].systemStatus = true
-                  } else {
-                    message.systemStatusList[i].systemStatus = false
-                  }
-                }
                 that.$store.state.loginData = message
                 that.$router.replace({path:'/entrance'})
               } else {
