@@ -12,19 +12,11 @@ import { Button, Select } from 'element-ui'
 Vue.use(ElementUI)
 Vue.component(Button.name, Button)
 Vue.component(Select.name, Select)
+Vue.config.productionTip = false
 
 Object.defineProperty(Vue.prototype, "$axios", {
   value: axios
 })
-
-Vue.config.productionTip = false
-
-//vue router连续点击多次路由报错解决方法
-// import Router from 'vue-router'
-// const originalPush = Router.prototype.push
-// Router.prototype.push = function push(location) {
-//   return originalPush.call(this, location).catch(err => err)
-// }
 
 /* eslint-disable no-new */
 new Vue({

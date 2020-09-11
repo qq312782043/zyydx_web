@@ -24,18 +24,19 @@
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="warning" size="small" plain>重置</el-button>
         <el-upload style="display:inline-block;margin:0 10px;"
-          action="http://192.168.102.114:8909/hospital/admin/case/importCaseQuestion"
-          :before-upload="beforeUpload"
+          :action="this.$store.state.Q_http + 'case/importCaseQuestion'"
+          :before-upload="clickImportFile"
           :show-file-list="false">
-          <el-button @click="clickImportFile()" icon="el-icon-download" type="warning" size="small" plain>表格导入</el-button>
+          <el-button icon="el-icon-download" type="warning" size="small" plain>表格导入</el-button>
         </el-upload>
-        <el-button icon="el-icon-upload2" type="warning" size="small" plain>导出</el-button>
+        <el-button @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small" plain>导出</el-button>
         <el-button @click="clickCaseType(showValue)" icon="el-icon-s-tools" type="warning" size="small" plain>试题分类管理</el-button>
         <el-button @click="BatchDeletion()" icon="el-icon-delete" type="warning" size="small" plain>批量删除</el-button>
       </div>
     </div>
-    <div v-show="SelectSystem=='原文实训'?true:false" class="main" ref="heights">
-      <el-table @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableY"
+    <div class="main" ref="heights" v-if="heightCss== ''"></div>
+    <div class="main" ref="heights" v-else>
+      <el-table v-show="SelectSystem=='原文实训'?true:false" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableY"
         :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="45"></el-table-column>
         <el-table-column align="center" prop="questionOrder" label="题库序号" width="80"></el-table-column>
@@ -53,9 +54,7 @@
           </template>
         </el-table-column>
       </el-table>
-    </div>
-    <div v-show="SelectSystem=='案例实训'?true:false" class="main" ref="heights">
-      <el-table @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
+      <el-table v-show="SelectSystem=='案例实训'?true:false" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
         :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="45"></el-table-column>
         <el-table-column align="center" prop="index" label="题库序号" width="75"></el-table-column>
@@ -107,7 +106,7 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '600',
+      heightCss: '',
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       escape: false, // 是否可以关闭弹窗
       loading: false, // 加载
@@ -255,9 +254,9 @@ export default {
             curPage: that.curPage,
             pageSize: that.pageSize,
             orderFlag: that.pageSize,
-            chapterId: that.ChapterData.toString(),
-            courseId: that.CourseData.toString(),
-            levelId: that.LevelData.toString()
+            chapterIds: that.ChapterData.toString(),
+            courseIds: that.CourseData.toString(),
+            levelIds: that.LevelData.toString()
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -310,8 +309,58 @@ export default {
         duration: '1000'
       })
     },
-    clickImportFile() { // 点击导入文件
+    clickImportFile(file) { // 点击导入文件
       let that = this
+      const formData = new FormData()
+      formData.append('file', file)
+      that.$axios({
+        url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
+        headers: { 'Content-Type': 'multipart/form-data' },
+        method: 'post',
+        data: formData,
+      }).then((res) =>{
+        // console.log(res)
+        if (res.data.code == 200) {
+          that.clickSearch()
+          that.$message({
+            type: 'success',
+            message: '导入成功!',
+            duration: 1000
+          })
+        } else {
+          that.$message.error('导入失败，请查看表格格式!')
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
+    },
+    clickExportFile() { // 点击导出文件
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'case/exportCaseQuestion',
+        method: 'post',
+        responseType: 'blob',
+        data: {
+          chapterId: that.ChapterData.toString(),
+          categoryId: that.CategoryData.toString(),
+        }
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        const fileName = "题库管理.xlsx"
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      })
     },
     clickToView(e) { // 点击查看题库详情
       let that = this
@@ -381,7 +430,7 @@ export default {
           })
           return
         }
-        if (that.TestData[e].id == 0) {
+        if (that.TestData[e].id == 0 || that.TestData[e].ids == 0) {
           that.FnAdded(e)
         } else {
           that.FnEdit(e)
@@ -390,7 +439,7 @@ export default {
     },
     clickDeleteIpt(e) { // 点击删除input
       let that = this
-      if (that.TestData[e].id == 0) {
+      if (that.TestData[e].id == 0 || that.TestData[e].ids == 0) {
         that.TestData.splice(e,1)
       } else {
         that.$confirm('确认要删除吗？', '提示', {
@@ -406,11 +455,13 @@ export default {
       let that = this
       let questionIds = []
       that.TestData.map((value,index,arry)=>{
-        questionIds.push({ 'id': value.id, 'name': value.typeName })
+        if (value.status == 1) {
+          questionIds.push({ 'id': value.id || value.ids, 'name': value.typeName })
+        }
       })
       for(var i = 0; i < questionIds.length; i++){
         if (questionIds[i].name == '') {
-          if (questionIds[i].id == 0) {
+          if (questionIds[i].id == 0 || questionIds[i].ids == 0) {
             that.$message({
               message: '请输入新增内容~',
               type: 'warning'
@@ -424,26 +475,50 @@ export default {
           return
         }
       }
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseType/saveType',
-        method: 'post',
-        data: {
-          questionIds: JSON.stringify(questionIds),
-          caseType: that.TestData[0].type
-        }
-      }).then((res) =>{
-        console.log(res.data)
-        if (res.data.code == 200) {
-          that.CaseType = false
-          that.$message({
-            type: 'success',
-            message: '保存成功!',
-            duration: '1000'
-          })
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Y_http + 'originalType/batchSaveType',
+          method: 'post',
+          data: {
+            typeName: JSON.stringify(questionIds),
+            type: that.TestData[0].type
+          }
+        }).then((res) =>{
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            that.CaseType = false
+            that.$message({
+              type: 'success',
+              message: '保存成功!',
+              duration: '1000'
+            })
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseType/saveType',
+          method: 'post',
+          data: {
+            questionIds: JSON.stringify(questionIds),
+            caseType: that.TestData[0].type
+          }
+        }).then((res) =>{
+          console.log(res.data)
+          if (res.data.code == 200) {
+            that.CaseType = false
+            that.$message({
+              type: 'success',
+              message: '保存成功!',
+              duration: '1000'
+            })
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
+
     },
     clickAdded(e) { // 点击新增
       let that = this
@@ -451,7 +526,7 @@ export default {
         status: 1,
         type: e,
         typeName: '',
-        id: 0
+        ids: 0
       })
     },
 
@@ -494,7 +569,7 @@ export default {
         data = { ids: that.queryQuestionId }
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'case/batchDelCaseQuestion'
-        data = { id: that.queryQuestionId }
+        data = { questionIds: that.queryQuestionId }
       }
       that.$axios({
         url: url,
@@ -526,7 +601,7 @@ export default {
         url: url,
         method: 'post',
         data: {
-          id: that.TestData[e].id,
+          id: that.TestData[e].id || that.TestData[e].ids,
           typeName: that.TestData[e].typeName,
         }
       }).then((res) =>{
@@ -596,6 +671,7 @@ export default {
                 }
               }).then((res) =>{
                 // console.log(res.data)
+                // console.log(that.TestData[e].id)
                 if (res.data.code == 200) {
                   that.CaseTypeData(that.TestData[e].type)
                   that.$message({
@@ -640,31 +716,7 @@ export default {
         })
       }
     },
-    beforeUpload(file) { // 文件导入函数
-      let that = this
-      const formData = new FormData()
-      formData.append('file', file)
-      that.$axios({
-        url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
-        headers: { 'Content-Type': 'multipart/form-data' },
-        method: 'post',
-        data: formData,
-      }).then((res) =>{
-        console.log(res)
-        if (res.data.code == 200) {
-          that.clickSearch()
-          that.$message({
-            type: 'success',
-            message: '导入成功!',
-            duration: 1000
-          })
-        } else {
-          that.$message.error('导入失败!')
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    },
+
     formatTime(row, column) { // 时间戳转换
       let date = new Date(parseInt(row.updateOn))
       var Y = date.getFullYear() + '-'

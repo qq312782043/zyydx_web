@@ -4,9 +4,8 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    // Q_http: 'https://visit-api.tamiyun.com/',
-    Q_http: 'http://192.168.112.83:8383/hospital-service/hospital/admin/',
-    Y_http: 'http://192.168.112.83:8383/hospital-service/hospital/partner/',
+    Q_http: 'http://192.168.112.73:8080/hospital-service/hospital/admin/',
+    Y_http: 'http://192.168.112.73:8080/hospital-service/hospital/partner/',
     loginData: '', // 登录成功用户数据
     SelectSystem: '', // 用户选择的哪个系统
     navList: [ // 二级导航

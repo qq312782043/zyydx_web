@@ -12,11 +12,34 @@
       <div class="button_box">
         <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
-        <el-button icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
+        <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
       </div>
     </div>
-    <div class="main" ref="height">
-      <el-table v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+    <div class="main" ref="height" v-if="heightCss== ''"></div>
+    <div class="main" ref="height" v-else>
+      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" prop="examinationId" label="考试ID" width="80"></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="80"></el-table-column>
+        <el-table-column align="center" prop="personNum" label="参考人数" width="80"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="开始时间" width="130"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="结束时间" width="130"></el-table-column>
+        <el-table-column align="center" prop="examTime" label="考试用时" width="110"></el-table-column>
+        <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
+        <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
+        <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
+        <el-table-column align="center" prop="minScore" label="最低分" width="70"></el-table-column>
+        <el-table-column align="center" prop="avgScore" label="平均分" width="70"></el-table-column>
+        <el-table-column align="center" prop="chapterIds" label="课程" width="110"></el-table-column>
+        <el-table-column align="center" prop="categoryIds" label="级别" width="70"></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="章节" width="110"></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="难度" width="70"></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
+          <template slot-scope="scope">
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="examinationId" label="考试ID" width="80"></el-table-column>
         <el-table-column align="center" prop="examinationName" label="考试名称" width="80"></el-table-column>
         <el-table-column align="center" prop="personNum" label="参考人数" width="80"></el-table-column>
@@ -38,6 +61,7 @@
         </el-table-column>
       </el-table>
     </div>
+
     <div class="footer">
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
         :current-page="curPage" :page-sizes="[10, 50, 100]" :total="totalElements"
@@ -53,7 +77,7 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '600',
+      heightCss: '',
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       loading: false, // 页面加载
       curPage: 1, // 第几页
@@ -88,23 +112,43 @@ export default {
     // 点击函数区域
     clickSearch() { // 点击搜索
       let that = this
-      let data = {
-        startDate: that.TimeData[0],
-        endDate: that.TimeData[1],
-        curPage: that.curPage,
-        pageSize: that.pageSize,
-        searchKey: that.searchKey,
-      }
-      // console.log(data)
       if (that.SelectSystem == '原文实训') {
-
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/queryOriginalScorePage',
+          method: 'post',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            curPage: that.curPage,
+            pageSize: that.pageSize,
+            examText: that.searchKey,
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.count
+            that.ScoreQueryData = res.data.data.dataList
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
       } else if (that.SelectSystem == '案例实训') {
         that.$axios({
           url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne',
           method: 'post',
-          data: data
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            curPage: that.curPage,
+            pageSize: that.pageSize,
+            searchKey: that.searchKey,
+          }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.count
@@ -127,6 +171,35 @@ export default {
         message: '重置成功~',
         type: 'success',
         duration: '1000'
+      })
+    },
+    clickExportFile() { // 点击导出文件
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOneExcel',
+        method: 'post',
+        responseType: 'blob',
+        data: {
+          startDate: that.TimeData[0]?that.TimeData[0]:'',
+          endDate: that.TimeData[1]?that.TimeData[1]:'',
+          searchKey: that.searchKey,
+        }
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        const fileName = "考试成绩查询.xlsx"
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
       })
     },
     clickToView(e) { // 点击查看

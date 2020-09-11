@@ -98,6 +98,7 @@
 <script>
 export default {
   name: 'SmallBox',
+  inject:['FnParent'],
   data () {
     return {
       modular_1: false,
@@ -268,20 +269,31 @@ export default {
         method: 'post',
         data: data
       }).then((res) =>{
-        // console.log(res.data)
         // console.log(data)
+        console.log(res.data)
         if (res.data.code == 200) {
-          that.modular_1 = false
-          that.modular_2 = true
-          that.caseData = res.data.data
-          that.ChapterData = '' // 已选章节置空
-          that.CategoryData = '' // 已选病症类别置空
-          that.knowledgeData = '' // 已选知识点置空
-          that.topicNumber = '' // 练习题数置空
-          that.search = '' // 题库置空
-          that.searchData = [] // 已选题库置空
-          that.practice = false // 开启练习题数
-          that.searchDataL = '已选列表'
+          if (res.data.data.code == '20001') {
+            that.$message.error({
+              message: res.data.data.message
+            })
+          } else if (res.data.data.code == '20003') {
+            that.$message.error({
+              message: res.data.data.message
+            })
+          } else {
+            that.modular_1 = false
+            that.modular_2 = true
+            that.caseData = res.data.data
+            that.ChapterData = '' // 已选章节置空
+            that.CategoryData = '' // 已选病症类别置空
+            that.knowledgeData = '' // 已选知识点置空
+            that.topicNumber = '' // 练习题数置空
+            that.search = '' // 题库置空
+            that.searchData = [] // 已选题库置空
+            that.practice = false // 开启练习题数
+            that.searchDataL = '已选列表'
+            that.FnParent()
+          }
         } else {
           that.$message.error({
             message: res.data.message

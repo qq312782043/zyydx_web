@@ -72,7 +72,7 @@ export default {
       dialogVisible: false,
       escape: false,
       title: '',
-      tabList: this.$store.state.tabList,
+      tabList: '',
       loginData: this.$store.state.loginData, // 用户数据
       ruleForm: {
         Pass: '',
@@ -122,13 +122,28 @@ export default {
     },
     appendData() { // 获取当前模式
       let that = this
-      let navList = that.$store.state.navList
       that.tabList = that.$store.state.tabList
-      for(var i = 0; i < navList.length; i++){
-        if (navList[i].class == 'Choice') {
-          that.title = navList[i].text
+      that.$axios({
+        url: that.$store.state.Q_http + 'user/getUser',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.loginData.user.requestToken },
+        method: 'post',
+        data: {
+          userId: that.$store.state.loginData.user.id,
         }
-      }
+      }).then((res) =>{
+        // console.log(res.data.data.systemStatusList)
+        if (res.data.code == 200) {
+          if (res.data.data.systemStatusList[1].patternType == 1) {
+            that.title = '自由练习模式'
+          } else if (res.data.data.systemStatusList[1].patternType == 2) {
+            that.title = '课堂练习模式'
+          } else {
+            that.title = '考试模式'
+          }
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
     },
     submitForm(formName) { // 提交修改密码
       let that = this

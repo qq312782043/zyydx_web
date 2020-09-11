@@ -17,12 +17,12 @@
         <div class="title">请选择使用的系统</div>
         <div class="content">
           <div class="btn_box">
-            <div class="item" style="background:#923222">
+            <div class="item" style="background:#923222" @click="jumpPlatform('原文实训')">
               <h4>经典原文实训</h4><h6>原文实训</h6>
             </div>
             <div class="switch">
-              <el-switch v-model="System_1" active-color="#13ce66" inactive-color="#ccc"></el-switch>
-              <p @click="clickSwitch(ImplementData1)">12345</p>
+              <el-switch v-model="systemStatus1" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+              <p @click="clickSwitch(ImplementData[0])">12345</p>
             </div>
           </div>
           <div class="btn_box">
@@ -30,8 +30,8 @@
               <h4>经典案例实训</h4><h6>案例实训</h6>
             </div>
             <div class="switch">
-              <el-switch v-model="System_2" active-color="#13ce66" inactive-color="#ccc"></el-switch>
-              <p @click="clickSwitch(ImplementData2)">12345</p>
+              <el-switch v-model="systemStatus2" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+              <p @click="clickSwitch(ImplementData[1])">12345</p>
             </div>
           </div>
           <div class="btn_box">
@@ -39,14 +39,13 @@
               <h4>经典案例实训问诊</h4><h6>问诊实训</h6>
             </div>
             <div class="switch">
-              <el-switch v-model="System_3" active-color="#13ce66" inactive-color="#ccc"></el-switch>
-              <p @click="clickSwitch(ImplementData3)">12345</p>
+              <el-switch v-model="systemStatus3" active-color="#13ce66" inactive-color="#ccc"></el-switch>
+              <p @click="clickSwitch(ImplementData[2])">12345</p>
             </div>
           </div>
         </div>
         <div class="footer">关闭开关学生将无法使用该系统，不影响教师使用</div>
       </div>
-
     </el-main>
     <el-dialog title="修改密码" :visible.sync="dialogVisible" width="40%" :close-on-press-escape="escape" :close-on-click-modal="escape">
       <el-form ref="ruleForm" :model="ruleForm" :rules="rules" label-width="80px">
@@ -99,12 +98,10 @@ export default {
       loginData: this.$store.state.loginData, // 用户数据
       dialogVisible: false,
       escape: false,
-      ImplementData1: '',
-      ImplementData2: '',
-      ImplementData3: '',
-      System_1: true, // 原文系统状态
-      System_2: true, // 案例系统状态
-      System_3: true, // 问诊系统状态
+      ImplementData: '',
+      systemStatus1: true,
+      systemStatus2: true,
+      systemStatus3: true,
       ruleForm: {
         Pass: '',
         NewPass: '',
@@ -125,9 +122,7 @@ export default {
   },
   created() {
     let that = this
-    that.FnGetStatus1()
-    that.FnGetStatus2()
-    that.FnGetStatus3()
+    that.FnGetStatus()
   },
   methods: {
     submitForm(formName) { // 提交修改密码
@@ -191,21 +186,45 @@ export default {
     },
     jumpPlatform(e) { // 跳转平台页面
       let that = this
+      if (e == '原文实训') {
+        that.$store.state.tabList = [
+          {text:'课堂管理',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
+          {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+          {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+          {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
+          {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+        ]
+      } else {
+        that.$store.state.tabList = [
+          {text:'课堂管理',route:'/Administration',class:'Choice',icon:'el-icon-s-home'},
+          {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+          {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+          {text:'学生答题数据',route:'/AnswerData',class:'NoChoice',icon:'el-icon-s-claim'},
+          {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+          {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
+        ]
+      }
       that.$router.replace({path:'/Platform'})
       that.$store.state.SelectSystem = e
     },
     clickSwitch(e) { // 开关
       let that = this
-      console.log(e)
       if (e.systemStatus == 1) {
         if (e.examStatus == 1) {
-          that.$confirm('有学生正在进行练习，是否关闭该系统？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            that.Fnimplement(e)
-          }).catch(() => {})
+          if (e.patternType == 3) {
+            this.$alert('有考试正在进行，无法关闭系统！', '提示', {
+              confirmButtonText: '确定',
+              callback: action => {return}
+            })
+          } else {
+            that.$confirm('有学生正在进行练习，是否关闭该系统？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              that.Fnimplement(e)
+            }).catch(() => {})
+          }
         } else {
           that.Fnimplement(e)
         }
@@ -215,66 +234,36 @@ export default {
     },
 
     // 执行函数
-    FnGetStatus1() { // 获取原文系统状态
+    FnGetStatus() { // 获取原文系统状态
       let that = this
       that.$axios({
-        url: that.$store.state.Q_http + 'common/reloadSystemStatus',
+        url: that.$store.state.Q_http + 'user/getUser',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.loginData.user.requestToken },
         method: 'post',
         data: {
-          systemType: 1,
+          userId: that.loginData.user.id,
         }
       }).then((res) =>{
-        // console.log(res.data)
+        // console.log(res.data.data.systemStatusList)
         if (res.data.code == 200) {
-          that.ImplementData1 = res.data.data
-          if (res.data.data.systemStatus == 1) {
-            that.System_1 = true
+          that.ImplementData = res.data.data.systemStatusList
+          that.systemStatus1 = res.data.data.systemStatusList[0].systemStatus
+          that.systemStatus2 = res.data.data.systemStatusList[1].systemStatus
+          that.systemStatus3 = res.data.data.systemStatusList[2].systemStatus
+          if (res.data.data.systemStatusList[0].systemStatus == 1) {
+            that.systemStatus1 = true
           } else {
-            that.System_1 = false
+            that.systemStatus1 = false
           }
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    },
-    FnGetStatus2() { // 获取案例系统状态
-      let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'common/reloadSystemStatus',
-        method: 'post',
-        data: {
-          systemType: 2,
-        }
-      }).then((res) =>{
-        // console.log(res.data)
-        if (res.data.code == 200) {
-          that.ImplementData2 = res.data.data
-          if (res.data.data.systemStatus == 1) {
-            that.System_2 = true
+          if (res.data.data.systemStatusList[1].systemStatus == 1) {
+            that.systemStatus2 = true
           } else {
-            that.System_2 = false
+            that.systemStatus2 = false
           }
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    },
-    FnGetStatus3() { // 获取问诊系统状态
-      let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'common/reloadSystemStatus',
-        method: 'post',
-        data: {
-          systemType: 3,
-        }
-      }).then((res) =>{
-        // console.log(res.data)
-        if (res.data.code == 200) {
-          that.ImplementData3 = res.data.data
-          if (res.data.data.systemStatus == 1) {
-            that.System_3 = true
+          if (res.data.data.systemStatusList[2].systemStatus == 1) {
+            that.systemStatus3 = true
           } else {
-            that.System_3 = false
+            that.systemStatus3 = false
           }
         }
       }).catch((err) =>{
@@ -283,12 +272,6 @@ export default {
     },
     Fnimplement(e) {
       let that = this
-      console.log({
-          id: e.systemType,
-          userId: that.loginData.user.id,
-          systemStatus: e.systemStatus
-        })
-
       that.$axios({
         url: that.$store.state.Q_http + 'common/modifySytemStatus',
         method: 'post',
@@ -300,13 +283,7 @@ export default {
       }).then((res) =>{
         // console.log(res.data)
         if (res.data.code == 200) {
-          if (e.systemType == 1) {
-            that.FnGetStatus1()
-          } else if (e.systemType == 2) {
-            that.FnGetStatus2()
-          } else {
-            that.FnGetStatus3()
-          }
+          that.FnGetStatus()
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')

@@ -6,43 +6,74 @@
           <el-date-picker v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
             range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
           </el-date-picker>
+          <el-input placeholder="题库ID" v-model="questionId" size="small" clearable></el-input>
+          <el-input placeholder="班级号" v-model="className" size="small" clearable></el-input>
+          <el-input placeholder="学号" v-model="studentNumber" size="small" clearable></el-input>
         </div>
         <div style="float:right">
           <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
           <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
-          <el-button icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
+          <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
         </div>
       </div>
       <div class="input_box">
-        <el-input placeholder="题库ID" class="input" v-model="questionId" size="small" clearable></el-input>
-        <el-input placeholder="班级号" class="input" v-model="className" size="small" clearable></el-input>
-        <el-input placeholder="学生姓名" class="input" v-model="userName" size="small" clearable></el-input>
-        <el-input placeholder="学号" class="input" v-model="studentNumber" size="small" clearable></el-input>
-        <el-input placeholder="考试名称" class="input" v-model="examinationName" size="small" clearable></el-input>
-        <!-- <el-select v-model="value_1" class="input" clearable placeholder="课程" size="small">
-          <el-option v-for="item in optionData" :key="item.id" :label="item.name" :value="item.id">
+        <el-input placeholder="学生姓名" v-model="userName" size="small" clearable></el-input>
+        <el-input placeholder="考试名称" v-model="examinationName" size="small" clearable></el-input>
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="courseId" filterable multiple collapse-tags
+          clearable placeholder="课程" size="small">
+          <el-option v-for="item in optionData.course" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
-        </el-select> -->
-        <el-select v-model="categoryId" class="input" clearable placeholder="病症类别" size="small">
+        </el-select>
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="practiceDifficulty" filterable multiple collapse-tags
+          clearable placeholder="难度" size="small">
+          <el-option v-for="item in optionData.practiceDifficulty" :key="item.id" :label="item.name" :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="levelId" filterable multiple collapse-tags
+          clearable placeholder="级别" size="small">
+          <el-option v-for="item in optionData.level" :key="item.id" :label="item.name" :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-show="SelectSystem=='案例实训'?true:false" v-model="categoryId" filterable multiple collapse-tags
+          clearable placeholder="病症类别" size="small">
           <el-option v-for="item in optionData.Category" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-        <el-select v-model="chapterId" class="input" clearable placeholder="章节" size="small">
+        <el-select v-model="chapterId" filterable multiple collapse-tags
+          clearable placeholder="章节" size="small">
           <el-option v-for="item in optionData.Chapter" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-        <!-- <el-select v-model="value_4" class="input" clearable placeholder="难度" size="small">
-          <el-option v-for="item in optionData" :key="item.id" :label="item.name" :value="item.id">
-          </el-option>
-        </el-select> -->
-        <el-select v-model="patternType" class="input" clearable placeholder="模式" size="small">
+        <el-select v-model="patternType" filterable multiple collapse-tags
+          clearable placeholder="模式" size="small">
           <el-option v-for="item in optionData.mod" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
       </div>
     </div>
-    <div class="main" ref="heights">
-      <el-table v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
+    <div class="main" ref="heights" v-if="heightCss== ''"></div>
+    <div class="main" ref="heights" v-else>
+      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" prop="questionId" label="题库ID" width="70"></el-table-column>
+        <el-table-column align="center" prop="submitOn" label="时间" width="130" :formatter="formatTime"></el-table-column>
+        <el-table-column align="center" prop="userName" label="姓名" width="70"></el-table-column>
+        <el-table-column align="center" prop="className" label="班级号" width="70"></el-table-column>
+        <el-table-column align="center" prop="studentNumber" label="学号" width="70"></el-table-column>
+        <el-table-column align="center" prop="questionText" label="考试题目" width=""></el-table-column>
+        <el-table-column align="center" prop="flagRight" label="结果" width="70"></el-table-column>
+        <el-table-column align="center" prop="patternType" label="模式" width="110"></el-table-column>
+        <el-table-column align="center" prop="courseValue" label="课程" width="70"></el-table-column>
+        <el-table-column align="center" prop="levelValue" label="级别" width="70"></el-table-column>
+        <el-table-column align="center" prop="chapterValue" label="章节" width="110"></el-table-column>
+        <el-table-column align="center" prop="knowledgeValues" label="知识点" width="110"></el-table-column>
+        <el-table-column align="center" prop="practiceDifficulty" label="难度" width="70"></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
+          <template slot-scope="scope">
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="questionId" label="题库ID" width="70"></el-table-column>
         <el-table-column align="center" prop="updateOn" label="时间" width="130"></el-table-column>
         <el-table-column align="center" prop="userName" label="姓名" width="70"></el-table-column>
@@ -76,7 +107,7 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '550',
+      heightCss: '',
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       loading: false, // 页面加载
       curPage: 1, // 第几页
@@ -84,21 +115,48 @@ export default {
       totalElements: 0, // 分页全部数量
       AnswerData: [], // 学生答题数据
       TimeData: [], // 时间数据
+      levelId: '', // 级别ID
+      courseId: '', // 课程ID
+      practiceDifficulty: '', // 难度
       questionId: '', // 题库ID
       className: '', // 班级号
       userName: '', // 学生姓名
       studentNumber: '', // 学号
       examinationName: '', // 考试名称
-      optionData: [], // 下拉框总数据数据（级别、章节、模式、课程、难度）
       categoryId: '', // 已选病症类别ID
       chapterId: '', // 已选章节ID
       patternType: '', // 已选模式ID
+      optionData: [], // 下拉框总数据数据（级别、章节、模式、课程、难度、模式）
     }
   },
   created() {
     let that = this
     if (that.$route.query.questionId) {
       that.questionId = that.$route.query.questionId
+    }
+    if (that.$route.query.studentNumber) {
+      that.studentNumber = that.$route.query.studentNumber
+    }
+    if (that.$route.query.categoryId) {
+      that.categoryId = that.$route.query.categoryId
+    }
+    if (that.$route.query.chapterId) {
+      that.chapterId = that.$route.query.chapterId
+    }
+    if (that.$route.query.className) {
+      that.className = that.$route.query.className
+    }
+    if (that.$route.query.examinationName) {
+      that.examinationName = that.$route.query.examinationName
+    }
+    if (that.$route.query.mode) {
+      that.patternType = that.$route.query.mode
+    }
+    if (that.$route.query.userName) {
+      that.userName = that.$route.query.userName
+    }
+    if (that.$route.query.TimeData) {
+      that.TimeData = that.$route.query.TimeData
     }
     that.clickSearch()
     that.FnOptionData()
@@ -123,30 +181,73 @@ export default {
     // 点击函数区域
     clickSearch() { // 点击搜索
       let that = this
-      let data = {
-        startDate: that.TimeData[0],
-        endDate: that.TimeData[1],
-        questionId: that.questionId,
-        userName: that.userName,
-        className: that.className,
-        studentNumber: that.studentNumber,
-        examinationName: that.examinationName,
-        chapterId: that.chapterId,
-        categoryId: that.categoryId,
-        mode: that.patternType,
-        curPage: that.curPage,
-        pageSize: that.pageSize
-      }
-      // console.log(data)
       if (that.SelectSystem == '原文实训') {
-
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/queryOriginalStudentAnswerPage',
+          method: 'post',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            levelId: that.levelId.toString(),
+            courseId: that.courseId.toString(),
+            practiceDifficulty: that.practiceDifficulty.toString(),
+            chapterId: that.chapterId.toString(),
+            mode: that.patternType.toString(),
+            curPage: that.curPage,
+            pageSize: that.pageSize
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            for(var i = 0; i < res.data.data.elements.length; i++){
+              if (res.data.data.elements[i].flagRight == 1) {
+                res.data.data.elements[i].flagRight = '正确'
+              } else {
+                res.data.data.elements[i].flagRight = '错误'
+              }
+              if (res.data.data.elements[i].patternType == 1) {
+                res.data.data.elements[i].patternType = '自由练习模式'
+              } else if (res.data.data.elements[i].patternType == 2) {
+                res.data.data.elements[i].patternType = '课堂练习模式'
+              } else {
+                res.data.data.elements[i].patternType = '考试模式'
+              }
+            }
+            that.totalElements = res.data.data.totalElements
+            that.AnswerData = res.data.data.elements
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
       } else if (that.SelectSystem == '案例实训') {
         that.$axios({
           url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwo',
           method: 'post',
-          data: data
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            chapterId: that.chapterId.toString(),
+            categoryId: that.categoryId.toString(),
+            mode: that.patternType.toString(),
+            curPage: that.curPage,
+            pageSize: that.pageSize
+          }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.count
@@ -173,6 +274,42 @@ export default {
       that.patternType = '', // 模式ID
       that.clickSearch()
     },
+    clickExportFile() { // 点击导出文件
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwoExcel',
+        method: 'post',
+        responseType: 'blob',
+        data: {
+          startDate: that.TimeData[0]?that.TimeData[0]:'',
+          endDate: that.TimeData[1]?that.TimeData[1]:'',
+          questionId: that.questionId,
+          userName: that.userName,
+          className: that.className,
+          studentNumber: that.studentNumber,
+          examinationName: that.examinationName,
+          chapterId: that.chapterId.toString(),
+          categoryId: that.categoryId.toString(),
+          mode: that.patternType.toString(),
+        }
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        const fileName = "学生答题数据.xlsx"
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      })
+    },
     clickToView(e) { // 点击查看
       let that = this
       that.$router.replace({
@@ -184,17 +321,40 @@ export default {
     // 执行函数区域
     FnOptionData() { // 请求下拉筛选条件数据（知识点、章节、病症类别、模式）
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
-        method: 'post',
-      }).then((res) =>{
-        // console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.optionData = res.data.data
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByType',
+          method: 'post',
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.optionData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
+          method: 'post',
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.optionData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else {}
+    },
+    formatTime(row, column) { // 时间戳转换
+      let date = new Date(parseInt(row.submitOn))
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
+      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
+      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      return Y + M + D + h + m
     },
   },
 }
@@ -209,11 +369,15 @@ export default {
   box-sizing: border-box;
   padding:10px 0;
 }
+.time_box .el-input{
+  width:180px;
+  margin-left:10px;
+}
 .input_box{
   margin-top:20px;
   display: flex;
 }
-.input_box .input{
+.input_box .el-input,.el-select{
   margin-right:20px;
   flex: 1;
 }

@@ -30,9 +30,10 @@
     <div class="ipt_box">
       <el-input placeholder="输入班级号、学号、姓名" size="small" v-model="searchKey" clearable></el-input>
       <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small">搜索</el-button>
-      <el-button icon="el-icon-upload2" type="warning" size="small">导出</el-button>
+      <el-button @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small">导出</el-button>
     </div>
-    <div class="main" ref="heights">
+    <div class="main" ref="heights" v-if="heightCss== ''"></div>
+    <div class="main" ref="heights" v-else>
       <el-table v-loading="loading" :data="StudentListData" border style="width:90%" :max-height="heightCss" size="small"
         :default-sort="{prop: 'sort', order: 'ascending'}">
         <el-table-column align="center" prop="userName" label="姓名"></el-table-column>
@@ -62,7 +63,7 @@ export default {
   name: 'whole',
   data () {
     return {
-      heightCss: '300',
+      heightCss: '',
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       id: this.$route.query.id, // 页面传参ID
       loading: false, // 页面加载
@@ -128,6 +129,36 @@ export default {
           that.$message.error('请求失败!')
         })
       }
+    },
+    clickExportFile() { // 点击导出文件
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOneExcel',
+        method: 'post',
+        responseType: 'blob',
+        data: {
+          id: that.id,
+          searchKey: that.searchKey,
+          sortColumn: 'sort',
+          orderBy: 1,
+        }
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        const fileName = "考试成绩查询.xlsx"
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      })
     },
     clickToView(e) { // 点击查看
       let that = this

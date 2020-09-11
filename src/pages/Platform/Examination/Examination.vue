@@ -84,7 +84,7 @@ export default {
           that.$message.error('请求失败!')
         })
       } else {
-        that.$alert('四项分数总和必须为10分~', '提示', {
+        that.$alert('五项分数总和必须为10分~', '提示', {
           confirmButtonText: '好的',
           callback: action => {}
         })

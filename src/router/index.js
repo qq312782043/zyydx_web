@@ -18,6 +18,11 @@ import Question from '@/pages/Platform/Question/Question' // 题库管理
 import QuestionDetails from '@/pages/Platform/Question/QuestionDetails' // 题库管理>题库详情
 import Examination from '@/pages/Platform/Examination/Examination' // 考试管理
 
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
 Vue.use(Router)
 export default new Router({
   routes: [

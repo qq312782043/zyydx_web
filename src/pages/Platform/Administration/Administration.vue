@@ -24,9 +24,16 @@ export default {
       navList: ''
     }
   },
+  provide() {
+    return{
+      FnParent: this.FnParent,
+    }
+  },
   created() {
     let that = this
+    console.log(that.$store.state.navList)
     that.navList = that.$store.state.navList
+    that.FnGetStatus()
     if (that.SelectSystem == '原文实训') {
       that.SelectSystemID = 1
     } else if (that.SelectSystem == '案例实训') {
@@ -48,62 +55,79 @@ export default {
             that.Fnimplement(e,id)
           }).catch(() => {})
         } else {
-          that.$axios({
-            url: that.$store.state.Q_http + 'common/modifyPatternType',
-            method: 'post',
-            data: {
-              id: that.SelectSystemID,
-              userId: that.loginData.user.id,
-              patternType: id
-            }
-          }).then((res) =>{
-            console.log(res.data)
-            if (res.data.code == 200) {
-              if (res.data.data.errorCode == 10006) {
-                that.$alert('当前有正在进行的考试，请先收卷再切换模式', '提示', {
-                  confirmButtonText: '确定',
-                  callback: action => {return}
-                })
-              } else {
-                that.$message({
-                  type: 'success',
-                  message: res.data.data,
-                  duration: 1000
-                })
-                for(var i = 0; i < that.navList.length; i++){
-                  that.navList[i].class = 'NoChoice'
-                }
-                that.navList[e].class = 'Choice'
-                that.$router.replace({path:that.navList[e].route})
-                that.$store.state.navList = that.navList
-                that.appendData()
-              }
-            }
-          }).catch((err) =>{
-            that.$message.error('请求失败!')
-          })
+          that.Fnimplement(e,id)
         }
       }
     },
+
     // 执行函数
+    FnGetStatus() { // 获取系统状态
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'user/getUser',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.loginData.user.requestToken },
+        method: 'post',
+        data: {
+          userId: that.loginData.user.id,
+        }
+      }).then((res) =>{
+        // console.log(res.data.data.systemStatusList)
+        if (res.data.code == 200) {
+          if (res.data.data.systemStatusList[1].patternType == 1) {
+            that.navList = [
+              {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice',id:1},
+              {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
+              {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
+            ]
+            that.$router.replace({path:'/FreePractice_mode'})
+            that.$store.state.navList = that.navList
+          } else if (res.data.data.systemStatusList[1].patternType == 2) {
+            that.navList = [
+              {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
+              {text:'课堂练习模式',route:'/Classrooms_mode',class:'Choice',id:2},
+              {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
+            ]
+            that.$router.replace({path:'/Classrooms_mode'})
+            that.$store.state.navList = that.navList
+          } else {
+            that.navList = [
+              {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
+              {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
+              {text:'考试模式',route:'/Examination_mode',class:'Choice',id:3}
+            ]
+            that.$router.replace({path:'/Examination_mode'})
+            that.$store.state.navList = that.navList
+          }
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
+    },
     Fnimplement(e,id) {
       let that = this
-      console.log({
-        id: that.loginData.systemStatusList[1].id,
-        userId: that.loginData.user.id,
-        patternType: id,
-      })
       that.$axios({
         url: that.$store.state.Q_http + 'common/modifyPatternType',
         method: 'post',
         data: {
-          id: that.loginData.systemStatusList[1].id,
+          id: that.SelectSystemID,
           userId: that.loginData.user.id,
           patternType: id,
         }
       }).then((res) =>{
         console.log(res.data)
-        if (res.data.code == 200) {
+        if (res.data.data.errorCode == 10006) {
+          that.$alert('当前有正在进行的考试，请先收卷再切换模式', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {return}
+          })
+        } else if (res.data.data.errorCode == 10007) {
+          for(var i = 0; i < that.navList.length; i++){
+            that.navList[i].class = 'NoChoice'
+          }
+          that.navList[e].class = 'Choice'
+          that.$router.replace({path:that.navList[e].route})
+          that.appendData()
+        } else {
           that.$message({
             type: 'success',
             message: res.data.data,
@@ -114,13 +138,15 @@ export default {
           }
           that.navList[e].class = 'Choice'
           that.$router.replace({path:that.navList[e].route})
-          that.$store.state.navList = that.navList
           that.appendData()
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
       })
     },
+    FnParent() { // 父级方法
+      this.appendData()
+    }
   }
 }
 </script>
