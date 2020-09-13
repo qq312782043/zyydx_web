@@ -124,7 +124,7 @@ export default {
             examText: that.searchKey,
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements
@@ -265,7 +265,7 @@ export default {
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
       var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
       var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
     formatTime3(row) {

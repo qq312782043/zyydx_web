@@ -136,7 +136,7 @@ export default {
             pageSize: that.pageSize,
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.count
@@ -243,7 +243,7 @@ export default {
             sortType: 1
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements
@@ -266,7 +266,7 @@ export default {
             pageSize: that.pageSize,
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.count
@@ -286,19 +286,19 @@ export default {
       let date = new Date(parseInt(row))
       var Y = date.getFullYear() + '-'
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
-      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
-      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
+      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
     formatTime2(row) { // 时间戳转换
       let that = this
       let date = new Date(parseInt(row))
       var Y = date.getFullYear() + '-'
-      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
-      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
-      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var M = (date.getMonth() < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
+      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     }
   }

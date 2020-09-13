@@ -399,7 +399,7 @@ export default {
           url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
           method: 'post',
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.optionData = res.data.data
           }
@@ -426,7 +426,7 @@ export default {
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
       var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
       var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
     formatTime2(row) {

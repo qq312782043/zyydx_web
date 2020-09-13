@@ -79,7 +79,6 @@ export default {
   },
   created: function () {
     let that = this
-    console.log(that.id)
     if (that.SelectSystem == '原文实训') {
       that.$axios({
         url: that.$store.state.Q_http + 'originalReport/getStudentQuestionAnswer',
@@ -89,7 +88,7 @@ export default {
           userId: that.id.userId,
         }
       }).then((res) =>{
-        console.log(res.data.data)
+        // console.log(res.data.data)
         if (res.data.code == 200) {
           that.AllData = res.data.data
         }

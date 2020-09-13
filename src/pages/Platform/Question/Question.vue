@@ -723,7 +723,6 @@ export default {
                 }
               }).then((res) =>{
                 // console.log(res.data)
-                // console.log(that.TestData[e].id)
                 if (res.data.code == 200) {
                   that.CaseTypeData(that.TestData[e].type)
                   that.$message({
@@ -775,7 +774,7 @@ export default {
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
       var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
       var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
   },

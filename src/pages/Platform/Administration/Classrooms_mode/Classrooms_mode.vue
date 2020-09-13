@@ -342,20 +342,26 @@ export default {
         }).then((res) =>{
           // console.log(res.data)
           if (res.data.code == 200) {
-            that.modular_1 = false
-            that.modular_2 = true
-            that.chapterData = '' // 已选章节置空
-            that.courseData = '' // 已选课程
-            that.levelData = '' // 已选级别
-            that.difficultyData = '' // 已选难度
-            that.knowledgeData = '' // 已选知识点置空
-            that.topicNumber = '' // 练习题数置空
-            that.search = '' // 题库置空
-            that.searchData = [] // 已选题库置空
-            that.practice = false // 开启练习题数
-            that.searchDataL = '已选列表'
-            that.FnParent()
-            that.FnShowData()
+            if (res.data.data.errorCode) {
+              that.$message.error({
+                message: res.data.data.msg
+              })
+            } else {
+              that.modular_1 = false
+              that.modular_2 = true
+              that.chapterData = '' // 已选章节置空
+              that.courseData = '' // 已选课程
+              that.levelData = '' // 已选级别
+              that.difficultyData = '' // 已选难度
+              that.knowledgeData = '' // 已选知识点置空
+              that.topicNumber = '' // 练习题数置空
+              that.search = '' // 题库置空
+              that.searchData = [] // 已选题库置空
+              that.practice = false // 开启练习题数
+              that.searchDataL = '已选列表'
+              that.FnParent()
+              that.FnShowData()
+            }
           } else {
             that.$message.error(res.data.message)
           }
@@ -376,12 +382,9 @@ export default {
             questionIds: that.searchId.toString()
           }
         }).then((res) =>{
+          // console.log(res.data)
           if (res.data.code == 200) {
-            if (res.data.data.code == '20001') {
-              that.$message.error({
-                message: res.data.data.message
-              })
-            } else if (res.data.data.code == '20003') {
+            if (res.data.data.code != 200) {
               that.$message.error({
                 message: res.data.data.message
               })
@@ -451,7 +454,7 @@ export default {
             patternType: 2,
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             if(res.data.data.length != 0){
               that.modular_1 = false
@@ -517,7 +520,7 @@ export default {
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
       var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
       var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
   }

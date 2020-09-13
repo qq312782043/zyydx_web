@@ -120,7 +120,7 @@ export default {
             id: that.id.id,
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.StudentData = that.$store.state.PaperDetails
@@ -142,7 +142,7 @@ export default {
             typeId: that.id.typeId,
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             that.StudentData = res.data.data

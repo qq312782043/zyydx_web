@@ -235,7 +235,7 @@ export default {
     },
 
     // 执行函数
-    FnGetStatus() { // 获取原文系统状态
+    FnGetStatus() { // 获取系统状态
       let that = this
       that.$axios({
         url: that.$store.state.Q_http + 'user/getUser',

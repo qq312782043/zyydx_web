@@ -108,7 +108,7 @@ export default {
       curPage: 1, // 第几页
       pageSize: 10, // 每页几条
       sortColumn: 'flag_avg_score', // 排序字段
-      sortType: 1, // 排序方式
+      sortType: 0, // 排序方式
       totalElements: 0, // 分页全部数量
       AnalysisData: [], // 试题分析数据
       TimeData: [], // 时间数据
@@ -192,7 +192,7 @@ export default {
             sortType: that.sortType
           }
         }).then((res) =>{
-          console.log(res.data.data.elements)
+          // console.log(res.data.data.elements)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements
