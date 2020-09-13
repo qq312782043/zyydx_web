@@ -8,6 +8,9 @@ export default new Vuex.Store({
     Y_http: 'http://192.168.112.73:8080/hospital-service/hospital/partner/',
     loginData: '', // 登录成功用户数据
     SelectSystem: '', // 用户选择的哪个系统
+    SystemID: '', // 系统ID
+    StudentListData: '', // 考试成绩查询跳转数据
+    PaperDetails: '', // 考试成绩查询跳转数据详情页
     navList: [ // 二级导航
       {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice',id:1},
       {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},

@@ -19,8 +19,6 @@ export default {
   data () {
     return {
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
-      SelectSystemID: '',
-      loginData: this.$store.state.loginData, // 用户数据
       navList: ''
     }
   },
@@ -31,16 +29,8 @@ export default {
   },
   created() {
     let that = this
-    console.log(that.$store.state.navList)
     that.navList = that.$store.state.navList
     that.FnGetStatus()
-    if (that.SelectSystem == '原文实训') {
-      that.SelectSystemID = 1
-    } else if (that.SelectSystem == '案例实训') {
-      that.SelectSystemID = 2
-    } else if (that.SelectSystem == '问诊实训') {
-      that.SelectSystemID = 3
-    }
   },
   methods: {
     clickTabBar(e,id) { // 点击切换
@@ -65,15 +55,24 @@ export default {
       let that = this
       that.$axios({
         url: that.$store.state.Q_http + 'user/getUser',
-        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.loginData.user.requestToken },
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.$store.state.loginData.user.requestToken },
         method: 'post',
         data: {
-          userId: that.loginData.user.id,
+          userId: that.$store.state.loginData.user.id,
         }
       }).then((res) =>{
         // console.log(res.data.data.systemStatusList)
         if (res.data.code == 200) {
-          if (res.data.data.systemStatusList[1].patternType == 1) {
+          let index = ''
+          if (that.$store.state.SystemID == 1) {
+            index = 0
+          } else if (that.$store.state.SystemID == 2) {
+            index = 1
+          } else if (that.$store.state.SystemID == 3) {
+            index = 2
+          }
+          // console.log(res.data.data.systemStatusList[index])
+          if (res.data.data.systemStatusList[index].patternType == 1) {
             that.navList = [
               {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice',id:1},
               {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
@@ -81,7 +80,7 @@ export default {
             ]
             that.$router.replace({path:'/FreePractice_mode'})
             that.$store.state.navList = that.navList
-          } else if (res.data.data.systemStatusList[1].patternType == 2) {
+          } else if (res.data.data.systemStatusList[index].patternType == 2) {
             that.navList = [
               {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
               {text:'课堂练习模式',route:'/Classrooms_mode',class:'Choice',id:2},
@@ -89,7 +88,7 @@ export default {
             ]
             that.$router.replace({path:'/Classrooms_mode'})
             that.$store.state.navList = that.navList
-          } else {
+          } else if (res.data.data.systemStatusList[index].patternType == 3)  {
             that.navList = [
               {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
               {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
@@ -109,12 +108,12 @@ export default {
         url: that.$store.state.Q_http + 'common/modifyPatternType',
         method: 'post',
         data: {
-          id: that.SelectSystemID,
-          userId: that.loginData.user.id,
+          id: that.$store.state.SystemID,
+          userId: that.$store.state.loginData.user.id,
           patternType: id,
         }
       }).then((res) =>{
-        console.log(res.data)
+        // console.log(res.data)
         if (res.data.data.errorCode == 10006) {
           that.$alert('当前有正在进行的考试，请先收卷再切换模式', '提示', {
             confirmButtonText: '确定',

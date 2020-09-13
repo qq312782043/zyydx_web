@@ -17,7 +17,7 @@
         <div class="title">请选择使用的系统</div>
         <div class="content">
           <div class="btn_box">
-            <div class="item" style="background:#923222" @click="jumpPlatform('原文实训')">
+            <div class="item" style="background:#923222" @click="jumpPlatform('原文实训',1)">
               <h4>经典原文实训</h4><h6>原文实训</h6>
             </div>
             <div class="switch">
@@ -26,7 +26,7 @@
             </div>
           </div>
           <div class="btn_box">
-            <div class="item" style="background:#015AA7" @click="jumpPlatform('案例实训')">
+            <div class="item" style="background:#015AA7" @click="jumpPlatform('案例实训',2)">
               <h4>经典案例实训</h4><h6>案例实训</h6>
             </div>
             <div class="switch">
@@ -96,8 +96,8 @@ export default {
     }
     return {
       loginData: this.$store.state.loginData, // 用户数据
-      dialogVisible: false,
-      escape: false,
+      dialogVisible: false, // 点击空白区域判断窗口是否关闭弹框
+      escape: false, // 按ESC键断窗口是否关闭弹框
       ImplementData: '',
       systemStatus1: true,
       systemStatus2: true,
@@ -184,7 +184,7 @@ export default {
         })
       }).catch(() => {})
     },
-    jumpPlatform(e) { // 跳转平台页面
+    jumpPlatform(e,id) { // 跳转平台页面
       let that = this
       if (e == '原文实训') {
         that.$store.state.tabList = [
@@ -206,6 +206,7 @@ export default {
       }
       that.$router.replace({path:'/Platform'})
       that.$store.state.SelectSystem = e
+      that.$store.state.SystemID = id
     },
     clickSwitch(e) { // 开关
       let that = this

@@ -19,19 +19,19 @@
       <div class="input_box">
         <el-input placeholder="学生姓名" v-model="userName" size="small" clearable></el-input>
         <el-input placeholder="考试名称" v-model="examinationName" size="small" clearable></el-input>
-        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="chapterId" filterable multiple collapse-tags
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="courseId" filterable multiple collapse-tags
           clearable placeholder="课程" size="small">
-          <el-option v-for="item in optionData.courseId" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in optionData.course" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="chapterId" filterable multiple collapse-tags
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="practiceDifficulty" filterable multiple collapse-tags
           clearable placeholder="难度" size="small">
-          <el-option v-for="item in optionData.practiceDifficulty" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in practiceDifficultyData" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="patternType" filterable multiple collapse-tags
+        <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="levelId" filterable multiple collapse-tags
           clearable placeholder="级别" size="small">
-          <el-option v-for="item in optionData.levelId" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in optionData.level" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
         <el-select v-show="SelectSystem=='案例实训'?true:false" v-model="categoryId" filterable multiple collapse-tags
@@ -53,9 +53,10 @@
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
     <div class="main" ref="heights" v-else>
-      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" border style="width:100%" :max-height="heightCss" size="small">
+      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'wrongRate',order:'ascending'}"
+        border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="id" label="题库ID" width="80"></el-table-column>
-        <el-table-column align="center" prop="wrongRate" label="错误率" width="80"></el-table-column>
+        <el-table-column align="center" prop="wrongRate" label="错误率" width="90" sortable="custom"></el-table-column>
         <el-table-column align="center" prop="rightNum" label="正确个数" width="80"></el-table-column>
         <el-table-column align="center" prop="wrongNum" label="错误个数" width="80"></el-table-column>
         <el-table-column align="center" prop="courseValue" label="课程" width="120"></el-table-column>
@@ -69,9 +70,10 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="AnalysisData" border style="width:100%" :max-height="heightCss" size="small">
+      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'flagAvgScore',order:'ascending'}"
+        border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="questionId" label="题库ID" width="80"></el-table-column>
-        <el-table-column align="center" prop="flagAvgScore" label="平均分" width="80"></el-table-column>
+        <el-table-column align="center" prop="flagAvgScore" label="平均分" width="90" sortable="custom"></el-table-column>
         <el-table-column align="center" prop="flagRight" label="正确个数" width="80"></el-table-column>
         <el-table-column align="center" prop="flagWrong" label="错误个数" width="80"></el-table-column>
         <el-table-column align="center" prop="chapterId" label="章节" width="110"></el-table-column>
@@ -105,6 +107,8 @@ export default {
       loading: false, // 页面加载
       curPage: 1, // 第几页
       pageSize: 10, // 每页几条
+      sortColumn: 'flag_avg_score', // 排序字段
+      sortType: 1, // 排序方式
       totalElements: 0, // 分页全部数量
       AnalysisData: [], // 试题分析数据
       TimeData: [], // 时间数据
@@ -116,9 +120,19 @@ export default {
       categoryId: '', // 已选病症类别ID
       chapterId: '', // 已选章节ID
       patternType: '', // 已选模式ID
-      courseId: '', // 课程ID
-      levelId: '', // 级别ID
-      practiceDifficulty: '', // 难度ID
+      courseId: '', // 已选课程ID
+      levelId: '', // 已选级别ID
+      practiceDifficulty: '', // 已选难度
+      practiceDifficultyData: [{
+        id: '1',
+        name: '一级'
+      },{
+        id: '2',
+        name: '二级'
+      },{
+        id: '3',
+        name: '三级'
+      }],
       optionData: [], // 下拉框总数据数据（级别、章节、模式、课程、难度）
     }
   },
@@ -143,6 +157,15 @@ export default {
       that.curPage = val
       that.clickSearch()
     },
+    sortChange(column) { // 排序监听
+      let that = this
+      if (column.order == 'ascending') {
+        that.sortType = 1
+      } else {
+        that.sortType = 0
+      }
+      that.clickSearch()
+    },
 
     // 点击函数区域
     clickSearch() { // 点击搜索
@@ -159,18 +182,17 @@ export default {
             className: that.className,
             studentNumber: that.studentNumber,
             examinationName: that.examinationName,
-            chapterId: that.chapterId.toString(),
-            categoryId: that.categoryId.toString(),
-            mode: that.patternType.toString(),
-            courseId: that.courseId.toString(),
-            levelId: that.levelId.toString(),
-            practiceDifficulty: that.practiceDifficulty.toString(),
+            chapterIds: that.chapterId.toString(),
+            patternTypes: that.patternType.toString(),
+            courseIds: that.courseId.toString(),
+            levelIds: that.levelId.toString(),
+            practiceDifficultys: that.practiceDifficulty.toString(),
             curPage: that.curPage,
             pageSize: that.pageSize,
-            sortTypes: '1'
+            sortType: that.sortType
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          console.log(res.data.data.elements)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements
@@ -199,8 +221,8 @@ export default {
             mode: that.patternType.toString(),
             curPage: that.curPage,
             pageSize: that.pageSize,
-            sortColumn: '',
-            orderBy: ''
+            sortColumn: that.sortColumn,
+            orderBy: that.sortType
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -228,63 +250,122 @@ export default {
       that.categoryId = '', // 病症类别ID
       that.chapterId = '', // 章节ID
       that.patternType = '', // 模式ID
+      that.practiceDifficulty = '' // 难度
+      that.courseId = '' // 课程
+      that.levelId = '' // 级别
+      that.sortTypes = 1
+      that.$message({
+        message: '重置成功~',
+        type: 'success',
+        duration: '1000'
+      })
       that.clickSearch()
     },
     clickExportFile() { // 点击导出文件
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOneExcel',
-        // url: 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryQuestionDescriptionOneExcel',
-        method: 'post',
-        responseType: 'blob',
-        data: {
-          startDate: that.TimeData[0]?that.TimeData[0]:'',
-          endDate: that.TimeData[1]?that.TimeData[1]:'',
-          questionId: that.questionId,
-          userName: that.userName,
-          className: that.className,
-          studentNumber: that.studentNumber,
-          examinationName: that.examinationName,
-          chapterId: that.chapterId.toString(),
-          categoryId: that.categoryId.toString(),
-          mode: that.patternType.toString(),
-          sortColumn: 'flag_avg_score',
-          orderBy: 1
-        }
-      }).then((res) =>{
-        // console.log(res)
-        const blob = new Blob([res.data])
-        const fileName = "试题分析.xlsx"
-        if ("download" in document.createElement("a")) { // 非IE下载
-          const elink = document.createElement("a")
-          elink.download = fileName
-          elink.style.display = "none"
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href)
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/exportOriginalExaminationAnalyse',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            courseIds: that.courseId.toString(),
+            chapterIds: that.chapterId.toString(),
+            levelIds: that.levelId.toString(),
+            patternTypes: that.patternType.toString(),
+            practiceDifficultys: that.practiceDifficulty.toString(),
+            sortType: 1
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const fileName = "试题分析(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOneExcel',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            chapterId: that.chapterId.toString(),
+            categoryId: that.categoryId.toString(),
+            mode: that.patternType.toString(),
+            sortColumn: 'flag_avg_score',
+            orderBy: 1
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const fileName = "试题分析(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      }
     },
     clickToView(e) { // 点击查看
       let that = this
-      that.$store.state.tabList = [
-        {text:'课堂管理',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
-        {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
-        {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
-        {text:'学生答题数据',route:'/AnswerData',class:'Choice',icon:'el-icon-s-claim'},
-        {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
-        {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
-      ]
+      if (that.SelectSystem == '原文实训') {
+        that.$store.state.tabList = [
+          {text:'课堂管理',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
+          {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+          {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+          {text:'学生答题数据',route:'/AnswerData',class:'Choice',icon:'el-icon-s-claim'},
+          {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+        ]
+      } else if (that.SelectSystem == '案例实训') {
+        that.$store.state.tabList = [
+          {text:'课堂管理',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
+          {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
+          {text:'试题分析',route:'/Analysis',class:'NoChoice',icon:'el-icon-s-flag'},
+          {text:'学生答题数据',route:'/AnswerData',class:'Choice',icon:'el-icon-s-claim'},
+          {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
+          {text:'考试管理',route:'/Examination',class:'NoChoice',icon:'el-icon-s-help'},
+        ]
+      }
       that.appendData()
       that.$router.replace({
         path:'/AnswerData',
         query: {
           TimeData: that.TimeData,
-          questionId: e.questionId,
+          questionId: e.questionId?e.questionId:e.id,
           userName: that.userName,
           className: that.className,
           studentNumber: that.studentNumber,
@@ -292,6 +373,9 @@ export default {
           chapterId: that.chapterId,
           categoryId: that.categoryId,
           mode: that.patternType,
+          practiceDifficulty: that.practiceDifficulty,
+          levelId: that.levelId,
+          courseId: that.courseId,
         }
       })
     },
@@ -299,19 +383,33 @@ export default {
     // 执行函数区域
     FnOptionData() { // 请求下拉筛选条件数据（知识点、章节、病症类别、模式）
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
-        method: 'post',
-      }).then((res) =>{
-        // console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.optionData = res.data.data
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    },
-  },
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
+          method: 'post',
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.optionData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
+          method: 'post',
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.optionData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else {}
+    }
+  }
 }
 </script>
 

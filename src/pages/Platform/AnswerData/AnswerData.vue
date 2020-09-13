@@ -26,7 +26,7 @@
         </el-select>
         <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="practiceDifficulty" filterable multiple collapse-tags
           clearable placeholder="难度" size="small">
-          <el-option v-for="item in optionData.practiceDifficulty" :key="item.id" :label="item.name" :value="item.id">
+          <el-option v-for="item in practiceDifficultyData" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
         <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="levelId" filterable multiple collapse-tags
@@ -55,7 +55,7 @@
     <div class="main" ref="heights" v-else>
       <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="questionId" label="题库ID" width="70"></el-table-column>
-        <el-table-column align="center" prop="submitOn" label="时间" width="130" :formatter="formatTime"></el-table-column>
+        <el-table-column align="center" prop="submitOn" label="时间" width="130" :formatter="formatTime1"></el-table-column>
         <el-table-column align="center" prop="userName" label="姓名" width="70"></el-table-column>
         <el-table-column align="center" prop="className" label="班级号" width="70"></el-table-column>
         <el-table-column align="center" prop="studentNumber" label="学号" width="70"></el-table-column>
@@ -66,7 +66,7 @@
         <el-table-column align="center" prop="levelValue" label="级别" width="70"></el-table-column>
         <el-table-column align="center" prop="chapterValue" label="章节" width="110"></el-table-column>
         <el-table-column align="center" prop="knowledgeValues" label="知识点" width="110"></el-table-column>
-        <el-table-column align="center" prop="practiceDifficulty" label="难度" width="70"></el-table-column>
+        <el-table-column align="center" prop="practiceDifficulty" label="难度" width="70" :formatter="formatTime2"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
@@ -118,6 +118,16 @@ export default {
       levelId: '', // 级别ID
       courseId: '', // 课程ID
       practiceDifficulty: '', // 难度
+      practiceDifficultyData: [{
+        id: '1',
+        name: '一级'
+      },{
+        id: '2',
+        name: '二级'
+      },{
+        id: '3',
+        name: '三级'
+      }],
       questionId: '', // 题库ID
       className: '', // 班级号
       userName: '', // 学生姓名
@@ -158,6 +168,15 @@ export default {
     if (that.$route.query.TimeData) {
       that.TimeData = that.$route.query.TimeData
     }
+    if (that.$route.query.practiceDifficulty) {
+      that.practiceDifficulty = that.$route.query.practiceDifficulty
+    }
+    if (that.$route.query.levelId) {
+      that.levelId = that.$route.query.levelId
+    }
+    if (that.$route.query.courseId) {
+      that.courseId = that.$route.query.courseId
+    }
     that.clickSearch()
     that.FnOptionData()
   },
@@ -193,16 +212,16 @@ export default {
             className: that.className,
             studentNumber: that.studentNumber,
             examinationName: that.examinationName,
-            levelId: that.levelId.toString(),
-            courseId: that.courseId.toString(),
-            practiceDifficulty: that.practiceDifficulty.toString(),
-            chapterId: that.chapterId.toString(),
-            mode: that.patternType.toString(),
+            levelIds: that.levelId.toString(),
+            courseIds: that.courseId.toString(),
+            practiceDifficultys: that.practiceDifficulty.toString(),
+            chapterIds: that.chapterId.toString(),
+            patternTypes: that.patternType.toString(),
             curPage: that.curPage,
             pageSize: that.pageSize
           }
         }).then((res) =>{
-          console.log(res.data.data)
+          // console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
             for(var i = 0; i < res.data.data.elements.length; i++){
@@ -272,49 +291,103 @@ export default {
       that.categoryId = '', // 病症类别ID
       that.chapterId = '', // 章节ID
       that.patternType = '', // 模式ID
+      that.practiceDifficulty = '' // 难度
+      that.courseId = '' // 课程
+      that.levelId = '' // 级别
+      that.$message({
+        message: '重置成功~',
+        type: 'success',
+        duration: '1000'
+      })
       that.clickSearch()
     },
     clickExportFile() { // 点击导出文件
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwoExcel',
-        method: 'post',
-        responseType: 'blob',
-        data: {
-          startDate: that.TimeData[0]?that.TimeData[0]:'',
-          endDate: that.TimeData[1]?that.TimeData[1]:'',
-          questionId: that.questionId,
-          userName: that.userName,
-          className: that.className,
-          studentNumber: that.studentNumber,
-          examinationName: that.examinationName,
-          chapterId: that.chapterId.toString(),
-          categoryId: that.categoryId.toString(),
-          mode: that.patternType.toString(),
-        }
-      }).then((res) =>{
-        // console.log(res)
-        const blob = new Blob([res.data])
-        const fileName = "学生答题数据.xlsx"
-        if ("download" in document.createElement("a")) { // 非IE下载
-          const elink = document.createElement("a")
-          elink.download = fileName
-          elink.style.display = "none"
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href)
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/exportOriginalStudentAnswer',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            chapterIds: that.chapterId.toString(),
+            levelIds: that.levelId.toString(),
+            courseIds: that.courseId.toString(),
+            practiceDifficultys: that.practiceDifficulty.toString(),
+            patternTypes: that.patternType.toString(),
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const fileName = "学生答题数据(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwoExcel',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            startDate: that.TimeData[0]?that.TimeData[0]:'',
+            endDate: that.TimeData[1]?that.TimeData[1]:'',
+            questionId: that.questionId,
+            userName: that.userName,
+            className: that.className,
+            studentNumber: that.studentNumber,
+            examinationName: that.examinationName,
+            chapterId: that.chapterId.toString(),
+            categoryId: that.categoryId.toString(),
+            mode: that.patternType.toString(),
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const fileName = "学生答题数据(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      }
     },
     clickToView(e) { // 点击查看
       let that = this
+      let parameter = {}
+      if (that.SelectSystem == '原文实训') {
+        parameter = { id: e.id , userId: e.userId }
+      } else if (that.SelectSystem == '案例实训') {
+        parameter = { questionId: e.questionId , userId: e.userId , examinationId: e.examinationId }
+      }
       that.$router.replace({
         path:'/AnswerDetails',
-        query: { questionId: e.questionId , userId: e.userId , examinationId: e.examinationId}
+        query: parameter
       })
     },
 
@@ -323,7 +396,7 @@ export default {
       let that = this
       if (that.SelectSystem == '原文实训') {
         that.$axios({
-          url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByType',
+          url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
           method: 'post',
         }).then((res) =>{
           console.log(res.data.data)
@@ -347,16 +420,20 @@ export default {
         })
       } else {}
     },
-    formatTime(row, column) { // 时间戳转换
+    formatTime1(row) { // 时间戳转换
       let date = new Date(parseInt(row.submitOn))
       var Y = date.getFullYear() + '-'
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
-      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
-      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
+      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
+      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
       var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
       return Y + M + D + h + m
     },
-  },
+    formatTime2(row) {
+      let date = row.practiceDifficulty + '级'
+      return date
+    },
+  }
 }
 </script>
 

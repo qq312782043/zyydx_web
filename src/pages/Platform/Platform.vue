@@ -133,11 +133,19 @@ export default {
       }).then((res) =>{
         // console.log(res.data.data.systemStatusList)
         if (res.data.code == 200) {
-          if (res.data.data.systemStatusList[1].patternType == 1) {
+          let index = ''
+          if (that.$store.state.SystemID == 1) {
+            index = 0
+          } else if (that.$store.state.SystemID == 2) {
+            index = 1
+          } else if (that.$store.state.SystemID == 3) {
+            index = 2
+          }
+          if (res.data.data.systemStatusList[index].patternType == 1) {
             that.title = '自由练习模式'
-          } else if (res.data.data.systemStatusList[1].patternType == 2) {
+          } else if (res.data.data.systemStatusList[index].patternType == 2) {
             that.title = '课堂练习模式'
-          } else {
+          } else if (res.data.data.systemStatusList[index].patternType == 3) {
             that.title = '考试模式'
           }
         }

@@ -5,16 +5,28 @@
         <div class="Range">
           <p class="text_1">选择练习范围<span>*不勾选则视为全选</span></p>
           <div class="contact">
-            <div class="chapter">
-              <div class="text_2">章节</div>
-              <el-select v-model="ChapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
-                <el-option v-for="item in Chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
+              <div class="text_2">课程</div>
+              <el-select v-model="courseData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in course" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </div>
+            <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
+              <div class="text_2">级别</div>
+              <el-select v-model="levelData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in level" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter">
+              <div class="text_2">章节</div>
+              <el-select v-model="chapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </div>
+            <div class="chapter" v-show="SelectSystem!='原文实训'?true:false">
               <div class="text_2">病症类别</div>
-              <el-select v-model="CategoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
-                <el-option v-for="item in Category" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              <el-select v-model="categoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
+                <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
           </div>
@@ -40,12 +52,12 @@
           <p class="text_1">*选择练习难度</p>
           <div class="knowledge">
             <el-select v-model="difficultyData" size="small" clearable placeholder="请选择试题难度">
-              <el-option v-for="(item,i) in difficulty" :key="i" :label="item.label" :value="item.value"></el-option>
+              <el-option v-for="(item,i) in difficulty" :key="i" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </div>
         </div>
         <div class="Range">
-          <p class="text_1">*练习题数<span>*如选择指定试题，该项配置失效</span></p>
+          <p class="text_1">*练习题数<span>*如选择指定试题,该项配置失效</span></p>
           <div class="knowledge">
             <el-input v-model="topicNumber" :disabled="practice" size="small" clearable placeholder="请输入练习题数"></el-input>
           </div>
@@ -57,7 +69,7 @@
           <el-tab-pane :label="search.length==0?'题库列表':'题库列表('+search.length+')'">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in search" :key="i">
-                <p class="text_1">{{i+1}}、{{item.chiefComplaint}}</p>
+                <p class="text_1">{{i+1}}、{{item.chiefComplaint?item.chiefComplaint:item.qustionShowText}}</p>
                 <p class="text_2" v-if="item.flag" @click="clickAdd(item,i)"><i class="el-icon-circle-plus"></i></p>
               </div>
               <div class="Tips">{{search.length==0?'没有可用题目':'共'+search.length+'道题'}}</div>
@@ -66,7 +78,7 @@
           <el-tab-pane :label="searchDataL">
             <el-main class="el_search">
               <div class="list" v-for="(item,i) in searchData" :key="i">
-                <p class="text_1">{{i+1}}、{{item.chiefComplaint}}</p>
+                <p class="text_1">{{i+1}}、{{item.chiefComplaint?item.chiefComplaint:item.qustionShowText}}</p>
                 <p class="text_2" @click="clickReduce(item.id)"><i class="el-icon-remove"></i></p>
               </div>
               <div class="Tips">{{searchData.length==0?'暂无已选试题':''}}</div>
@@ -78,17 +90,38 @@
       <div class="button_box"><el-button type="warning" size="small" @click="clickExamination()">开始课堂练习</el-button></div>
     </div>
     <div v-show="modular_2" class="Answer_sheet">
-      <p class="gestive">正在进行的课堂练习...</p>
-      <div class="Answer_crad">
-        <p class="title">经典案例实训课堂练习</p>
-        <p class="text_1">范围</p>
-        <p class="text_2 text_4">章节：<span>{{caseData.chapterIds}}</span></p>
-        <p class="text_2 text_4">病症类别：<span>{{caseData.categoryIds}}</span></p>
-        <p class="text_2" style="margin-top:20px">知识点：<span>{{caseData.knowledgePointsIds}}</span></p>
-        <p class="text_2">题数：<span>{{caseData.practiceNum}}</span></p>
-        <div class="set_up clear">
-          <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
-          <el-button type="warning" @click="clickSetUp()">设置新的练习范围</el-button>
+      <div v-if="SelectSystem=='原文实训'">
+        <div v-for="(item,i) in caseData" :key="i">
+          <p class="gestive">正在进行的课堂练习...</p>
+          <div class="Answer_crad">
+            <p class="title">经典原文课堂练习</p>
+            <p class="text_1">范围</p>
+            <p class="text_2 text_4">课程：<span>{{item.courseValues}}</span></p>
+            <p class="text_2 text_4">级别：<span>{{item.levelValues}}</span></p>
+            <p class="text_2 text_4">章节：<span>{{item.chapterValues}}</span></p>
+            <p class="text_2" style="margin-top:20px">知识点：<span>{{item.knowledgePointsValues}}</span></p>
+            <p class="text_2">题数：<span>{{item.practiceNum}}</span></p>
+            <p class="text_2">难度：<span>{{item.practiceDifficulty}}级难度</span></p>
+            <div class="set_up clear">
+              <p class="text_2 text_3">发起时间：<span>{{formatTime(item.createOn)}}</span></p>
+              <el-button type="warning" @click="clickSetUp()">设置新的练习范围</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div v-else-if="SelectSystem=='案例实训'">
+        <p class="gestive">正在进行的课堂练习...</p>
+        <div class="Answer_crad">
+          <p class="title">经典案例实训课堂练习</p>
+          <p class="text_1">范围</p>
+          <p class="text_2 text_4">章节：<span>{{caseData.chapterIds}}</span></p>
+          <p class="text_2 text_4">病症类别：<span>{{caseData.categoryIds}}</span></p>
+          <p class="text_2" style="margin-top:20px">知识点：<span>{{caseData.knowledgePointsIds}}</span></p>
+          <p class="text_2">题数：<span>{{caseData.practiceNum}}</span></p>
+          <div class="set_up clear">
+            <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
+            <el-button type="warning" @click="clickSetUp()">设置新的练习范围</el-button>
+          </div>
         </div>
       </div>
     </div>
@@ -104,13 +137,17 @@ export default {
       modular_1: false,
       modular_2: false,
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
-      Chapter: '', // 章节
-      ChapterData: '', // 已选章节
-      Category: '', // 病症类别
-      CategoryData: '', // 已选病症类别
+      chapter: '', // 章节
+      chapterData: '', // 已选章节
+      category: '', // 病症类别
+      categoryData: '', // 已选病症类别
       topicNumber: '', // 练习题数
-      difficulty: '', // 考试难度
-      difficultyData: '', // 已选考试难度
+      difficulty: '', // 难度
+      difficultyData: '', // 已选难度
+      course: '', // 课程
+      courseData: '', // 已选课程
+      level: '', // 级别
+      levelData: '', // 已选级别
       knowledge: '', // 知识点
       knowledgeData: [], // 已选知识点
       knowledgeId: '', // 已选知识点ID
@@ -124,30 +161,7 @@ export default {
   },
   created() {
     let that = this
-    that.$axios({
-      url: that.$store.state.Q_http + 'caseExamination/caseMainInformation',
-      method: 'post',
-      data: {
-        patternType: 2,
-      }
-    }).then((res) =>{
-      // console.log(res.data)
-      if (res.data.code == 200) {
-        if(res.data.data.code == 200){
-          that.modular_1 = false
-          that.modular_2 = true
-          that.caseData = res.data.data
-        } else {
-          that.modular_1 = true
-          that.modular_2 = false
-          that.knowledge = res.data.data.KnowledgePoints
-          that.Category = res.data.data.Category
-          that.Chapter = res.data.data.Chapter
-        }
-      }
-    }).catch((err) =>{
-      that.$message.error('请求失败!')
-    })
+    that.FnShowData()
   },
   methods: {
     ChoiceKnowledge(value) { // 选择知识点
@@ -195,29 +209,70 @@ export default {
     },
     clickSearch() { // 搜索题库
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
-        method: 'post',
-        data: {
-          chapterIds: that.ChapterData.toString(),
-          categoryIds: that.CategoryData.toString(),
-          knowledgePointsIds: that.knowledgeId
-        }
-      }).then((res) =>{
-        console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.search = res.data.data.data
-          for(var i = 0; i < that.search.length; i++){
-            for(var j = 0; j < that.searchData.length; j++){
-              if (that.search[i].id == that.searchData[j].id) {
-                that.search[i].flag = false
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalExamination/searchQuestionList',
+          method: 'post',
+          data: {
+            chapterIds: that.chapterData.toString(),
+            courseIds: that.courseData.toString(),
+            levelIds: that.levelData.toString(),
+            knowledgeIds: that.knowledgeId
+          }
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.search = res.data.data.questionList
+            if (res.data.data.questionList.length != 0) {
+              for(var i = 0; i < that.search.length; i++){
+                for(var j = 0; j < that.searchData.length; j++){
+                  if (that.search[i].id == that.searchData[j].id) {
+                    that.search[i].flag = false
+                  }
+                }
               }
+            } else {
+              this.$message({
+                message: '没有搜到可用题目',
+                type: 'warning'
+              })
             }
           }
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
+          method: 'post',
+          data: {
+            chapterIds: that.chapterData.toString(),
+            categoryIds: that.categoryData.toString(),
+            knowledgePointsIds: that.knowledgeId
+          }
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.search = res.data.data.data
+            if (res.data.data.data.length != 0) {
+              for(var i = 0; i < that.search.length; i++){
+                for(var j = 0; j < that.searchData.length; j++){
+                  if (that.search[i].id == that.searchData[j].id) {
+                    that.search[i].flag = false
+                  }
+                }
+              }
+            } else {
+              this.$message({
+                message: '没有搜到可用题目',
+                type: 'warning'
+              })
+            }
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
     },
     clickAdd(value,index) { // 添加题库
       let that = this
@@ -255,37 +310,44 @@ export default {
     },
     clickExamination() { // 开始练习
       let that = this
-      let data = {
-        patternType: 2,
-        createUserId: that.$store.state.loginData.user.id,
-        chapterIds: that.ChapterData.toString(),
-        categoryIds: that.CategoryData.toString(),
-        knowledgePointsIds: that.knowledgeId,
-        practiceNum: that.topicNumber || that.searchData.length,
-        questionIds: that.searchId.toString()
-      }
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/caseExamBeginTeacher',
-        method: 'post',
-        data: data
-      }).then((res) =>{
-        // console.log(data)
-        console.log(res.data)
-        if (res.data.code == 200) {
-          if (res.data.data.code == '20001') {
+      if (that.SelectSystem == '原文实训') {
+        if (!that.difficultyData) {
+          that.$message.error({
+            message: '请选择练习难度'
+          })
+          return
+        }
+        if (that.searchData.length == 0) {
+          if (!that.topicNumber) {
             that.$message.error({
-              message: res.data.data.message
+              message: '请填写练习题数'
             })
-          } else if (res.data.data.code == '20003') {
-            that.$message.error({
-              message: res.data.data.message
-            })
-          } else {
+            return
+          }
+        }
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalExamination/saveOriginalExamination',
+          method: 'post',
+          data: {
+            createUserId: that.$store.state.loginData.user.id,
+            patternType: 2,
+            chapterIds: that.chapterData.toString(),
+            knowledgePointsIds: that.knowledgeId,
+            levelIds: that.levelData.toString(),
+            practiceNum: that.searchData.length==0?that.topicNumber:that.searchData.length,
+            questionIds: that.searchId.toString(),
+            courseIds: that.courseData.toString(),
+            practiceDifficulty: that.difficultyData,
+          }
+        }).then((res) =>{
+          // console.log(res.data)
+          if (res.data.code == 200) {
             that.modular_1 = false
             that.modular_2 = true
-            that.caseData = res.data.data
-            that.ChapterData = '' // 已选章节置空
-            that.CategoryData = '' // 已选病症类别置空
+            that.chapterData = '' // 已选章节置空
+            that.courseData = '' // 已选课程
+            that.levelData = '' // 已选级别
+            that.difficultyData = '' // 已选难度
             that.knowledgeData = '' // 已选知识点置空
             that.topicNumber = '' // 练习题数置空
             that.search = '' // 题库置空
@@ -293,36 +355,170 @@ export default {
             that.practice = false // 开启练习题数
             that.searchDataL = '已选列表'
             that.FnParent()
+            that.FnShowData()
+          } else {
+            that.$message.error(res.data.message)
           }
-        } else {
-          that.$message.error({
-            message: res.data.message
-          })
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/caseExamBeginTeacher',
+          method: 'post',
+          data: {
+            patternType: 2,
+            createUserId: that.$store.state.loginData.user.id,
+            chapterIds: that.chapterData.toString(),
+            categoryIds: that.categoryData.toString(),
+            knowledgePointsIds: that.knowledgeId,
+            practiceNum: that.topicNumber || that.searchData.length,
+            questionIds: that.searchId.toString()
+          }
+        }).then((res) =>{
+          if (res.data.code == 200) {
+            if (res.data.data.code == '20001') {
+              that.$message.error({
+                message: res.data.data.message
+              })
+            } else if (res.data.data.code == '20003') {
+              that.$message.error({
+                message: res.data.data.message
+              })
+            } else {
+              that.modular_1 = false
+              that.modular_2 = true
+              that.caseData = res.data.data
+              that.chapterData = '' // 已选章节置空
+              that.categoryData = '' // 已选病症类别置空
+              that.knowledgeData = '' // 已选知识点置空
+              that.topicNumber = '' // 练习题数置空
+              that.search = '' // 题库置空
+              that.searchData = [] // 已选题库置空
+              that.practice = false // 开启练习题数
+              that.searchDataL = '已选列表'
+              that.FnParent()
+            }
+          } else {
+            that.$message.error({
+              message: res.data.message
+            })
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
+
+    },
+    clickSetUp() { // 设置新的练习题
+      let that = this
+      if (that.SelectSystem == '原文实训') {
+        that.modular_1 = true
+        that.modular_2 = false
+        that.FnOptionData()
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
+          method: 'post',
+          data: {
+            patternType: 2
+          }
+        }).then((res) =>{
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            that.modular_1 = true
+            that.modular_2 = false
+            that.knowledge = res.data.data.KnowledgePoints
+            that.category = res.data.data.Category
+            that.chapter = res.data.data.Chapter
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
+    },
+
+    // 执行区域函数
+    FnShowData() {
+      let that = this
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalExamination/queryExamination',
+          method: 'post',
+          data: {
+            userId: that.$store.state.loginData.user.id,
+            type: 1,
+            patternType: 2,
+          }
+        }).then((res) =>{
+          console.log(res.data)
+          if (res.data.code == 200) {
+            if(res.data.data.length != 0){
+              that.modular_1 = false
+              that.modular_2 = true
+              that.caseData = res.data.data
+            } else {
+              that.modular_1 = true
+              that.modular_2 = false
+              that.FnOptionData()
+            }
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/caseMainInformation',
+          method: 'post',
+          data: {
+            patternType: 2,
+          }
+        }).then((res) =>{
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            if(res.data.data.code == 200){
+              that.modular_1 = false
+              that.modular_2 = true
+              that.caseData = res.data.data
+            } else {
+              that.modular_1 = true
+              that.modular_2 = false
+              that.knowledge = res.data.data.KnowledgePoints
+              that.category = res.data.data.Category
+              that.chapter = res.data.data.Chapter
+            }
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
+    },
+    FnOptionData() { // 请求下拉筛选条件数据（知识点、章节、病症类别、模式）
+      let that = this
+      that.$axios({
+        url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
+        method: 'post',
+      }).then((res) =>{
+        // console.log(res.data.data)
+        if (res.data.code == 200) {
+          that.knowledge = res.data.data.KnowledgePoints
+          that.chapter = res.data.data.Chapter
+          that.level = res.data.data.level
+          that.course = res.data.data.course
+          that.difficulty = res.data.data.difficulty
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
       })
     },
-    clickSetUp() { // 设置新的练习题
-      let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestionBefore',
-        method: 'post',
-        data: {
-          patternType: 2
-        }
-      }).then((res) =>{
-        // console.log(res.data)
-        if (res.data.code == 200) {
-          that.modular_1 = true
-          that.modular_2 = false
-          that.knowledge = res.data.data.KnowledgePoints
-          that.Category = res.data.data.Category
-          that.Chapter = res.data.data.Chapter
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+    formatTime(row) { // 时间戳转换
+      let date = new Date(parseInt(row))
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
+      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
+      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      return Y + M + D + h + m
     },
   }
 }
@@ -410,7 +606,7 @@ export default {
   cursor: pointer;
 }
 .el_search .list p i:hover{
-  color:#41a310;
+  color:#BF8333;
   border-radius:50%;
 }
 .el_search .Tips{

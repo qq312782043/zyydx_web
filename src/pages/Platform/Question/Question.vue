@@ -313,54 +313,106 @@ export default {
       let that = this
       const formData = new FormData()
       formData.append('file', file)
-      that.$axios({
-        url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
-        headers: { 'Content-Type': 'multipart/form-data' },
-        method: 'post',
-        data: formData,
-      }).then((res) =>{
-        // console.log(res)
-        if (res.data.code == 200) {
-          that.clickSearch()
-          that.$message({
-            type: 'success',
-            message: '导入成功!',
-            duration: 1000
-          })
-        } else {
-          that.$message.error('导入失败，请查看表格格式!')
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'original/importQuestions?userId=' + that.$store.state.loginData.user.id,
+          headers: { 'Content-Type': 'multipart/form-data' },
+          method: 'post',
+          data: formData,
+        }).then((res) =>{
+          // console.log(res)
+          if (res.data.code == 200) {
+            that.clickSearch()
+            that.$message({
+              type: 'success',
+              message: '导入成功!',
+              duration: 1000
+            })
+          } else {
+            that.$message.error('导入失败，请查看表格格式!')
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
+          headers: { 'Content-Type': 'multipart/form-data' },
+          method: 'post',
+          data: formData,
+        }).then((res) =>{
+          // console.log(res)
+          if (res.data.code == 200) {
+            that.clickSearch()
+            that.$message({
+              type: 'success',
+              message: '导入成功!',
+              duration: 1000
+            })
+          } else {
+            that.$message.error('导入失败，请查看表格格式!')
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
     },
     clickExportFile() { // 点击导出文件
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'case/exportCaseQuestion',
-        method: 'post',
-        responseType: 'blob',
-        data: {
-          chapterId: that.ChapterData.toString(),
-          categoryId: that.CategoryData.toString(),
-        }
-      }).then((res) =>{
-        // console.log(res)
-        const blob = new Blob([res.data])
-        const fileName = "题库管理.xlsx"
-        if ("download" in document.createElement("a")) { // 非IE下载
-          const elink = document.createElement("a")
-          elink.download = fileName
-          elink.style.display = "none"
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href)
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'original/exportOriginalQuestion',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            chapterId: that.ChapterData.toString(),
+            levelId: that.LevelData.toString(),
+            courseId: that.CourseData.toString(),
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          const fileName = "题库管理.xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'case/exportCaseQuestion',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            chapterId: that.ChapterData.toString(),
+            categoryId: that.CategoryData.toString(),
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          const fileName = "题库管理.xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      }
     },
     clickToView(e) { // 点击查看题库详情
       let that = this
@@ -717,12 +769,12 @@ export default {
       }
     },
 
-    formatTime(row, column) { // 时间戳转换
+    formatTime(row) { // 时间戳转换
       let date = new Date(parseInt(row.updateOn))
       var Y = date.getFullYear() + '-'
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
-      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
-      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
+      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
+      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
       var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
       return Y + M + D + h + m
     },

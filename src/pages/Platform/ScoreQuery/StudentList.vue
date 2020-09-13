@@ -3,7 +3,30 @@
     <div class="Goback">
       <el-button type="text" icon="el-icon-arrow-left" @click="GoBack">返回</el-button>
     </div>
-    <div class="header">
+    <div v-if="SelectSystem=='原文实训'" class="header">
+      <div class="box_1">
+        <p class="text_1">考试ID：<span>{{StudentData.id}}</span></p>
+        <p class="text_1">考试名称：<span>{{StudentData.examinationName}}</span></p>
+        <p class="text_1">开始时间：<span>{{formatTime2(StudentData.createOn)}}</span></p>
+        <p class="text_1">结束时间：<span>{{formatTime2(StudentData.updateOn)}}</span></p>
+      </div>
+      <div class="box_1">
+        <p class="text_1">总分：<span>{{StudentData.fullScore}}</span></p>
+        <p class="text_1">最高分：<span>{{StudentData.maxScore}}</span></p>
+        <p class="text_1">最低分：<span>{{StudentData.minScore}}</span></p>
+        <p class="text_1">平均分：<span>{{StudentData.avgScore}}</span></p>
+      </div>
+      <div class="box_1">
+        <p class="text_1">课程：<span>{{StudentData.courseValues}}</span></p>
+        <p class="text_1">级别：<span>{{StudentData.levelValues}}</span></p>
+        <p class="text_1">章节：<span>{{StudentData.chapterValues}}</span></p>
+        <p class="text_1">难度：<span>{{StudentData.practiceDifficulty}}级</span></p>
+      </div>
+      <div class="box_1">
+        <p class="text_1">参考人数：<span>{{StudentData.attendCount}}人</span></p>
+      </div>
+    </div>
+    <div v-else-if="SelectSystem=='案例实训'" class="header">
       <div class="box_1">
         <p class="text_1">考试ID：<span>{{StudentData.examinationId}}</span></p>
         <p class="text_1">考试名称：<span>{{StudentData.examinationName}}</span></p>
@@ -17,11 +40,8 @@
         <p class="text_1">平均分：<span>{{StudentData.avgScore}}</span></p>
       </div>
       <div class="box_1">
-        <!-- <p class="text_1">课程：<span>伤寒</span></p> -->
-        <!-- <p class="text_1">级别：<span>一级</span></p> -->
         <p class="text_1">章节：<span>{{StudentData.chapterIds}}</span></p>
         <p class="text_1">病症类别：<span>{{StudentData.categoryIds}}</span></p>
-        <!-- <p class="text_1">难度：<span>很难</span></p> -->
       </div>
       <div class="box_1">
         <p class="text_1">参考人数：<span>{{StudentData.personNum}}</span></p>
@@ -102,7 +122,7 @@ export default {
     clickSearch() { // 点击搜索
       let that = this
       if (that.SelectSystem == '原文实训') {
-
+        that.FnShowData()
       } else if (that.SelectSystem == '案例实训') {
         that.$axios({
           url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoSearch',
@@ -132,39 +152,76 @@ export default {
     },
     clickExportFile() { // 点击导出文件
       let that = this
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOneExcel',
-        method: 'post',
-        responseType: 'blob',
-        data: {
-          id: that.id,
-          searchKey: that.searchKey,
-          sortColumn: 'sort',
-          orderBy: 1,
-        }
-      }).then((res) =>{
-        // console.log(res)
-        const blob = new Blob([res.data])
-        const fileName = "考试成绩查询.xlsx"
-        if ("download" in document.createElement("a")) { // 非IE下载
-          const elink = document.createElement("a")
-          elink.download = fileName
-          elink.style.display = "none"
-          elink.href = URL.createObjectURL(blob)
-          document.body.appendChild(elink)
-          elink.click()
-          URL.revokeObjectURL(elink.href)
-          document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
-        }
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/exportOriginalStudent',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            id: that.id,
+            examText: that.searchKey,
+            sortType: 1,
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+            const fileName = "学生列表(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      } else if (that.SelectSystem == '案例实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoExcel',
+          method: 'post',
+          responseType: 'blob',
+          data: {
+            id: that.id,
+            searchKey: that.searchKey,
+            sortColumn: 'sort',
+            orderBy: 1,
+          }
+        }).then((res) =>{
+          // console.log(res)
+          const blob = new Blob([res.data])
+          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+            const fileName = "学生列表(" + date +").xlsx"
+          if ("download" in document.createElement("a")) { // 非IE下载
+            const elink = document.createElement("a")
+            elink.download = fileName
+            elink.style.display = "none"
+            elink.href = URL.createObjectURL(blob)
+            document.body.appendChild(elink)
+            elink.click()
+            URL.revokeObjectURL(elink.href)
+            document.body.removeChild(elink)
+          } else { // IE10+下载
+            navigator.msSaveBlob(blob, fileName)
+          }
+        })
+      }
     },
     clickToView(e) { // 点击查看
       let that = this
-      console.log(e)
+      let parameter = {}
+      if (that.SelectSystem == '原文实训') {
+        parameter = { id: e.id }
+        that.$store.state.PaperDetails = e
+      } else if (that.SelectSystem == '案例实训') {
+        parameter = { userId: e.userId, examinationId: e.examinationId, typeId: 3 }
+      }
       that.$router.replace({path:'/PaperDetails',
-        query: { userId: e.userId, examinationId: e.examinationId, typeId: 3 }
+        query: parameter
       })
     },
     GoBack() { // 点击返回
@@ -175,7 +232,30 @@ export default {
     FnShowData() {
       let that = this
       if (that.SelectSystem == '原文实训') {
-
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/queryOriginalStudentPage',
+          method: 'post',
+          data: {
+            id: that.id,
+            curPage: that.curPage,
+            pageSize: that.pageSize,
+            examText: that.searchKey,
+            sortType: 1
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.totalElements = res.data.data.totalElements
+            that.StudentListData = res.data.data.elements
+            that.StudentData = that.$store.state.StudentListData
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
       } else if (that.SelectSystem == '案例实训') {
         that.$axios({
           url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwo',
@@ -200,6 +280,26 @@ export default {
           that.$message.error('请求失败!')
         })
       }
+    },
+    formatTime1(row) { // 时间戳转换
+      let that = this
+      let date = new Date(parseInt(row))
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
+      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
+      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      return Y + M + D + h + m
+    },
+    formatTime2(row) { // 时间戳转换
+      let that = this
+      let date = new Date(parseInt(row))
+      var Y = date.getFullYear() + '-'
+      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
+      var D = (date.getDate()+1 < 10 ? '0'+(date.getDate()+1) : date.getDate()+1) + ' '
+      var h = (date.getHours()+1 < 10 ? '0'+(date.getHours()+1) : date.getHours()+1) + ':'
+      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      return Y + M + D + h + m
     }
   }
 }

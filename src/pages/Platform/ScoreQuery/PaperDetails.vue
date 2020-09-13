@@ -18,11 +18,24 @@
           <p class="nth_5">错误</p>
         </div>
         <div class="TheBall">
-          <P v-for="(item,i) in StudentListData" :key="i" :style="{background:item.flagRight==1?'green':'red'}"><a :href="'#c' + i">{{item.sort}}</a></P>
+          <P v-for="(item,i) in StudentListData" :key="i" :style="{background:item.flagRight==1?'green':'red'}"><a :href="'#c' + i">{{i+1}}</a></P>
         </div>
       </div>
     </div>
-    <div class="main" v-loading="loading">
+    <div v-if="SelectSystem=='原文实训'" class="main" v-loading="loading">
+      <el-main class="card_box">
+        <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
+          <div>
+            <div v-html="item.questionText"></div>
+            <div>
+              <p class="text_5">参考答案</p>
+              <p class="text_6">{{item.optionText}}</p>
+            </div>
+          </div>
+        </div>
+      </el-main>
+    </div>
+    <div v-else-if="SelectSystem=='案例实训'" class="main" v-loading="loading">
       <el-main class="card_box">
         <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
           <p class="text_1">{{item.sort}}、病例主诉：{{item.chiefComplaint}}</p>
@@ -83,14 +96,42 @@ export default {
   },
   methods: {
     GoBack() { // 点击返回
-      this.$router.replace({path:'/StudentList'})
+      let that = this
+      let parameter = {}
+      if (that.SelectSystem == '原文实训') {
+        parameter = { id: that.$store.state.StudentListData.id }
+      } else if (that.SelectSystem == '案例实训') {
+        parameter = { id: that.id.examinationId }
+      }
+      that.$router.replace({
+        path:'/StudentList',
+        query: parameter
+      })
     },
 
     // 执行函数区域
     FnShowData() {
       let that = this
       if (that.SelectSystem == '原文实训') {
-
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/queryQuestionAnswer',
+          method: 'post',
+          data: {
+            id: that.id.id,
+          }
+        }).then((res) =>{
+          console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.loading = false
+            that.StudentData = that.$store.state.PaperDetails
+            that.StudentListData = res.data.data
+          } else {
+            that.loading = false
+          }
+        }).catch((err) =>{
+          that.loading = false
+          that.$message.error('请求失败!')
+        })
       } else if (that.SelectSystem == '案例实训') {
         that.$axios({
           url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreThree',
@@ -104,7 +145,6 @@ export default {
           console.log(res.data.data)
           if (res.data.code == 200) {
             that.loading = false
-            that.totalElements = res.data.data.count
             that.StudentData = res.data.data
             that.StudentListData = res.data.data.dataList
           } else {
@@ -127,7 +167,7 @@ export default {
   color:#333;
 }
 .Goback .el-button:hover{
-  color:#2E79BA;
+  color: #BF8333;
 }
 .header{
   width:100%;
@@ -247,5 +287,15 @@ export default {
 }
 .main .card .box_3 p{
   margin-bottom:5px;
+}
+
+.text_5{
+  color:#333;
+  font-weight: bold;
+  margin:20px 0 10px;
+  font-size:14px;
+}
+.text_6{
+  font-size:14px;
 }
 </style>
