@@ -34,7 +34,7 @@
           <el-option v-for="item in optionData.level" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-        <el-select v-show="SelectSystem=='案例实训'?true:false" v-model="categoryId" filterable multiple collapse-tags
+        <el-select v-show="SelectSystem!='原文实训'?true:false" v-model="categoryId" filterable multiple collapse-tags
           clearable placeholder="病症类别" size="small">
           <el-option v-for="item in optionData.Category" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
@@ -53,7 +53,7 @@
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
     <div class="main" ref="heights" v-else>
-      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'wrongRate',order:'ascending'}"
+      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'wrongRate',order:'descending'}"
         border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="id" label="题库ID" width="80"></el-table-column>
         <el-table-column align="center" prop="wrongRate" label="错误率" width="90" sortable="custom"></el-table-column>
@@ -70,7 +70,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'flagAvgScore',order:'ascending'}"
+      <el-table v-else v-loading="loading" :data="AnalysisData" :default-sort="{prop:'flagAvgScore',order:'descending'}"
         border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="questionId" label="题库ID" width="80"></el-table-column>
         <el-table-column align="center" prop="flagAvgScore" label="平均分" width="90" sortable="custom"></el-table-column>
@@ -161,10 +161,11 @@ export default {
       let that = this
       if (column.order == 'ascending') {
         that.sortType = 1
-      } else {
+        that.clickSearch()
+      } else if (column.order == 'descending') {
         that.sortType = 0
+        that.clickSearch()
       }
-      that.clickSearch()
     },
 
     // 点击函数区域
@@ -204,9 +205,15 @@ export default {
           that.loading = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOne'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionOne'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOne',
+          url: url,
           method: 'post',
           data: {
             startDate: that.TimeData[0]?that.TimeData[0]:'',
@@ -222,7 +229,7 @@ export default {
             curPage: that.curPage,
             pageSize: that.pageSize,
             sortColumn: that.sortColumn,
-            orderBy: that.sortType
+            orderBy: that.sortType==0?'2':1
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -254,6 +261,8 @@ export default {
       that.courseId = '' // 课程
       that.levelId = '' // 级别
       that.sortTypes = 1
+      that.curPage = 1
+      that.pageSize = 10
       that.$message({
         message: '重置成功~',
         type: 'success',
@@ -281,7 +290,7 @@ export default {
             levelIds: that.levelId.toString(),
             patternTypes: that.patternType.toString(),
             practiceDifficultys: that.practiceDifficulty.toString(),
-            sortType: 1
+            sortType: that.sortType
           }
         }).then((res) =>{
           // console.log(res)
@@ -301,9 +310,15 @@ export default {
             navigator.msSaveBlob(blob, fileName)
           }
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOneExcel'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionOneExcel'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionOneExcel',
+          url: url,
           method: 'post',
           responseType: 'blob',
           data: {
@@ -317,8 +332,8 @@ export default {
             chapterId: that.chapterId.toString(),
             categoryId: that.categoryId.toString(),
             mode: that.patternType.toString(),
-            sortColumn: 'flag_avg_score',
-            orderBy: 1
+            sortColumn: that.sortColumn,
+            orderBy: that.sortType==0?'2':1
           }
         }).then((res) =>{
           // console.log(res)
@@ -350,7 +365,7 @@ export default {
           {text:'学生答题数据',route:'/AnswerData',class:'Choice',icon:'el-icon-s-claim'},
           {text:'题库管理',route:'/Question',class:'NoChoice',icon:'el-icon-menu'},
         ]
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
         that.$store.state.tabList = [
           {text:'课堂管理',route:'/Administration',class:'NoChoice',icon:'el-icon-s-home'},
           {text:'考试成绩查询',route:'/ScoreQuery',class:'NoChoice',icon:'el-icon-s-data'},
@@ -407,13 +422,30 @@ export default {
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else {}
+      } else if (that.SelectSystem == '问诊实训')  {
+        that.$axios({
+          url: that.$store.state.Q_http + 'interroExamination/queryCaseExamQuestionBefore',
+          method: 'post',
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.optionData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
     }
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-button+.el-button{
+  margin-left:0px;
+}
+</style>
 <style scoped>
 .el-button--text{
   color: #BF8333;
@@ -432,7 +464,7 @@ export default {
 }
 .input_box .el-input,.el-select{
   margin-right:20px;
-  flex: 1;
+  width:180px;
 }
 .input_box :last-child{
   margin-right:0px;

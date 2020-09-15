@@ -19,19 +19,20 @@
     <div class="main" ref="height" v-else>
       <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="id" label="考试ID" width="70"></el-table-column>
-        <el-table-column align="center" prop="examinationName" label="考试名称" width=""></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="150"></el-table-column>
         <el-table-column align="center" prop="attendCount" label="参考人数" width="70" :formatter="formatTime3"></el-table-column>
-        <el-table-column align="center" prop="createOn" label="开始时间" width="130" :formatter="formatTime1"></el-table-column>
-        <el-table-column align="center" prop="updateOn" label="结束时间" width="130" :formatter="formatTime2"></el-table-column>
-        <el-table-column align="center" prop="examUseTime" label="考试用时" width="110"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="开始时间" width="150" :formatter="formatTime1"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="结束时间" width="150" :formatter="formatTime2"></el-table-column>
+        <el-table-column align="center" prop="examUseTime" label="考试用时" width="130"></el-table-column>
         <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
         <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
         <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
         <el-table-column align="center" prop="minScore" label="最低分" width="70"></el-table-column>
         <el-table-column align="center" prop="avgScore" label="平均分" width="70"></el-table-column>
-        <el-table-column align="center" prop="courseValues" label="课程" width="110"></el-table-column>
-        <el-table-column align="center" prop="levelValues" label="级别" width="70"></el-table-column>
-        <el-table-column align="center" prop="chapterValues" label="章节" width="110"></el-table-column>
+        <el-table-column align="center" prop="courseValues" label="课程" width="200"></el-table-column>
+        <el-table-column align="center" prop="levelValues" label="级别" width="150"></el-table-column>
+        <el-table-column align="center" prop="chapterValues" label="章节" width="200"></el-table-column>
+        <el-table-column align="center" prop="knowledgeValues" label="知识点" width="200"></el-table-column>
         <el-table-column align="center" prop="practiceDifficulty" label="难度" width="70" :formatter="formatTime4"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
@@ -39,7 +40,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+      <el-table v-else v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="examinationId" label="考试ID" width="80"></el-table-column>
         <el-table-column align="center" prop="examinationName" label="考试名称" width="80"></el-table-column>
         <el-table-column align="center" prop="personNum" label="参考人数" width="80"></el-table-column>
@@ -136,9 +137,15 @@ export default {
           that.loading = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreOne'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOne',
+          url: url,
           method: 'post',
           data: {
             startDate: that.TimeData[0]?that.TimeData[0]:'',
@@ -166,6 +173,8 @@ export default {
       let that = this
       that.TimeData = [] // 清空时间筛选条件
       that.searchKey = ''  // 考试ID或者考试名称
+      that.curPage = 1
+      that.pageSize = 10
       that.clickSearch()
       that.$message({
         message: '重置成功~',
@@ -188,7 +197,7 @@ export default {
         }).then((res) =>{
           // console.log(res)
           const blob = new Blob([res.data])
-          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "考试成绩查询(" + date +").xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
@@ -203,9 +212,15 @@ export default {
             navigator.msSaveBlob(blob, fileName)
           }
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreOneExcel'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreOneExcel'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreOneExcel',
+          url: url,
           method: 'post',
           responseType: 'blob',
           data: {
@@ -216,7 +231,7 @@ export default {
         }).then((res) =>{
           // console.log(res)
           const blob = new Blob([res.data])
-          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "考试成绩查询(" + date +").xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
@@ -232,7 +247,6 @@ export default {
           }
         })
       }
-
     },
     clickToView(e) { // 点击查看
       let that = this
@@ -240,7 +254,7 @@ export default {
       if (that.SelectSystem == '原文实训') {
         parameter = { id: e.id }
         that.$store.state.StudentListData = e
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
         parameter = { id: e.examinationId }
       }
       that.$router.replace({
@@ -256,7 +270,7 @@ export default {
       var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
       var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
       var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes()+1 < 10 ? '0'+(date.getMinutes()+1) : date.getMinutes()+1)
+      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
       return Y + M + D + h + m
     },
     formatTime2(row) { // 时间戳转换
@@ -281,6 +295,11 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-button+.el-button{
+  margin-left:0px;
+}
+</style>
 <style scoped>
 .el-button--text{
   color: #BF8333;

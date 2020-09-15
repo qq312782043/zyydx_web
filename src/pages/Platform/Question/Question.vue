@@ -23,20 +23,20 @@
       <div class="button_box">
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="warning" size="small" plain>重置</el-button>
-        <el-upload style="display:inline-block;margin:0 10px;"
-          :action="this.$store.state.Q_http + 'case/importCaseQuestion'"
-          :before-upload="clickImportFile"
-          :show-file-list="false">
-          <el-button icon="el-icon-download" type="warning" size="small" plain>表格导入</el-button>
+        <el-button @click="clickAddTestQuestions()" icon="el-icon-circle-plus-outline" type="warning" size="small" plain>新增试题</el-button>
+        <el-upload style="display:inline-block"
+          :action="this.$store.state.Q_http + 'case/importCaseQuestion'" :before-upload="clickImportFile" :show-file-list="false">
+          <el-button icon="el-icon-folder-opened" type="warning" size="small" plain>表格导入</el-button>
         </el-upload>
         <el-button @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small" plain>导出</el-button>
+        <el-button @click="clickDownloadTemplate()" icon="el-icon-download" type="warning" size="small" plain>模板下载</el-button>
         <el-button @click="clickCaseType(showValue)" icon="el-icon-s-tools" type="warning" size="small" plain>试题分类管理</el-button>
         <el-button @click="BatchDeletion()" icon="el-icon-delete" type="warning" size="small" plain>批量删除</el-button>
       </div>
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
     <div class="main" ref="heights" v-else>
-      <el-table v-show="SelectSystem=='原文实训'?true:false" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableY"
+      <el-table v-if="SelectSystem=='原文实训'" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableY"
         :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="45"></el-table-column>
         <el-table-column align="center" prop="questionOrder" label="题库序号" width="80"></el-table-column>
@@ -54,7 +54,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-show="SelectSystem=='案例实训'?true:false" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
+      <el-table v-else @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
         :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="45"></el-table-column>
         <el-table-column align="center" prop="index" label="题库序号" width="75"></el-table-column>
@@ -149,7 +149,7 @@ export default {
         name: "fourth",
         type: 4,
       }]
-    } else if (that.SelectSystem == '案例实训') {
+    } else {
       that.CaseTypeList = [{
         label: '章节',
         name: "first",
@@ -209,9 +209,15 @@ export default {
           that.loadingMain = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseType/getCaseTypeList'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroType/getInterroTypeList'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseType/getCaseTypeList',
+          url: url,
           method: 'post',
           data: {
             type: value
@@ -226,7 +232,7 @@ export default {
           that.loadingMain = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '问诊实训') {}
+      }
     },
 
     // 点击函数区域
@@ -271,9 +277,15 @@ export default {
           that.loading = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'case/queryQuestionPage'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interro/queryQuestionPage'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'case/queryQuestionPage',
+          url: url,
           method: 'post',
           data: {
             curPage: that.curPage,
@@ -302,6 +314,8 @@ export default {
       that.CategoryData = ''
       that.LevelData = ''
       that.CourseData = ''
+      that.curPage = 1
+      that.pageSize = 10
       that.clickSearch()
       that.$message({
         message: '重置成功~',
@@ -309,110 +323,122 @@ export default {
         duration: '1000'
       })
     },
+    clickAddTestQuestions() { // 点击新增试题
+      let that = this
+      that.$router.replace({path:'/AddQuestions'})
+    },
+    clickDownloadTemplate() { // 点击下载模板
+      let that = this
+      // console.log(that.$store.state.SystemID)
+      that.$axios({
+        url: that.$store.state.Q_http + 'template/downloadTemplate',
+        method: 'post',
+        responseType: 'blob',
+        data: { flag: that.$store.state.SystemID }
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        let fileName = ''
+        if (that.$store.state.SystemID == 1) {
+          fileName = "经典原文模板.xlsx"
+        } else if (that.$store.state.SystemID == 2) {
+          fileName = "经典案例实训模板.xlsx"
+        } else if (that.$store.state.SystemID == 3) {
+          fileName = "智能问诊实训模板.xlsx"
+        }
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      })
+    },
     clickImportFile(file) { // 点击导入文件
       let that = this
       const formData = new FormData()
       formData.append('file', file)
+      let url = ''
       if (that.SelectSystem == '原文实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'original/importQuestions?userId=' + that.$store.state.loginData.user.id,
-          headers: { 'Content-Type': 'multipart/form-data' },
-          method: 'post',
-          data: formData,
-        }).then((res) =>{
-          // console.log(res)
-          if (res.data.code == 200) {
-            that.clickSearch()
-            that.$message({
-              type: 'success',
-              message: '导入成功!',
-              duration: 1000
-            })
-          } else {
-            that.$message.error('导入失败，请查看表格格式!')
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
-        })
+        url = that.$store.state.Q_http + 'original/importQuestions?userId=' + that.$store.state.loginData.user.id
       } else if (that.SelectSystem == '案例实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id,
-          headers: { 'Content-Type': 'multipart/form-data' },
-          method: 'post',
-          data: formData,
-        }).then((res) =>{
-          // console.log(res)
-          if (res.data.code == 200) {
-            that.clickSearch()
-            that.$message({
-              type: 'success',
-              message: '导入成功!',
-              duration: 1000
-            })
-          } else {
-            that.$message.error('导入失败，请查看表格格式!')
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
-        })
+        url = that.$store.state.Q_http + 'case/importCaseQuestion?userId=' + that.$store.state.loginData.user.id
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interro/importInterroQuestion?userId=' + that.$store.state.loginData.user.id
       }
+      that.$axios({
+        url: url,
+        headers: { 'Content-Type': 'multipart/form-data' },
+        method: 'post',
+        data: formData,
+      }).then((res) =>{
+        // console.log(res)
+        if (res.data.code == 200) {
+          that.clickSearch()
+          that.$message({
+            type: 'success',
+            message: '导入成功!',
+            duration: 1000
+          })
+        } else {
+          that.$message.error('导入失败，请查看表格格式!')
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
     },
     clickExportFile() { // 点击导出文件
       let that = this
+      let data = {}
+      let url = ''
       if (that.SelectSystem == '原文实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'original/exportOriginalQuestion',
-          method: 'post',
-          responseType: 'blob',
-          data: {
-            chapterId: that.ChapterData.toString(),
-            levelId: that.LevelData.toString(),
-            courseId: that.CourseData.toString(),
-          }
-        }).then((res) =>{
-          // console.log(res)
-          const blob = new Blob([res.data])
-          const fileName = "题库管理.xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
-            const elink = document.createElement("a")
-            elink.download = fileName
-            elink.style.display = "none"
-            elink.href = URL.createObjectURL(blob)
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href)
-            document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
-          }
-        })
+        url = that.$store.state.Q_http + 'original/exportOriginalQuestion'
+        data = {
+          chapterId: that.ChapterData.toString(),
+          levelId: that.LevelData.toString(),
+          courseId: that.CourseData.toString(),
+        }
       } else if (that.SelectSystem == '案例实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'case/exportCaseQuestion',
-          method: 'post',
-          responseType: 'blob',
-          data: {
-            chapterId: that.ChapterData.toString(),
-            categoryId: that.CategoryData.toString(),
-          }
-        }).then((res) =>{
-          // console.log(res)
-          const blob = new Blob([res.data])
-          const fileName = "题库管理.xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
-            const elink = document.createElement("a")
-            elink.download = fileName
-            elink.style.display = "none"
-            elink.href = URL.createObjectURL(blob)
-            document.body.appendChild(elink)
-            elink.click()
-            URL.revokeObjectURL(elink.href)
-            document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
-          }
-        })
+        url = that.$store.state.Q_http + 'case/exportCaseQuestion'
+        data = {
+          chapterId: that.ChapterData.toString(),
+          categoryId: that.CategoryData.toString(),
+        }
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interro/exportInterroQuestion'
+        data = {
+          chapterId: that.ChapterData.toString(),
+          categoryId: that.CategoryData.toString(),
+        }
       }
+      that.$axios({
+        url: url,
+        method: 'post',
+        responseType: 'blob',
+        data: data
+      }).then((res) =>{
+        // console.log(res)
+        const blob = new Blob([res.data])
+        const fileName = "题库管理.xlsx"
+        if ("download" in document.createElement("a")) { // 非IE下载
+          const elink = document.createElement("a")
+          elink.download = fileName
+          elink.style.display = "none"
+          elink.href = URL.createObjectURL(blob)
+          document.body.appendChild(elink)
+          elink.click()
+          URL.revokeObjectURL(elink.href)
+          document.body.removeChild(elink)
+        } else { // IE10+下载
+          navigator.msSaveBlob(blob, fileName)
+        }
+      })
     },
     clickToView(e) { // 点击查看题库详情
       let that = this
@@ -548,16 +574,22 @@ export default {
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseType/saveType'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroType/saveType'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseType/saveType',
+          url: url,
           method: 'post',
           data: {
             questionIds: JSON.stringify(questionIds),
             caseType: that.TestData[0].type
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             that.CaseType = false
             that.$message({
@@ -565,12 +597,12 @@ export default {
               message: '保存成功!',
               duration: '1000'
             })
+            that.clickSearch()
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
       }
-
     },
     clickAdded(e) { // 点击新增
       let that = this
@@ -583,7 +615,7 @@ export default {
     },
 
     // 执行函数区域
-    FnDelete(id) { // (原文实训、案例实训)单个删除试题函数
+    FnDelete(id) { // (原文实训、案例实训、问诊实训)单个删除试题函数
       let that = this
       let url = ''
       let data = {}
@@ -592,6 +624,9 @@ export default {
         data = { questionId: id }
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'case/delCaseQuestion'
+        data = { id: id }
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interro/deleteInterroQuestion'
         data = { id: id }
       }
       that.$axios({
@@ -612,7 +647,7 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    FnDeletes() { // (原文实训、案例实训)批量删除试题函数
+    FnDeletes() { // (原文实训、案例实训、问诊实训)批量删除试题函数
       let that = this
       let url = ''
       let data = {}
@@ -622,13 +657,16 @@ export default {
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'case/batchDelCaseQuestion'
         data = { questionIds: that.queryQuestionId }
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interro/batchDelInterroQuestion'
+        data = { questionIds: that.queryQuestionId }
       }
       that.$axios({
         url: url,
         method: 'post',
         data: data
       }).then((res) =>{
-        // console.log(res.data)
+        console.log(res.data)
         if (res.data.code == 200) {
           that.clickSearch()
           that.$message({
@@ -641,13 +679,15 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    FnEdit(e) { // (原文实训、案例实训)试题分类管理编辑试题函数
+    FnEdit(e) { // (原文实训、案例实训、问诊实训)试题分类管理编辑试题函数
       let that = this
       let url = ''
       if (that.SelectSystem == '原文实训') {
         url = that.$store.state.Y_http + 'originalType/updateType'
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'caseType/updateCaseType'
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interroType/updateInterroType'
       }
       that.$axios({
         url: url,
@@ -670,13 +710,15 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    FnAdded(e) { // (原文实训、案例实训)试题分类管理新增试题函数
+    FnAdded(e) { // (原文实训、案例实训、问诊实训)试题分类管理新增试题函数
       let that = this
       let url = ''
       if (that.SelectSystem == '原文实训') {
         url = that.$store.state.Y_http + 'originalType/saveType'
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'caseType/createCaseType'
+      } else if (that.SelectSystem == '案例实训') {
+        url = that.$store.state.Q_http + 'interroType/createInterroType'
       }
       that.$axios({
         url: url,
@@ -699,7 +741,7 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    FnDeleteipt(e) { // (原文实训、案例实训)试题分类管理删除函数
+    FnDeleteipt(e) { // (原文实训、案例实训、问诊实训)试题分类管理删除函数
       let that = this
       if (that.SelectSystem == '原文实训') {
         that.$axios({
@@ -713,7 +755,7 @@ export default {
           // console.log(res.data)
           if (res.data.code == 200) {
             if (res.data.data == '包含') {
-              that.$message.error('包含试题，无法删除!')
+              that.$message.error('已包含试题，无法删除!')
             } else {
               that.$axios({
                 url: that.$store.state.Y_http + 'originalType/deleteType',
@@ -739,9 +781,15 @@ export default {
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseType/deleteCaseType'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroType/deleteInterroType'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseType/deleteCaseType',
+          url: url,
           method: 'post',
           data: {
             id: that.TestData[e].id,
@@ -792,6 +840,9 @@ export default {
 .el-dialog__headerbtn .el-dialog__close:hover{
   color: #BF8333;
 }
+.el-button+.el-button{
+  margin-left:0px;
+}
 </style>
 <style scoped>
 .el-button--text{
@@ -805,8 +856,8 @@ export default {
   float: left;
 }
 .select_box .select{
-  width: 170px;
-  margin-right:20px;
+  width: 150px;
+  margin-right:5px;
 }
 .button_box{
   float: right;

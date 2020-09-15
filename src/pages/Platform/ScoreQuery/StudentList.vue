@@ -26,7 +26,7 @@
         <p class="text_1">参考人数：<span>{{StudentData.attendCount}}人</span></p>
       </div>
     </div>
-    <div v-else-if="SelectSystem=='案例实训'" class="header">
+    <div v-else class="header">
       <div class="box_1">
         <p class="text_1">考试ID：<span>{{StudentData.examinationId}}</span></p>
         <p class="text_1">考试名称：<span>{{StudentData.examinationName}}</span></p>
@@ -34,7 +34,7 @@
         <p class="text_1">结束时间：<span>{{StudentData.endTime}}</span></p>
       </div>
       <div class="box_1">
-        <p class="text_1">总分：<span>{{StudentData.fullSocre}}</span></p>
+        <p class="text_1">总分：<span>{{StudentData.fullScore}}</span></p>
         <p class="text_1">最高分：<span>{{StudentData.maxScore}}</span></p>
         <p class="text_1">最低分：<span>{{StudentData.minScore}}</span></p>
         <p class="text_1">平均分：<span>{{StudentData.avgScore}}</span></p>
@@ -55,10 +55,10 @@
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
     <div class="main" ref="heights" v-else>
       <el-table v-loading="loading" :data="StudentListData" border style="width:90%" :max-height="heightCss" size="small"
-        :default-sort="{prop: 'sort', order: 'ascending'}">
+        :default-sort="{prop: 'sort', order: 'ascending'}" @sort-change="sortChange">
         <el-table-column align="center" prop="userName" label="姓名"></el-table-column>
         <el-table-column align="center" prop="score" label="分数"></el-table-column>
-        <el-table-column align="center" prop="sort" label="排名" sortable></el-table-column>
+        <el-table-column align="center" prop="sort" label="排名" sortable="custom"></el-table-column>
         <el-table-column align="center" prop="studentNumber"  label="学号"></el-table-column>
         <el-table-column align="center" prop="className" label="班级号"></el-table-column>
         <el-table-column fixed="right" align="center" label="操作" width="120">
@@ -93,6 +93,8 @@ export default {
       StudentData: '', // 考试查询数据
       StudentListData: [], // 考试查询数据列表
       searchKey: '', // 页面搜索框信息
+      sortColumn: 'sort', // 排序字段
+      sortType: 1, // 排序方式
     }
   },
   created() {
@@ -117,21 +119,37 @@ export default {
       that.curPage = val
       that.clickSearch()
     },
+    sortChange(column) { // 排序监听
+      let that = this
+      if (column.order == 'ascending') {
+        that.sortType = 1
+        that.clickSearch()
+      } else if (column.order == 'descending') {
+        that.sortType = 0
+        that.clickSearch()
+      }
+    },
 
     // 点击函数区域
     clickSearch() { // 点击搜索
       let that = this
       if (that.SelectSystem == '原文实训') {
         that.FnShowData()
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoSearch'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreTwoSearch'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoSearch',
+          url: url,
           method: 'post',
           data: {
             id: that.id,
             searchKey: that.searchKey,
-            sortColumn: '',
-            orderBy: '',
+            sortColumn: that.sortColumn,
+            orderBy: that.sortType==0?2:1,
             curPage: that.curPage,
             pageSize: that.pageSize,
           }
@@ -160,7 +178,7 @@ export default {
           data: {
             id: that.id,
             examText: that.searchKey,
-            sortType: 1,
+            sortType: that.sortType,
           }
         }).then((res) =>{
           // console.log(res)
@@ -180,22 +198,28 @@ export default {
             navigator.msSaveBlob(blob, fileName)
           }
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoExcel'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreTwoExcel'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwoExcel',
+          url: url,
           method: 'post',
           responseType: 'blob',
           data: {
             id: that.id,
             searchKey: that.searchKey,
-            sortColumn: 'sort',
-            orderBy: 1,
+            sortColumn: that.sortColumn,
+            orderBy: that.sortType==0?2:1,
           }
         }).then((res) =>{
           // console.log(res)
           const blob = new Blob([res.data])
-          var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-            const fileName = "学生列表(" + date +").xlsx"
+          const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
+          const fileName = "学生列表(" + date +").xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -217,7 +241,7 @@ export default {
       if (that.SelectSystem == '原文实训') {
         parameter = { id: e.id }
         that.$store.state.PaperDetails = e
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
         parameter = { userId: e.userId, examinationId: e.examinationId, typeId: 3 }
       }
       that.$router.replace({path:'/PaperDetails',
@@ -240,7 +264,7 @@ export default {
             curPage: that.curPage,
             pageSize: that.pageSize,
             examText: that.searchKey,
-            sortType: 1
+            sortType: that.sortType
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -256,9 +280,15 @@ export default {
           that.loading = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwo'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreTwo'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreTwo',
+          url: url,
           method: 'post',
           data: {
             id: that.id,
@@ -306,6 +336,11 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-button+.el-button{
+  margin-left:0px;
+}
+</style>
 <style scoped>
 .el-button--text{
   color: #BF8333;

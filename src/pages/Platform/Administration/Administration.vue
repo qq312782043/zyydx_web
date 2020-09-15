@@ -4,7 +4,7 @@
       <p class="title">请选择以下模式来控制学生电脑</p>
       <div class="tabBar">
         <div v-for="(item,i) in navList" :key="i">
-          <p :class="item.class" @click="clickTabBar(i,item.id)">开启{{item.text}}</p>
+          <p :class="item.class" @click="clickTabBar(i,item)">开启{{item.text}}</p>
         </div>
       </div>
     </div>
@@ -25,6 +25,7 @@ export default {
   provide() {
     return{
       FnParent: this.FnParent,
+      FnGetStatus: this.FnGetStatus,
     }
   },
   created() {
@@ -33,19 +34,23 @@ export default {
     that.FnGetStatus()
   },
   methods: {
-    clickTabBar(e,id) { // 点击切换
+    clickTabBar(e,item) { // 点击切换
       let that = this
-      if (that.$route.path!==that.navList[e].route) {
-        if (that.$route.path == '/FreePractice_mode' || that.$route.path == '/Classrooms_mode') {
-          that.$confirm('有学生正在练习，是否切换到其他模式？', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            that.Fnimplement(e,id)
-          }).catch(() => {})
-        } else {
-          that.Fnimplement(e,id)
+      if (item.class == 'Close') {
+        return
+      } else {
+        if (that.$route.path!==that.navList[e].route) {
+          if (that.$route.path == '/FreePractice_mode' || that.$route.path == '/Classrooms_mode') {
+            that.$confirm('有学生正在练习，是否切换到其他模式？', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              that.Fnimplement(e,item.id)
+            }).catch(() => {})
+          } else {
+            that.Fnimplement(e,item.id)
+          }
         }
       }
     },
@@ -61,7 +66,6 @@ export default {
           userId: that.$store.state.loginData.user.id,
         }
       }).then((res) =>{
-        // console.log(res.data.data.systemStatusList)
         if (res.data.code == 200) {
           let index = ''
           if (that.$store.state.SystemID == 1) {
@@ -72,30 +76,40 @@ export default {
             index = 2
           }
           // console.log(res.data.data.systemStatusList[index])
-          if (res.data.data.systemStatusList[index].patternType == 1) {
+          if (res.data.data.systemStatusList[index].systemStatus == 0) {
             that.navList = [
-              {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice',id:1},
-              {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
-              {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
+              {text:'自由练习模式',route:'/FreePractice_mode',class:'Close',id:1},
+              {text:'课堂练习模式',route:'/Classrooms_mode',class:'Close',id:2},
+              {text:'考试模式',route:'/Examination_mode',class:'Close',id:3}
             ]
             that.$router.replace({path:'/FreePractice_mode'})
             that.$store.state.navList = that.navList
-          } else if (res.data.data.systemStatusList[index].patternType == 2) {
-            that.navList = [
-              {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
-              {text:'课堂练习模式',route:'/Classrooms_mode',class:'Choice',id:2},
-              {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
-            ]
-            that.$router.replace({path:'/Classrooms_mode'})
-            that.$store.state.navList = that.navList
-          } else if (res.data.data.systemStatusList[index].patternType == 3)  {
-            that.navList = [
-              {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
-              {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
-              {text:'考试模式',route:'/Examination_mode',class:'Choice',id:3}
-            ]
-            that.$router.replace({path:'/Examination_mode'})
-            that.$store.state.navList = that.navList
+          } else {
+            if (res.data.data.systemStatusList[index].patternType == 1) {
+              that.navList = [
+                {text:'自由练习模式',route:'/FreePractice_mode',class:'Choice',id:1},
+                {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
+                {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
+              ]
+              that.$router.replace({path:'/FreePractice_mode'})
+              that.$store.state.navList = that.navList
+            } else if (res.data.data.systemStatusList[index].patternType == 2) {
+              that.navList = [
+                {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
+                {text:'课堂练习模式',route:'/Classrooms_mode',class:'Choice',id:2},
+                {text:'考试模式',route:'/Examination_mode',class:'NoChoice',id:3}
+              ]
+              that.$router.replace({path:'/Classrooms_mode'})
+              that.$store.state.navList = that.navList
+            } else if (res.data.data.systemStatusList[index].patternType == 3)  {
+              that.navList = [
+                {text:'自由练习模式',route:'/FreePractice_mode',class:'NoChoice',id:1},
+                {text:'课堂练习模式',route:'/Classrooms_mode',class:'NoChoice',id:2},
+                {text:'考试模式',route:'/Examination_mode',class:'Choice',id:3}
+              ]
+              that.$router.replace({path:'/Examination_mode'})
+              that.$store.state.navList = that.navList
+            }
           }
         }
       }).catch((err) =>{
@@ -192,6 +206,17 @@ export default {
   border:1px solid #BF8333;
   color: #fff;
   background:#BF8333;
+  border-radius:4px;
+}
+.Close{
+  width:300px;
+  padding:10px 0;
+  text-align: center;
+  box-sizing: border-box;
+  font-size:15px;
+  border:1px solid #ccc;
+  color: #666;
+  background:#f5f5f5;
   border-radius:4px;
 }
 </style>

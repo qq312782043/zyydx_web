@@ -35,7 +35,7 @@
             </div>
           </div>
           <div class="btn_box">
-            <div class="item" style="background:#363680">
+            <div class="item" style="background:#363680" @click="jumpPlatform('问诊实训',3)">
               <h4>经典案例实训问诊</h4><h6>问诊实训</h6>
             </div>
             <div class="switch">

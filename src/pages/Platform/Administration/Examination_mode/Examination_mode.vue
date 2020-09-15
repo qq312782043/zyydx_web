@@ -110,13 +110,14 @@
             <p class="text_2">题数：<span>{{item.practiceNum}}</span></p>
             <p class="text_2">难度：<span>{{item.practiceDifficulty}}级难度</span></p>
             <div class="set_up clear">
-              <p class="text_2 text_3">发起时间：<span>{{formatTime(item.createOn)}}</span></p>
+              <p class="text_2 text_3">发起时间：<span>{{item.createOn}}</span></p>
+              <p class="text_2 text_3">进行时间：<span>{{TimeToProceed(item.createOn)}}</span></p>
               <el-button type="warning" @click="clickSetUp(item.id)">收卷</el-button>
             </div>
           </div>
         </div>
       </div>
-      <div v-else-if="SelectSystem=='案例实训'">
+      <div v-else>
         <p class="gestive">正在进行的考试...</p>
         <div class="Answer_crad">
           <p class="title">经典案例考试系统</p>
@@ -128,7 +129,7 @@
           <p class="text_2">最大题数：<span>{{caseData.practiceNum}}</span></p>
           <div class="set_up clear">
             <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
-            <!-- <p class="text_2 text_3">进行时间：<span>{{caseData.createOn}}</span></p> -->
+            <p class="text_2 text_3">进行时间：<span>{{TimeToProceed(caseData.createOn)}}</span></p>
             <el-button size="medium" type="warning" @click="clickSetUp(caseData.id)">收卷</el-button>
           </div>
         </div>
@@ -171,6 +172,7 @@ export default {
   created() {
     let that = this
     that.FnShowData()
+    that.FnOptionData()
   },
   methods: {
     ChoiceKnowledge(value,id) { // 选择知识点
@@ -250,9 +252,15 @@ export default {
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryInterrogationExamQuestion'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryCaseExamQuestion',
+          url: url,
           method: 'post',
           data: {
             chapterIds: that.chapterData.toString(),
@@ -363,8 +371,6 @@ export default {
                 message: res.data.data.msg
               })
             } else {
-              that.modular_1 = false
-              that.modular_2 = true
               that.courseData = '' // 已选课程
               that.levelData = '' // 已选级别
               that.difficultyData = '' // 已选难度
@@ -386,9 +392,15 @@ export default {
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/caseExamBeginTeacher'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/caseExamBeginTeacher'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/caseExamBeginTeacher',
+          url: url,
           method: 'post',
           data: {
             patternType: 3,
@@ -401,7 +413,7 @@ export default {
             questionIds: that.searchId.toString()
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             if (res.data.data.code != 200) {
               that.$message.error({
@@ -443,9 +455,7 @@ export default {
           that.$axios({
             url: that.$store.state.Y_http + 'examinationQuestion/updateCollectPapers',
             method: 'post',
-            data: {
-              examinationId: id
-            }
+            data: { examinationId: id }
           }).then((res) =>{
             // console.log(res.data)
             if (res.data.code == 200) {
@@ -454,21 +464,24 @@ export default {
                 message: '收卷成功!',
                 duration: '1000',
                 onClose: function () {
-                  that.modular_1 = true
-                  that.modular_2 = false
+                  that.FnShowData()
                 }
               })
             }
           }).catch((err) =>{
             that.$message.error('请求失败!')
           })
-        } else if (that.SelectSystem == '案例实训') {
+        } else {
+          let url = ''
+          if (that.SelectSystem == '案例实训') {
+            url = that.$store.state.Q_http + 'caseExamination/caseTeacherSubmitExam'
+          } else if (that.SelectSystem == '问诊实训') {
+            url = that.$store.state.Q_http + 'interroExamination/caseTeacherSubmitExam'
+          }
           that.$axios({
-            url: that.$store.state.Q_http + 'caseExamination/caseTeacherSubmitExam',
+            url: url,
             method: 'post',
-            data: {
-              id: id
-            }
+            data: { id: id }
           }).then((res) =>{
             // console.log(res.data)
             if (res.data.code == 200) {
@@ -486,8 +499,6 @@ export default {
             that.$message.error('请求失败!')
           })
         }
-
-
       }).catch(() => {})
     },
 
@@ -506,30 +517,33 @@ export default {
         }).then((res) =>{
           // console.log(res.data)
           if (res.data.code == 200) {
-            if(res.data.data.length != 0){
+            if(res.data.data.length === 0){
+              that.modular_1 = true
+              that.modular_2 = false
+            } else {
               that.modular_1 = false
               that.modular_2 = true
               that.caseData = res.data.data
-            } else {
-              that.modular_1 = true
-              that.modular_2 = false
-              that.FnOptionData()
             }
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/caseMainInformation'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/mainInformation'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/caseMainInformation',
+          url: url,
           method: 'post',
-          data: {
-            patternType: 3,
-          }
+          data: { patternType: 3 }
         }).then((res) =>{
           // console.log(res.data)
           if (res.data.code == 200) {
-            if(res.data.data.code == 200){
+            if (res.data.data.code == 200) {
               that.modular_1 = false
               that.modular_2 = true
               that.caseData = res.data.data
@@ -564,14 +578,23 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    formatTime(row) { // 时间戳转换
-      let date = new Date(parseInt(row))
-      var Y = date.getFullYear() + '-'
-      var M = (date.getMonth()+1 < 10 ? '0'+(date.getMonth()+1) : date.getMonth()+1) + '-'
-      var D = (date.getDate() < 10 ? '0'+(date.getDate()) : date.getDate()) + ' '
-      var h = (date.getHours() < 10 ? '0'+(date.getHours()) : date.getHours()) + ':'
-      var m = (date.getMinutes() < 10 ? '0'+(date.getMinutes()) : date.getMinutes())
-      return Y + M + D + h + m
+    TimeToProceed(value) { // 考试进行时间
+      let that = this
+      let sDate1 = Date.parse(new Date())
+      let sDate2 = Date.parse(value)
+      let usedTime = sDate1 - sDate2
+      let days = Math.floor(usedTime/(24*3600*1000))
+      let leave1 = usedTime%(24*3600*1000)
+      let hours = Math.floor(leave1/(3600*1000))
+      let leave2 = leave1%(3600*1000)
+      let minutes = Math.floor(leave2/(60*1000))
+      let time = ''
+      if (days == 0) {
+        time =  hours + "小时" + minutes + "分钟"
+      } else {
+        time =  days + '天' + hours + "小时" + minutes + "分钟"
+      }
+      return time
     },
   }
 }

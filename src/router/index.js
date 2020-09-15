@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import store from '../store'
+// import store from '../store'
 import Router from 'vue-router'
 import Login from '@/pages/login/login' // 登录
 import Entrance from '@/pages/Entrance/Entrance' // 选择平台
@@ -16,12 +16,8 @@ import AnswerData from '@/pages/Platform/AnswerData/AnswerData' // 学生答题�
 import AnswerDetails from '@/pages/Platform/AnswerData/AnswerDetails' // 学生答题数据>试题详情
 import Question from '@/pages/Platform/Question/Question' // 题库管理
 import QuestionDetails from '@/pages/Platform/Question/QuestionDetails' // 题库管理>题库详情
+import AddQuestions from '@/pages/Platform/Question/AddQuestions' // 题库管理>新增试题
 import Examination from '@/pages/Platform/Examination/Examination' // 考试管理
-
-const originalPush = Router.prototype.push
-Router.prototype.push = function push(location) {
-  return originalPush.call(this, location).catch(err => err)
-}
 
 Vue.use(Router)
 export default new Router({
@@ -55,14 +51,14 @@ export default new Router({
           name: 'Examination_mode',
           component: Examination_mode
         }],
-        redirect:function () {
-          let navList = store.state.navList
-          for(var i = 0; i < navList.length; i++){
-            if (navList[i].class == 'Choice') {
-              return navList[i].route
-            }
-          }
-        }
+        // redirect:function () {
+        //   let navList = store.state.navList
+        //   for(var i = 0; i < navList.length; i++){
+        //     if (navList[i].class == 'Choice') {
+        //       return navList[i].route
+        //     }
+        //   }
+        // }
       },{ // 考试成绩查询（一级tab路由）
         path: '/ScoreQuery',
         name: 'ScoreQuery',
@@ -99,6 +95,10 @@ export default new Router({
         path: '/AnswerDetails',
         name: 'AnswerDetails',
         component: AnswerDetails
+      },{ // 新增试题页（二级页面）
+        path: '/AddQuestions',
+        name: 'AddQuestions',
+        component: AddQuestions
       }],
       redirect:'/Administration'
     }

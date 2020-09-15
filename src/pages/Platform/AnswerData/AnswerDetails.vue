@@ -14,7 +14,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="SelectSystem == '案例实训'">
+    <el-main v-else>
       <div class="header">
         <div class="box_1">
           <p class="text_1">病症案例主诉：{{AllData.chiefComplaint}}</p>
@@ -23,29 +23,29 @@
       <div class="main">
         <div class="box_2">
           <p v-if="diagnosisStu.flag == 1">诊断：
-            <span :style="{color:diagnosisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{diagnosisStu.rightFlag==1?diagnosisStu.name:''}}
+            <span :style="{color:diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{diagnosisStu.rightFlag==1?diagnosisStu.name:''}}
               <i :class="diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="pathogenesisStu.flag == 1">病机：
-            <span :style="{color:pathogenesisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{pathogenesisStu.rightFlag==1?pathogenesisStu.name:''}}
+            <span :style="{color:pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{pathogenesisStu.rightFlag==1?pathogenesisStu.name:''}}
               <i :class="pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="treatmentStu.flag == 1">治法：
-            <span :style="{color:treatmentStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{treatmentStu.rightFlag==1?treatmentStu.name:''}}
+            <span :style="{color:treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{treatmentStu.rightFlag==1?treatmentStu.name:''}}
               <i :class="treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="drugStu.flag == 1">处方：
-            <span :style="{color:drugStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{drugStu.rightFlag==1?drugStu.name:''}}
+            <span :style="{color:drugStu.rightFlag==1?'#333':'#f56c6c'}">{{drugStu.rightFlag==1?drugStu.name:''}}
               <i :class="drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="prescriptionStu.flag == 1">药物：
-            <span v-for="(item,i) in prescriptionStu.tipList" :key="i" :style="{color:item.flag==1?'#67c23a':'#f56c6c'}">
+            <span v-for="(item,i) in prescriptionStu.tipList" :key="i" :style="{color:item.flag==1?'#333':'#f56c6c'}">
               {{item.name}}
-              <i :style="{color:item.flag==1?'#67c23a':'#f56c6c'}" :class="item.flag==1?'el-icon-check':'el-icon-close'"></i>
+              <i :style="{color:item.flag==1?'#333':'#f56c6c'}" :class="item.flag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
         </div>
@@ -57,8 +57,15 @@
           <p v-if="drugStu.flag == 1">处方：<span>{{AllData.drug}}</span></p>
           <p v-if="prescriptionStu.flag == 1">药物：<span>{{AllData.prescription}}</span></p>
         </div>
+        <div class="box_2" v-if="SelectSystem == '问诊实训'">
+          <p>学生问诊记录</p>
+          <div v-for="(item,i) in AllData.reply" :key="i">
+            <p>学生：<span>{{item.question}}</span></p>
+            <p>系统：<span>{{item.reply}}</span></p>
+          </div>
+        </div>
       </div>
-    </div>
+    </el-main>
   </div>
 </template>
 
@@ -79,50 +86,62 @@ export default {
   },
   created: function () {
     let that = this
-    if (that.SelectSystem == '原文实训') {
-      that.$axios({
-        url: that.$store.state.Q_http + 'originalReport/getStudentQuestionAnswer',
-        method: 'post',
-        data: {
-          id: that.id.id,
-          userId: that.id.userId,
-        }
-      }).then((res) =>{
-        // console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.AllData = res.data.data
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    } else if (that.SelectSystem == '案例实训') {
-      that.$axios({
-        url: that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionThree',
-        method: 'post',
-        data: {
-          questionId: that.id.questionId,
-          examinationId: that.id.examinationId,
-          userId: that.id.userId,
-        }
-      }).then((res) =>{
-        // console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.AllData = res.data.data
-          that.diagnosisStu = res.data.data.diagnosisStu
-          that.pathogenesisStu = res.data.data.pathogenesisStu
-          that.treatmentStu = res.data.data.treatmentStu
-          that.drugStu = res.data.data.drugStu
-          that.prescriptionStu = res.data.data.prescriptionStu
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
-    }
+    that.FnShowData()
   },
   methods: {
     GoBack() { // 点击返回
       let that = this
       that.$router.replace({path:'/AnswerData'})
+    },
+
+    // 执行区域函数
+    FnShowData() {
+      let that = this
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'originalReport/getStudentQuestionAnswer',
+          method: 'post',
+          data: {
+            id: that.id.id,
+            userId: that.id.userId,
+          }
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.AllData = res.data.data
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionThree'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionThree'
+        }
+        that.$axios({
+          url: url,
+          method: 'post',
+          data: {
+            questionId: that.id.questionId,
+            examinationId: that.id.examinationId,
+            userId: that.id.userId,
+          }
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.AllData = res.data.data
+            that.diagnosisStu = res.data.data.diagnosisStu
+            that.pathogenesisStu = res.data.data.pathogenesisStu
+            that.treatmentStu = res.data.data.treatmentStu
+            that.drugStu = res.data.data.drugStu
+            that.prescriptionStu = res.data.data.prescriptionStu
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
     }
   },
 }
@@ -162,6 +181,10 @@ export default {
   color:#333;
   font-size:14px;
   margin-top:5px;
+}
+.el-main{
+  max-height:calc(100vh - 130px);
+  padding:0;
 }
 .main{
   width:100%;

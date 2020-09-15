@@ -32,25 +32,13 @@ export default {
   name: 'whole',
   data () {
     return {
+      SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       dataList: ''
     }
   },
   created() {
     let that = this
-    that.$axios({
-      url: that.$store.state.Q_http + 'caseType/getCaseScore',
-      method: 'post',
-      data: {
-        id: 1,
-      }
-    }).then((res) =>{
-      // console.log(res.data)
-      if(res.data.code == 200){
-        that.dataList = res.data.data
-      }
-    }).catch((err) =>{
-      that.$message.error('请求失败!')
-    })
+    that.FnShowData()
   },
   methods: {
     clickPreservation() { // 点击保存
@@ -60,9 +48,15 @@ export default {
       + parseInt(that.dataList.treatmentScore)
       + parseInt(that.dataList.drugScore)
       + parseInt(that.dataList.prescriptionScore)
-      if(number == 10){
+      if (number == 10) {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseType/setCaseScore'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroType/setInterroScore'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseType/setCaseScore',
+          url: url,
           method: 'post',
           data: {
             id: 1,
@@ -89,8 +83,33 @@ export default {
           callback: action => {}
         })
       }
+    },
+
+    // 执行区域函数
+    FnShowData() {
+      let that = this
+      let url = ''
+      if (that.SelectSystem == '案例实训') {
+        url = that.$store.state.Q_http + 'caseType/getCaseScore'
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interroType/getInterroScore'
+      }
+      that.$axios({
+        url: url,
+        method: 'post',
+        data: {
+          id: 1,
+        }
+      }).then((res) =>{
+        // console.log(res.data)
+        if(res.data.code == 200){
+          that.dataList = res.data.data
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
     }
-  },
+  }
 }
 </script>
 

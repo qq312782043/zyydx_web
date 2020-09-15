@@ -29,9 +29,9 @@
         </div>
         <div class="input_box">
           <p>知识点</p>
-          <el-select @visible-change="clickvisible($event,4)" v-model="knowledgeIds"
-          :placeholder="CaseQuestion.knowledgeNames" size="small" :disabled="disabled" clearable>
-            <el-option v-for="item in chapter" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
+          <el-select @visible-change="clickvisible($event,4)" filterable multiple collapse-tags
+            v-model="knowledgeIds" :placeholder="CaseQuestion.knowledgeNames" size="small" :disabled="disabled" clearable>
+            <el-option v-for="item in knowledge" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
       </div>
@@ -42,7 +42,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="SelectSystem=='案例实训'">
+    <div v-else>
       <div class="header">
         <div class="input_box">
           <p>章节</p>
@@ -55,7 +55,7 @@
           <p>病症类别</p>
           <el-select @visible-change="clickvisible($event,2)" v-model="categoryId"
           :placeholder="CaseQuestion.categoryName" size="small" :disabled="disabled" clearable>
-            <el-option v-for="item in Category" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
+            <el-option v-for="item in category" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="input_box"></div>
@@ -75,40 +75,67 @@
         </div>
         <div class="input_box">
           <p>性别</p>
-          <el-select v-model="SexData" :placeholder="CaseQuestion.sex==2?'女':'男'" size="small" :disabled="disabled" clearable>
+          <el-select v-model="SexData" :placeholder="CaseQuestion.sex==0?'女':'男'" size="small" :disabled="disabled" clearable>
             <el-option v-for="item in sex" :key="item.id" :label="item.label" :value="item.id"></el-option>
           </el-select>
         </div>
-        <div class="input_box"> </div>
+        <div class="input_box"></div>
       </div>
       <div class="main">
         <div class="input_box">
           <p>病症案例主诉</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
+        <div class="input_box" v-if="SelectSystem=='问诊实训'">
+          <p>兼夹症</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.interroJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
+        <div class="input_box" v-if="SelectSystem=='问诊实训'">
+          <p>问诊提示语</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.interroTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
         <div class="input_box">
           <p>诊断</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
+        <div class="input_box">
+          <p>诊断提示</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>病机</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
+          <p>病机提示</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
+        <div class="input_box">
           <p>治法</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.treatmentJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
+        <div class="input_box">
+          <p>治法提示</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.treatmentTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>处方</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.drugJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
+          <p>处方提示</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.drugTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
+        <div class="input_box">
           <p>药物</p>
           <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
+        <div class="input_box">
+          <p>药物提示</p>
+          <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+        </div>
       </div>
     </div>
-
     <div class="footer">
       <el-button :disabled="disabled" type="warning" @click="clickPreserva()">保存</el-button>
     </div>
@@ -153,42 +180,40 @@ export default {
     },
     FnData() { // 初始化数据
       let that = this
+      let data = {}
+      let url = ''
       if (that.SelectSystem == '原文实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'original/getQuestionId',
-          method: 'post',
-          data: {
-            questionId: that.id,
-          }
-        }).then((res) =>{
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            that.CaseQuestion = res.data.data
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
-        })
+        url = that.$store.state.Q_http + 'original/getQuestionId'
+        data = {
+          questionId: that.id,
+        }
       } else if (that.SelectSystem == '案例实训') {
-        that.$axios({
-          url: that.$store.state.Q_http + 'case/getCaseQuestion',
-          method: 'post',
-          data: {
-            id: that.id,
-          }
-        }).then((res) =>{
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            that.CaseQuestion = res.data.data
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
-        })
+        url = that.$store.state.Q_http + 'case/getCaseQuestion'
+        data = {
+          id: that.id,
+        }
+      } else if (that.SelectSystem == '问诊实训') {
+        url = that.$store.state.Q_http + 'interro/getInterroQuestion'
+        data = {
+          id: that.id,
+        }
       }
+      that.$axios({
+        url: url,
+        method: 'post',
+        data: data
+      }).then((res) =>{
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          that.CaseQuestion = res.data.data
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
     },
     clickEdit() { // 点击编辑
       let that = this
       that.disabled = false
-      that.Preserva = false
     },
     clickvisible(e,value) { // 点击下拉框选择章节、知识点、类别
       let that = this
@@ -208,21 +233,25 @@ export default {
               } else if (value == 2) {
                 that.course = res.data.data
               } else if (value == 3) {
-                that.chapter =  res.data.data
-              } else {
-                that.knowledge =  res.data.data
+                that.chapter = res.data.data
+              } else if (value == 4){
+                that.knowledge = res.data.data
               }
             }
           }).catch((err) =>{
             that.$message.error('请求失败!')
           })
-        } else if (that.SelectSystem == '案例实训') {
+        } else {
+          let url = ''
+          if (that.SelectSystem == '案例实训') {
+            url = that.$store.state.Q_http + 'caseType/getCaseTypeList'
+          } else if (that.SelectSystem == '问诊实训') {
+            url = that.$store.state.Q_http + 'interroType/getInterroTypeList'
+          }
           that.$axios({
-            url: that.$store.state.Q_http + 'caseType/getCaseTypeList',
+            url: url,
             method: 'post',
-            data: {
-              type: value
-            }
+            data: { type: value }
           }).then((res) =>{
             // console.log(res.data)
             if (res.data.code == 200) {
@@ -291,6 +320,46 @@ export default {
             treatmentTipStr: that.CaseQuestion.treatmentTip,
             drugTipStr: that.CaseQuestion.drugTip,
             prescriptionTipStr: that.CaseQuestion.prescriptionTip,
+          }
+        }).then((res) =>{
+          // console.log(res.data)
+          if (res.data.code == 200) {
+            that.disabled = true
+            that.$message({
+              message: '保存成功！',
+              type: 'success',
+              duration: '1000'
+            })
+            that.FnData()
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else if (that.SelectSystem == '问诊实训') {
+        that.$axios({
+          url: that.$store.state.Q_http + 'interro/updateInterroQuestion',
+          method: 'post',
+          data: {
+            id: that.id,
+            chapterId: that.chapterId==''?that.CaseQuestion.chapterId:that.chapterId,
+            categoryId: that.categoryId==''?that.CaseQuestion.categoryId:that.categoryId,
+            knowledgePointsIds: that.knowledgeIds.toString()==''?that.CaseQuestion.knowledgePointsIds:that.knowledgeIds.toString(),
+            age: that.Age==''?that.CaseQuestion.age:that.Age,
+            sex: that.SexData==''?that.CaseQuestion.sex:that.SexData,
+            chiefComplaint: that.CaseQuestion.chiefComplaint,
+            diagnosisJsonStr: that.CaseQuestion.diagnosisJson,
+            pathogenesisJsonStr: that.CaseQuestion.pathogenesisJson,
+            treatmentJsonStr: that.CaseQuestion.treatmentJson,
+            drugJsonStr: that.CaseQuestion.drugJson,
+            prescriptionJsonStr: that.CaseQuestion.prescriptionJson,
+            questionExplain: that.CaseQuestion.questionExplain,
+            diagnosisTipStr: that.CaseQuestion.diagnosisTip,
+            pathogenesisTipStr: that.CaseQuestion.pathogenesisTip,
+            treatmentTipStr: that.CaseQuestion.treatmentTip,
+            drugTipStr: that.CaseQuestion.drugTip,
+            prescriptionTipStr: that.CaseQuestion.prescriptionTip,
+            interroJsonStr: that.CaseQuestion.interroJson,
+            interroTipStr: that.CaseQuestion.interroTip,
           }
         }).then((res) =>{
           // console.log(res.data)

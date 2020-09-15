@@ -35,41 +35,50 @@
         </div>
       </el-main>
     </div>
-    <div v-else-if="SelectSystem=='案例实训'" class="main" v-loading="loading">
+    <div v-else class="main" v-loading="loading">
       <el-main class="card_box">
         <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
           <p class="text_1">{{item.sort}}、病例主诉：{{item.chiefComplaint}}</p>
-          <p class="text_2">诊断：
-            <span :style="{color:item.diagnosisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.diagnosisStu.name}}
+          <p v-if="item.diagnosisStu.flag == 1" class="text_2">诊断：
+            <span :style="{color:item.diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.diagnosisStu.name}}
               <i :class="item.diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
-          <p class="text_2">病机：
-            <span :style="{color:item.pathogenesisStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.pathogenesisStu.name}}
+          <p v-if="item.pathogenesisStu.flag == 1" class="text_2">病机：
+            <span :style="{color:item.pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.pathogenesisStu.name}}
               <i :class="item.pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
-          <p class="text_2">治法：
-            <span :style="{color:item.treatmentStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.treatmentStu.name}}
+          <p v-if="item.treatmentStu.flag == 1" class="text_2">治法：
+            <span :style="{color:item.treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{item.treatmentStu.name}}
               <i :class="item.treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
-          <p class="text_2">处方：
-            <span :style="{color:item.drugStu.rightFlag==1?'#67c23a':'#f56c6c'}">{{item.drugStu.name}}
+          <p v-if="item.drugStu.flag == 1" class="text_2">处方：
+            <span :style="{color:item.drugStu.rightFlag==1?'#333':'#f56c6c'}">{{item.drugStu.name}}
               <i :class="item.drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
-          <p class="text_2">药物：
-            <span :style="{color:item.prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">{{value.name}}</span>
-            <i :style="{color:item.prescriptionStu.rightFlag==1?'#67c23a':'#f56c6c'}" :class="item.prescriptionStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
+          <p v-if="item.prescriptionStu.flag == 1" class="text_2">药物：
+            <span :style="{color:item.prescriptionStu.rightFlag==1?'#333':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">
+              {{value.name}}
+              <i :style="{color:value.flag==1?'#333':'#f56c6c'}" :class="value.flag==1?'el-icon-check':'el-icon-close'"></i>
+            </span>
           </p>
           <div class="box_3">
             <p class="text_4">参考答案</p>
-            <p>诊断：<span>{{item.diagnosis}}</span></p>
-            <p>病机：<span>{{item.pathogenesis}}</span></p>
-            <p>治法：<span>{{item.treatment}}</span></p>
-            <p>处方：<span>{{item.drug}}</span></p>
-            <p>药物：<span>{{item.prescription}}</span></p>
+            <p v-if="item.diagnosis">诊断：<span>{{item.diagnosis}}</span></p>
+            <p v-if="item.pathogenesis">病机：<span>{{item.pathogenesis}}</span></p>
+            <p v-if="item.treatment">治法：<span>{{item.treatment}}</span></p>
+            <p v-if="item.drug">处方：<span>{{item.drug}}</span></p>
+            <p v-if="item.prescription">药物：<span>{{item.prescription}}</span></p>
+          </div>
+          <div class="box_3" v-if="SelectSystem=='问诊实训'">
+            <p class="text_4">问诊记录</p>
+            <div v-for="(value,i) in item.reply" :key="i">
+              <p>学生：<span>{{value.question}}</span></p>
+              <p>系统：<span>{{value.reply}}</span></p>
+            </div>
           </div>
         </div>
       </el-main>
@@ -100,7 +109,7 @@ export default {
       let parameter = {}
       if (that.SelectSystem == '原文实训') {
         parameter = { id: that.$store.state.StudentListData.id }
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
         parameter = { id: that.id.examinationId }
       }
       that.$router.replace({
@@ -132,9 +141,15 @@ export default {
           that.loading = false
           that.$message.error('请求失败!')
         })
-      } else if (that.SelectSystem == '案例实训') {
+      } else {
+        let url = ''
+        if (that.SelectSystem == '案例实训') {
+          url = that.$store.state.Q_http + 'caseExamination/queryStudentScoreThree'
+        } else if (that.SelectSystem == '问诊实训') {
+          url = that.$store.state.Q_http + 'interroExamination/queryStudentScoreThree'
+        }
         that.$axios({
-          url: that.$store.state.Q_http + 'caseExamination/queryStudentScoreThree',
+          url: url,
           method: 'post',
           data: {
             id: that.id.examinationId,
