@@ -11,7 +11,7 @@
           :placeholder="CaseQuestion.courseName" size="small" :disabled="disabled" clearable>
             <el-option v-for="item in course" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
-          <span @click="clickEdit()">编辑</span>
+          <span v-if="IsAdmin == 1" @click="clickEdit()">编辑</span>
         </div>
         <div class="input_box">
           <p>级别</p>
@@ -38,7 +38,7 @@
       <div class="main">
         <div class="input_box">
           <p>考试题目</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.optionText" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" autosize v-model="CaseQuestion.optionText" size="small" clearable :disabled="disabled"></el-input>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@
           </el-select>
         </div>
         <div class="input_box"></div>
-        <div class="input_box"><p style="color:#BF8333;cursor:pointer" @click="clickEdit()">编辑</p></div>
+        <div v-if="IsAdmin == 1" class="input_box"><p style="color:#BF8333;cursor:pointer" @click="clickEdit()">编辑</p></div>
       </div>
       <div class="header">
         <div class="input_box">
@@ -147,6 +147,7 @@ export default {
   name: 'whole',
   data () {
     return {
+      IsAdmin: this.$store.state.loginData.user.isAdmin, // 是否为管理员
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       disabled: true, // 页面禁用属性
       id: this.$route.query.id, // 页面传参ID
@@ -382,6 +383,14 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tag.el-tag--info{
+  max-width:60%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+</style>
 <style scoped>
 .Goback .el-button{
   padding:0;

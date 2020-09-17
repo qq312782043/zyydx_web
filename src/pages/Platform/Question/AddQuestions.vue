@@ -317,18 +317,6 @@ export default {
           })
           return
         }
-        if (!that.Age) {
-          that.$message({
-            message: '请输入年龄', type: 'warning'
-          })
-          return
-        }
-        if (!that.SexData) {
-          that.$message({
-            message: '请选择性别', type: 'warning'
-          })
-          return
-        }
         if (!that.CaseQuestion.chiefComplaint) {
           that.$message({
             message: '请填写案例主诉', type: 'warning'
@@ -408,6 +396,14 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tag.el-tag--info{
+  max-width:60%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+</style>
 <style scoped>
 .Goback .el-button{
   padding:0;

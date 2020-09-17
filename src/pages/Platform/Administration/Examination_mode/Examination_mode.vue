@@ -7,25 +7,25 @@
           <div class="contact">
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">课程</div>
-              <el-select v-model="courseData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="courseData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in course" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">级别</div>
-              <el-select v-model="levelData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="levelData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in level" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter">
               <div class="text_2">章节</div>
-              <el-select v-model="chapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="chapterData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem!='原文实训'?true:false">
               <div class="text_2">病症类别</div>
-              <el-select v-model="categoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="categoryData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
@@ -34,14 +34,14 @@
         <div class="Range">
           <p class="text_1">选择考试知识点<span>*不勾选则视为全选</span></p>
           <div class="knowledge">
-            <el-select style="margin-top:21px" v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
+            <el-select style="margin-top:21px" clearable v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
               collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
               <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
           </div>
         </div>
         <div class="Range">
-          <p class="text_1">已选知识点({{knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
+          <p class="text_1">已选知识点({{knowledgeData.length==0?'暂无知识点':knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
           <el-main class="box_card" style="margin-top:31px">
             <p v-for="(item,i) in knowledgeData" :key="i">{{item}}<i @click="clickRemove(item)" class="el-icon-remove"></i></p>
           </el-main>
@@ -57,7 +57,7 @@
           </div>
         </div>
         <div class="Range" style="flex:0.7">
-          <p class="text_1">*练习题数<span>*如选择指定试题,该项配置失效</span></p>
+          <p class="text_1">*考试题数<span>*如选择指定试题,该项配置失效</span></p>
           <div class="knowledge">
             <el-input v-model="topicNumber" :disabled="practice" size="small" clearable placeholder="请输入练习题数"></el-input>
           </div>
@@ -65,7 +65,7 @@
         <div class="Range" style="flex:0.7">
           <p class="text_1">*考试名称</p>
           <div class="knowledge">
-            <el-input v-model="examinationName" size="small" clearable placeholder="请输入考试名称"></el-input>
+            <el-input v-model="examinationName" maxlength="15" size="small" clearable placeholder="请输入考试名称"></el-input>
           </div>
         </div>
         <div class="Range" style="visibility:hidden"></div>
@@ -111,7 +111,7 @@
             <p class="text_2">难度：<span>{{item.practiceDifficulty}}级难度</span></p>
             <div class="set_up clear">
               <p class="text_2 text_3">发起时间：<span>{{item.createOn}}</span></p>
-              <p class="text_2 text_3">进行时间：<span>{{TimeToProceed(item.createOn)}}</span></p>
+              <p class="text_2 text_3">进行时间：<span>{{time}}</span></p>
               <el-button type="warning" @click="clickSetUp(item.id)">收卷</el-button>
             </div>
           </div>
@@ -129,7 +129,7 @@
           <p class="text_2">最大题数：<span>{{caseData.practiceNum}}</span></p>
           <div class="set_up clear">
             <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
-            <p class="text_2 text_3">进行时间：<span>{{TimeToProceed(caseData.createOn)}}</span></p>
+            <p class="text_2 text_3">进行时间：<span>{{time}}</span></p>
             <el-button size="medium" type="warning" @click="clickSetUp(caseData.id)">收卷</el-button>
           </div>
         </div>
@@ -167,12 +167,20 @@ export default {
       searchDataL: '已选列表',
       practice: false, // 练习题数禁用变量
       caseData: '', // 已开启的考试数据
+      time: '', // 考试用时
+      setInterval: '', // 定时器
     }
   },
   created() {
     let that = this
     that.FnShowData()
     that.FnOptionData()
+  },
+  mounted() {
+    this.setInterval = setInterval(this.TimeToProceed,1000)
+  },
+  beforeDestroy() {
+    clearInterval(this.setInterval)
   },
   methods: {
     ChoiceKnowledge(value,id) { // 选择知识点
@@ -465,6 +473,7 @@ export default {
                 duration: '1000',
                 onClose: function () {
                   that.FnShowData()
+                  clearInterval(that.setInterval)
                 }
               })
             }
@@ -492,6 +501,7 @@ export default {
                 onClose: function () {
                   that.modular_1 = true
                   that.modular_2 = false
+                  clearInterval(that.setInterval)
                 }
               })
             }
@@ -578,33 +588,52 @@ export default {
         that.$message.error('请求失败!')
       })
     },
-    TimeToProceed(value) { // 考试进行时间
+    TimeToProceed() { // 考试进行时间
       let that = this
-      let sDate1 = Date.parse(new Date())
-      let sDate2 = Date.parse(value)
-      let usedTime = sDate1 - sDate2
-      let days = Math.floor(usedTime/(24*3600*1000))
-      let leave1 = usedTime%(24*3600*1000)
-      let hours = Math.floor(leave1/(3600*1000))
-      let leave2 = leave1%(3600*1000)
-      let minutes = Math.floor(leave2/(60*1000))
-      let time = ''
-      if (days == 0) {
-        time =  hours + "小时" + minutes + "分钟"
-      } else {
-        time =  days + '天' + hours + "小时" + minutes + "分钟"
+      if (that.caseData) {
+        let createOn = ''
+        if (that.SelectSystem == '原文实训') {
+          createOn = that.caseData[0].createOn
+        } else {
+          createOn = that.caseData.createOn
+        }
+        let sDate1 = Date.parse(new Date())
+        let sDate2 = Date.parse(createOn)
+        let leave1 = sDate1 - sDate2
+        let days = Math.floor(leave1/(24*3600*1000))
+        let leave2 = leave1%(24*3600*1000)
+        let hours = Math.floor(leave2/(3600*1000))
+        let leave3 = leave2%(3600*1000)
+        let minutes = Math.floor(leave3/(60*1000))
+        let leave4 = leave3%(60*1000)
+        let second = Math.floor(leave4/(1000))
+        let time = ''
+        if (days == 0) {
+          if (hours == 0) {
+            time =  minutes + "分钟" + (second) + "秒"
+          } else {
+            time =  hours + "小时" + minutes + "分钟" + (second) + "秒"
+          }
+        } else {
+          time =  days + '天' + hours + "小时" + minutes + "分钟" + (second) + "秒"
+        }
+        that.time = time
       }
-      return time
     },
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-.el-select{
+<style>
+.el-tag.el-tag--info{
+  max-width:60%;
   overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
+</style>
+<style scoped>
 .SmallBox .header,.main{
   box-sizing: border-box;
   display: flex;

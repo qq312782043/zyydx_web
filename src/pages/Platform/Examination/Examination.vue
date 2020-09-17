@@ -18,7 +18,7 @@
       <el-input v-model="dataList.drugScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="input_box">
-      <p>方药分数</p>
+      <p>药物分数</p>
       <el-input v-model="dataList.prescriptionScore" clearable size="small" maxlength="1"></el-input><p>分</p>
     </div>
     <div class="footer">

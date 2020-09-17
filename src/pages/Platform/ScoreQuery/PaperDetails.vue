@@ -17,9 +17,9 @@
           <p class="nth_4"></p>
           <p class="nth_5">错误</p>
         </div>
-        <div class="TheBall">
+        <el-main class="TheBall">
           <P v-for="(item,i) in StudentListData" :key="i" :style="{background:item.flagRight==1?'green':'red'}"><a :href="'#c' + i">{{i+1}}</a></P>
-        </div>
+        </el-main>
       </div>
     </div>
     <div v-if="SelectSystem=='原文实训'" class="main" v-loading="loading">
@@ -246,12 +246,16 @@ export default {
 }
 .header .box_2 .TheBall{
   display: flex;
+  flex-wrap: wrap;
   margin-top:20px;
+  max-height:100px;
+  padding:0;
 }
 .header .box_2 .TheBall p{
   margin-right:20px;
   border-radius:15px;
   overflow: hidden;
+  margin-bottom:20px;
 }
 .header .box_2 .TheBall p a{
   width:30px;
@@ -271,7 +275,7 @@ export default {
   padding:10px 10px 10px 2px;
   box-sizing: border-box;
   width:100%;
-  max-height: calc(100vh - 350px);
+  max-height: calc(100vh - 380px);
 }
 .main .card{
   box-shadow: 1px 1px 2px 2px rgba(0, 0, 0, 0.1);

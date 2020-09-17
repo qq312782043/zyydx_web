@@ -213,7 +213,7 @@ export default {
       if (e.systemStatus == 1) {
         if (e.examStatus == 1) {
           if (e.patternType == 3) {
-            this.$alert('有考试正在进行，无法关闭系统！', '提示', {
+            this.$alert('该系统有正在进行的考试，请先收卷后再关闭', '提示', {
               confirmButtonText: '确定',
               callback: action => {return}
             })
@@ -266,6 +266,8 @@ export default {
           } else {
             that.systemStatus3 = false
           }
+        } else {
+          that.$message.error('登录状态已失效，请退出重新登录!')
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')

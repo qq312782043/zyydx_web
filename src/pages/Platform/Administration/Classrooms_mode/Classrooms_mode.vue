@@ -7,25 +7,25 @@
           <div class="contact">
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">课程</div>
-              <el-select v-model="courseData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="courseData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in course" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">级别</div>
-              <el-select v-model="levelData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="levelData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in level" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter">
               <div class="text_2">章节</div>
-              <el-select v-model="chapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="chapterData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem!='原文实训'?true:false">
               <div class="text_2">病症类别</div>
-              <el-select v-model="categoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="categoryData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
@@ -34,14 +34,14 @@
         <div class="Range">
           <p class="text_1">选择练习知识点<span>*不勾选则视为全选</span></p>
           <div class="knowledge">
-            <el-select style="margin-top:22px" v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
+            <el-select style="margin-top:22px" v-model="knowledgeData" clearable filterable multiple @change="ChoiceKnowledge"
               collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
               <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
           </div>
         </div>
         <div class="Range">
-          <p class="text_1">已选知识点({{knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
+          <p class="text_1">已选知识点({{knowledgeData.length==0?'暂无知识点':knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
           <el-main class="box_card" style="margin-top:31px">
             <p v-for="(item,i) in knowledgeData" :key="i">{{item}}<i @click="clickRemove(item)" class="el-icon-remove"></i></p>
           </el-main>
@@ -540,6 +540,14 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
+<style>
+.el-tag.el-tag--info{
+  max-width:60%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+</style>
 <style scoped>
 .el-select{
   overflow: hidden;

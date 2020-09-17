@@ -2,14 +2,10 @@
   <div class="whole">
     <div class="header clear">
       <div class="time_box">
-        <el-date-picker v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+        <el-date-picker style="margin-right:10px" v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
           range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
         </el-date-picker>
-      </div>
-      <div class="input_box">
         <el-input placeholder="输入考试ID或考试名称" v-model="searchKey" size="small" clearable></el-input>
-      </div>
-      <div class="button_box">
         <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
         <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
@@ -19,20 +15,20 @@
     <div class="main" ref="height" v-else>
       <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="id" label="考试ID" width="70"></el-table-column>
-        <el-table-column align="center" prop="examinationName" label="考试名称" width="150"></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="100"></el-table-column>
         <el-table-column align="center" prop="attendCount" label="参考人数" width="70" :formatter="formatTime3"></el-table-column>
-        <el-table-column align="center" prop="createOn" label="开始时间" width="150" :formatter="formatTime1"></el-table-column>
-        <el-table-column align="center" prop="updateOn" label="结束时间" width="150" :formatter="formatTime2"></el-table-column>
-        <el-table-column align="center" prop="examUseTime" label="考试用时" width="130"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="考试开始时间" width="100" :formatter="formatTime1"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="考试结束时间" width="100" :formatter="formatTime2"></el-table-column>
+        <el-table-column align="center" prop="examUseTime" label="考试用时" width="100"></el-table-column>
         <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
         <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
         <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
         <el-table-column align="center" prop="minScore" label="最低分" width="70"></el-table-column>
         <el-table-column align="center" prop="avgScore" label="平均分" width="70"></el-table-column>
-        <el-table-column align="center" prop="courseValues" label="课程" width="200"></el-table-column>
-        <el-table-column align="center" prop="levelValues" label="级别" width="150"></el-table-column>
-        <el-table-column align="center" prop="chapterValues" label="章节" width="200"></el-table-column>
-        <el-table-column align="center" prop="knowledgeValues" label="知识点" width="200"></el-table-column>
+        <el-table-column align="center" prop="courseValues" label="课程" width="70"></el-table-column>
+        <el-table-column align="center" prop="levelValues" label="级别" width="70"></el-table-column>
+        <el-table-column align="center" prop="chapterValues" label="章节" width=""></el-table-column>
+        <el-table-column align="center" prop="knowledgeValues" label="知识点" width=""></el-table-column>
         <el-table-column align="center" prop="practiceDifficulty" label="难度" width="70" :formatter="formatTime4"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
@@ -41,12 +37,12 @@
         </el-table-column>
       </el-table>
       <el-table v-else v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
-        <el-table-column align="center" prop="examinationId" label="考试ID" width="80"></el-table-column>
-        <el-table-column align="center" prop="examinationName" label="考试名称" width="80"></el-table-column>
-        <el-table-column align="center" prop="personNum" label="参考人数" width="80"></el-table-column>
-        <el-table-column align="center" prop="createOn" label="开始时间" width="130"></el-table-column>
-        <el-table-column align="center" prop="updateOn" label="结束时间" width="130"></el-table-column>
-        <el-table-column align="center" prop="examTime" label="考试用时" width="110"></el-table-column>
+        <el-table-column align="center" prop="examinationId" label="考试ID" width="70"></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="100"></el-table-column>
+        <el-table-column align="center" prop="personNum" label="参考人数" width="70" :formatter="formatTime3"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="考试开始时间" width="100"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="考试结束时间" width="100"></el-table-column>
+        <el-table-column align="center" prop="examTime" label="考试用时" width="100"></el-table-column>
         <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
         <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
         <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
@@ -198,7 +194,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "考试成绩查询(" + date +").xlsx"
+          const fileName = "考试成绩查询" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -232,7 +228,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "考试成绩查询(" + date +").xlsx"
+          const fileName = "考试成绩查询" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -283,7 +279,7 @@ export default {
       return Y + M + D + h + m
     },
     formatTime3(row) {
-      let date = row.attendCount + '人'
+      let date = row.attendCount?row.attendCount:row.personNum + '人'
       return date
     },
     formatTime4(row) {
@@ -295,31 +291,21 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.el-button+.el-button{
-  margin-left:0px;
-}
-</style>
 <style scoped>
 .el-button--text{
   color: #BF8333;
 }
-.header{
-  box-sizing: border-box;
-  padding:10px 0;
+.el-input,.el-select{
+  width:150px;
+  margin-right:10px;
+  margin-bottom:10px;
 }
-.header .time_box,.input_box{
-  margin-right:40px;
-  float: left;
-}
-.header .button_box{
-  float: right;
-}
+
 .main{
   width:100%;
-  height: calc(100vh - 230px);
+  height: calc(100vh - 228px);
   box-sizing: border-box;
-  margin-top:20px;
+  margin-top:10px;
 }
 .footer{
   position:fixed;

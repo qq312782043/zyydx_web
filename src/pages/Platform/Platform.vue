@@ -1,7 +1,8 @@
 <template>
   <el-container>
-    <el-header class="clear">
+    <el-header>
       <div class="left_box"></div>
+      <div class="middle_box">{{SystemName}}</div>
       <div class="right_box">
         <span class="pattern">当前模式：{{title}}</span>
         <el-dropdown trigger="click">
@@ -73,6 +74,7 @@ export default {
       escape: false,
       title: '',
       tabList: '',
+      SystemName: '', // 系统名称
       loginData: this.$store.state.loginData, // 用户数据
       ruleForm: {
         Pass: '',
@@ -125,7 +127,7 @@ export default {
       that.tabList = that.$store.state.tabList
       that.$axios({
         url: that.$store.state.Q_http + 'user/getUser',
-        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.loginData.user.requestToken },
+        headers: { 'Content-Type': 'application/json;charset=UTF-8', 'token': that.$store.state.loginData.user.requestToken },
         method: 'post',
         data: {
           userId: that.$store.state.loginData.user.id,
@@ -136,10 +138,13 @@ export default {
           let index = ''
           if (that.$store.state.SystemID == 1) {
             index = 0
+            that.SystemName = '经典原文实训'
           } else if (that.$store.state.SystemID == 2) {
             index = 1
+            that.SystemName = '经典案例实训'
           } else if (that.$store.state.SystemID == 3) {
             index = 2
+            that.SystemName = '经典案例实训问诊'
           }
           if (res.data.data.systemStatusList[index].patternType == 1) {
             that.title = '自由练习模式'
@@ -148,6 +153,8 @@ export default {
           } else if (res.data.data.systemStatusList[index].patternType == 3) {
             that.title = '考试模式'
           }
+        } else {
+          that.$message.error('登录状态已失效，请退出重新登录!')
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
@@ -166,7 +173,7 @@ export default {
               url: that.$store.state.Q_http + 'user/modifyPassWord',
               method: 'post',
               data: {
-                userId: that.loginData.user.id,
+                userId: that.$store.state.loginData.user.id,
                 newPassword: that.ruleForm.NewPass,
                 password: that.ruleForm.Pass,
               }
@@ -203,7 +210,7 @@ export default {
           url: that.$store.state.Q_http + 'user/loginOut',
           method: 'post',
           data: {
-            userId: that.loginData.user.id
+            userId: that.$store.state.loginData.user.id,
           }
         }).then((res) =>{
           if(res.data.code == 200){
@@ -272,8 +279,19 @@ export default {
   margin-top:10px;
   float: left;
 }
+.el-container .el-header .middle_box{
+  font-size:18px;
+  font-weight: bold;
+  color:#fff;
+  width:100%;
+  text-align: center;
+  position: absolute;
+  z-index:0;
+}
 .el-container .el-header .right_box{
   float: right;
+  position: relative;
+  z-index:10;
 }
 .el-container .el-header .right_box .pattern{
   color:#fff;

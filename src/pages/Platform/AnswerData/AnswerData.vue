@@ -1,22 +1,13 @@
 <template>
   <div class="whole">
     <div class="header">
-      <div class="time_box clear">
-        <div style="float:left">
-          <el-date-picker v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
-            range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
-          </el-date-picker>
-          <el-input placeholder="题库ID" v-model="questionId" size="small" clearable></el-input>
-          <el-input placeholder="班级号" v-model="className" size="small" clearable></el-input>
-          <el-input placeholder="学号" v-model="studentNumber" size="small" clearable></el-input>
-        </div>
-        <div style="float:right">
-          <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
-          <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
-          <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
-        </div>
-      </div>
-      <div class="input_box">
+      <div class="time_box">
+        <el-date-picker style="margin-right:10px" v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+          range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
+        </el-date-picker>
+        <el-input placeholder="题库ID" v-model="questionId" size="small" clearable></el-input>
+        <el-input placeholder="班级号" v-model="className" size="small" clearable></el-input>
+        <el-input placeholder="学号" v-model="studentNumber" size="small" clearable></el-input>
         <el-input placeholder="学生姓名" v-model="userName" size="small" clearable></el-input>
         <el-input placeholder="考试名称" v-model="examinationName" size="small" clearable></el-input>
         <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="courseId" filterable multiple collapse-tags
@@ -49,6 +40,9 @@
           <el-option v-for="item in optionData.mod" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
+        <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
+        <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
+        <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
@@ -62,7 +56,7 @@
         <el-table-column align="center" prop="questionText" label="考试题目" width=""></el-table-column>
         <el-table-column align="center" prop="flagRight" label="结果" width="70"></el-table-column>
         <el-table-column align="center" prop="patternType" label="模式" width="110"></el-table-column>
-        <el-table-column align="center" prop="courseValue" label="课程" width="70"></el-table-column>
+        <el-table-column align="center" prop="courseValue" label="课程" width="110"></el-table-column>
         <el-table-column align="center" prop="levelValue" label="级别" width="70"></el-table-column>
         <el-table-column align="center" prop="chapterValue" label="章节" width="110"></el-table-column>
         <el-table-column align="center" prop="knowledgeValues" label="知识点" width="110"></el-table-column>
@@ -251,6 +245,7 @@ export default {
         let url = ''
         if (that.SelectSystem == '案例实训') {
           url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwo'
+          // url = 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryQuestionDescriptionTwo'
         } else if (that.SelectSystem == '问诊实训') {
           url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionTwo'
         }
@@ -334,7 +329,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "学生答题数据(" + date +").xlsx"
+          const fileName = "学生答题数据" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -375,7 +370,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "学生答题数据(" + date +").xlsx"
+          const fileName = "学生答题数据" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -397,7 +392,7 @@ export default {
       if (that.SelectSystem == '原文实训') {
         parameter = { id: e.id , userId: e.userId }
       } else {
-        parameter = { questionId: e.questionId , userId: e.userId , examinationId: e.examinationId }
+        parameter = { questionId: e.id }
       }
       that.$router.replace({
         path:'/AnswerDetails',
@@ -465,38 +460,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.el-button+.el-button{
-  margin-left:0px;
+.el-tag.el-tag--info{
+  max-width:50%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 </style>
 <style scoped>
 .el-button--text{
   color: #BF8333;
 }
-.header{
-  box-sizing: border-box;
-  padding:10px 0;
+.el-input,.el-select{
+  width:150px;
+  margin-right:10px;
+  margin-bottom:10px;
 }
-.time_box .el-input{
-  width:180px;
-  margin-left:10px;
-}
-.input_box{
-  margin-top:20px;
-  display: flex;
-}
-.input_box .el-input,.el-select{
-  margin-right:20px;
-  width:180px;
-}
-.input_box :last-child{
-  margin-right:0px;
-}
+
 .main{
   width:100%;
-  height: calc(100vh - 285px);
+  height: calc(100vh - 270px);
   box-sizing: border-box;
-  margin-top:20px;
+  margin-top:10px;
 }
 .footer{
   position:fixed;

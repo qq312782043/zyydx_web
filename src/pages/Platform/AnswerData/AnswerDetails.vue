@@ -23,22 +23,22 @@
       <div class="main">
         <div class="box_2">
           <p v-if="diagnosisStu.flag == 1">诊断：
-            <span :style="{color:diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{diagnosisStu.rightFlag==1?diagnosisStu.name:''}}
+            <span :style="{color:diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{diagnosisStu.name}}
               <i :class="diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="pathogenesisStu.flag == 1">病机：
-            <span :style="{color:pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{pathogenesisStu.rightFlag==1?pathogenesisStu.name:''}}
+            <span :style="{color:pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{pathogenesisStu.name}}
               <i :class="pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="treatmentStu.flag == 1">治法：
-            <span :style="{color:treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{treatmentStu.rightFlag==1?treatmentStu.name:''}}
+            <span :style="{color:treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{treatmentStu.name}}
               <i :class="treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="drugStu.flag == 1">处方：
-            <span :style="{color:drugStu.rightFlag==1?'#333':'#f56c6c'}">{{drugStu.rightFlag==1?drugStu.name:''}}
+            <span :style="{color:drugStu.rightFlag==1?'#333':'#f56c6c'}">{{drugStu.name}}
               <i :class="drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
@@ -117,6 +117,7 @@ export default {
         let url = ''
         if (that.SelectSystem == '案例实训') {
           url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionThree'
+          // url = 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryQuestionDescriptionThree'
         } else if (that.SelectSystem == '问诊实训') {
           url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionThree'
         }
@@ -125,8 +126,6 @@ export default {
           method: 'post',
           data: {
             questionId: that.id.questionId,
-            examinationId: that.id.examinationId,
-            userId: that.id.userId,
           }
         }).then((res) =>{
           // console.log(res.data.data)

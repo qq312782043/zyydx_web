@@ -1,7 +1,7 @@
 <template>
   <div class="whole">
-    <div class="header clear">
-      <div class="select_box">
+    <div class="header">
+      <div class="time_box">
         <el-select v-show="SelectSystem=='原文实训'?true:false" @visible-change="clickvisible($event,1)" filterable multiple collapse-tags
           v-model="LevelData" class="select" clearable placeholder="级别" size="small">
           <el-option v-for="item in TestData" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
@@ -19,19 +19,17 @@
           v-model="CategoryData" class="select" clearable placeholder="病症类别" size="small">
           <el-option v-for="item in TestData" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
         </el-select>
-      </div>
-      <div class="button_box">
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="warning" size="small" plain>重置</el-button>
-        <el-button @click="clickAddTestQuestions()" icon="el-icon-circle-plus-outline" type="warning" size="small" plain>新增试题</el-button>
-        <el-upload style="display:inline-block"
+        <el-button v-if="IsAdmin == 1" @click="clickAddTestQuestions()" icon="el-icon-circle-plus-outline" type="warning" size="small" plain>新增</el-button>
+        <el-upload v-if="IsAdmin == 1" style="display:inline-block;margin:0 10px;"
           :action="this.$store.state.Q_http + 'case/importCaseQuestion'" :before-upload="clickImportFile" :show-file-list="false">
-          <el-button icon="el-icon-folder-opened" type="warning" size="small" plain>表格导入</el-button>
+          <el-button icon="el-icon-folder-opened" type="warning" size="small" plain>试题导入</el-button>
         </el-upload>
-        <el-button @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small" plain>导出</el-button>
-        <el-button @click="clickDownloadTemplate()" icon="el-icon-download" type="warning" size="small" plain>模板下载</el-button>
-        <el-button @click="clickCaseType(showValue)" icon="el-icon-s-tools" type="warning" size="small" plain>试题分类管理</el-button>
-        <el-button @click="BatchDeletion()" icon="el-icon-delete" type="warning" size="small" plain>批量删除</el-button>
+        <el-button v-if="IsAdmin == 1" @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small" plain>试题导出</el-button>
+        <el-button v-if="IsAdmin == 1" @click="clickDownloadTemplate()" icon="el-icon-download" type="warning" size="small" plain>模板下载</el-button>
+        <el-button v-if="IsAdmin == 1" @click="clickCaseType(showValue)" icon="el-icon-s-tools" type="warning" size="small" plain>试题分类管理</el-button>
+        <el-button v-if="IsAdmin == 1" @click="BatchDeletion()" icon="el-icon-delete" type="warning" size="small" plain>批量删除</el-button>
       </div>
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
@@ -49,7 +47,7 @@
         <el-table-column align="center" prop="optionText" label="考试题目" width=""></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="130">
           <template slot-scope="scope">
-            <el-button @click="clickDetails(scope.row)" type="text" size="small">删除</el-button>
+            <el-button v-if="IsAdmin == 1" @click="clickDetails(scope.row)" type="text" size="small">删除</el-button>
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
           </template>
         </el-table-column>
@@ -66,7 +64,7 @@
         <el-table-column align="center" prop="chiefComplaint" label="病症案例主诉" width=""></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="130">
           <template slot-scope="scope">
-            <el-button @click="clickDetails(scope.row)" type="text" size="small">删除</el-button>
+            <el-button v-if="IsAdmin == 1" @click="clickDetails(scope.row)" type="text" size="small">删除</el-button>
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
           </template>
         </el-table-column>
@@ -79,13 +77,13 @@
       </el-pagination>
     </div>
     <router-view />
-    <el-dialog title="试题分类管理" append-to-body :visible.sync="CaseType" width="50%" :close-on-press-escape="escape" :close-on-click-modal="escape">
+    <el-dialog title="试题分类管理" append-to-body center :visible.sync="CaseType" width="50%" :close-on-press-escape="escape" :close-on-click-modal="escape">
       <div class="Dialogs">
         <el-tabs v-model="activeName" type="border-card" @tab-click="clickToSwitch">
           <el-tab-pane v-for="(item,i) in CaseTypeList" :key="i" :label="item.label" :name="item.name">
             <el-main style="max-height:300px" v-loading="loadingMain">
               <div class="input_box" v-for="(item,i) in TestData" :key="i">
-                <el-input v-model="item.typeName" placeholder="请输入内容" size="mini" :disabled="item.status==0?true:false"></el-input>
+                <el-input v-model="item.typeName" placeholder="请输入内容" maxlength="50" size="mini" :disabled="item.status==0?true:false"></el-input>
                 <el-button @click="clickEdit(i)" type="text">{{item.status==0?'编辑':'确定'}}</el-button>
                 <el-button @click="clickDeleteIpt(i)" type="text">删除</el-button>
               </div>
@@ -107,6 +105,8 @@ export default {
   data () {
     return {
       heightCss: '',
+      IsAdmin: this.$store.state.loginData.user.isAdmin, // 是否为管理员
+      // IsAdmin: 1, // 是否为管理员
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       escape: false, // 是否可以关闭弹窗
       loading: false, // 加载
@@ -387,7 +387,7 @@ export default {
             duration: 1000
           })
         } else {
-          that.$message.error('导入失败，请查看表格格式!')
+          that.$message.error(res.data.message)
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
@@ -532,76 +532,80 @@ export default {
     clickPreservation() { // 点击批量保存
       let that = this
       let questionIds = []
-      that.TestData.map((value,index,arry)=>{
-        if (value.status == 1) {
-          questionIds.push({ 'id': value.id || value.ids, 'name': value.typeName })
-        }
-      })
-      for(var i = 0; i < questionIds.length; i++){
-        if (questionIds[i].name == '') {
-          if (questionIds[i].id == 0 || questionIds[i].ids == 0) {
-            that.$message({
-              message: '请输入新增内容~',
-              type: 'warning'
-            })
-          } else {
-            that.$message({
-              message: '请输入编辑内容~',
-              type: 'warning'
-            })
+      if (that.TestData.length !=0) {
+        that.TestData.map((value,index,arry)=>{
+          if (value.status == 1) {
+            questionIds.push({ 'id': value.id || value.ids, 'name': value.typeName })
           }
-          return
-        }
-      }
-      if (that.SelectSystem == '原文实训') {
-        that.$axios({
-          url: that.$store.state.Y_http + 'originalType/batchSaveType',
-          method: 'post',
-          data: {
-            typeName: JSON.stringify(questionIds),
-            type: that.TestData[0].type
-          }
-        }).then((res) =>{
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            that.CaseType = false
-            that.$message({
-              type: 'success',
-              message: '保存成功!',
-              duration: '1000'
-            })
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
         })
+        for(var i = 0; i < questionIds.length; i++){
+          if (questionIds[i].name == '') {
+            if (questionIds[i].id == 0 || questionIds[i].ids == 0) {
+              that.$message({
+                message: '请输入新增内容~',
+                type: 'warning'
+              })
+            } else {
+              that.$message({
+                message: '请输入编辑内容~',
+                type: 'warning'
+              })
+            }
+            return
+          }
+        }
+        if (that.SelectSystem == '原文实训') {
+          that.$axios({
+            url: that.$store.state.Y_http + 'originalType/batchSaveType',
+            method: 'post',
+            data: {
+              typeName: JSON.stringify(questionIds),
+              type: that.TestData[0].type
+            }
+          }).then((res) =>{
+            // console.log(res.data)
+            if (res.data.code == 200) {
+              that.CaseType = false
+              that.$message({
+                type: 'success',
+                message: '保存成功!',
+                duration: '1000'
+              })
+            }
+          }).catch((err) =>{
+            that.$message.error('请求失败!')
+          })
+        } else {
+          let url = ''
+          if (that.SelectSystem == '案例实训') {
+            url = that.$store.state.Q_http + 'caseType/saveType'
+          } else if (that.SelectSystem == '问诊实训') {
+            url = that.$store.state.Q_http + 'interroType/saveType'
+          }
+          that.$axios({
+            url: url,
+            method: 'post',
+            data: {
+              questionIds: JSON.stringify(questionIds),
+              caseType: that.TestData[0].type
+            }
+          }).then((res) =>{
+            // console.log(res.data)
+            if (res.data.code == 200) {
+              that.CaseType = false
+              that.$message({
+                type: 'success',
+                message: '保存成功!',
+                duration: '1000'
+              })
+              that.clickSearch()
+            }
+          }).catch((err) =>{
+            that.$message.error('请求失败!')
+          })
+        }
       } else {
-        let url = ''
-        if (that.SelectSystem == '案例实训') {
-          url = that.$store.state.Q_http + 'caseType/saveType'
-        } else if (that.SelectSystem == '问诊实训') {
-          url = that.$store.state.Q_http + 'interroType/saveType'
-        }
-        that.$axios({
-          url: url,
-          method: 'post',
-          data: {
-            questionIds: JSON.stringify(questionIds),
-            caseType: that.TestData[0].type
-          }
-        }).then((res) =>{
-          // console.log(res.data)
-          if (res.data.code == 200) {
-            that.CaseType = false
-            that.$message({
-              type: 'success',
-              message: '保存成功!',
-              duration: '1000'
-            })
-            that.clickSearch()
-          }
-        }).catch((err) =>{
-          that.$message.error('请求失败!')
-        })
+        that.CaseType = false
       }
     },
     clickAdded(e) { // 点击新增
@@ -840,39 +844,35 @@ export default {
 .el-dialog__headerbtn .el-dialog__close:hover{
   color: #BF8333;
 }
-.el-button+.el-button{
-  margin-left:0px;
+.el-tag.el-tag--info{
+  max-width:50%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 </style>
 <style scoped>
 .el-button--text{
   color: #BF8333;
 }
-.header{
-  box-sizing: border-box;
-  padding:10px 0;
-}
-.select_box{
-  float: left;
-}
-.select_box .select{
-  width: 150px;
-  margin-right:5px;
-}
-.button_box{
-  float: right;
+.el-input,.el-select{
+  width:150px;
+  margin-right:10px;
+  margin-bottom:10px;
 }
 .main{
   width:100%;
-  height: calc(100vh - 230px);
+  height: calc(100vh - 228px);
   box-sizing: border-box;
-  margin-top:20px;
+  margin-top:10px;
 }
 .footer{
   position:fixed;
   left:34%;
   bottom:10px;
 }
+
+/* 弹框样式 */
 .input_box{
   display: flex;
   align-items: center;

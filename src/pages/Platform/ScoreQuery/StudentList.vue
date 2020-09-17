@@ -20,10 +20,11 @@
         <p class="text_1">课程：<span>{{StudentData.courseValues}}</span></p>
         <p class="text_1">级别：<span>{{StudentData.levelValues}}</span></p>
         <p class="text_1">章节：<span>{{StudentData.chapterValues}}</span></p>
-        <p class="text_1">难度：<span>{{StudentData.practiceDifficulty}}级</span></p>
+        <p class="text_1">知识点：<span>{{StudentData.knowledgeValues}}</span></p>
       </div>
       <div class="box_1">
         <p class="text_1">参考人数：<span>{{StudentData.attendCount}}人</span></p>
+        <p class="text_1">难度：<span>{{StudentData.practiceDifficulty}}级</span></p>
       </div>
     </div>
     <div v-else class="header">
@@ -42,10 +43,10 @@
       <div class="box_1">
         <p class="text_1">章节：<span>{{StudentData.chapterIds}}</span></p>
         <p class="text_1">病症类别：<span>{{StudentData.categoryIds}}</span></p>
-      </div>
-      <div class="box_1">
+        <p class="text_1">知识点：<span>{{StudentData.knowledgeValues}}</span></p>
         <p class="text_1">参考人数：<span>{{StudentData.personNum}}</span></p>
       </div>
+      <div class="box_1"></div>
     </div>
     <div class="ipt_box">
       <el-input placeholder="输入班级号、学号、姓名" size="small" v-model="searchKey" clearable></el-input>
@@ -149,7 +150,7 @@ export default {
             id: that.id,
             searchKey: that.searchKey,
             sortColumn: that.sortColumn,
-            orderBy: that.sortType==0?2:1,
+            orderBy: that.sortType===0?2:that.sortType,
             curPage: that.curPage,
             pageSize: that.pageSize,
           }
@@ -184,7 +185,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-            const fileName = "学生列表(" + date +").xlsx"
+            const fileName = "学生列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -219,7 +220,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "学生列表(" + date +").xlsx"
+          const fileName = "学生列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -336,11 +337,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.el-button+.el-button{
-  margin-left:0px;
-}
-</style>
 <style scoped>
 .el-button--text{
   color: #BF8333;

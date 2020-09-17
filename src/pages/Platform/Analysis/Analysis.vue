@@ -1,22 +1,13 @@
 <template>
   <div class="whole">
     <div class="header">
-      <div class="time_box clear">
-        <div style="float:left">
-          <el-date-picker v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
-            range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
-          </el-date-picker>
-          <el-input placeholder="题库ID" v-model="questionId" size="small" clearable></el-input>
-          <el-input placeholder="班级号" v-model="className" size="small" clearable></el-input>
-          <el-input placeholder="学号" v-model="studentNumber" size="small" clearable></el-input>
-        </div>
-        <div style="float:right">
-          <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
-          <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
-          <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
-        </div>
-      </div>
-      <div class="input_box">
+      <div class="time_box">
+        <el-date-picker style="margin-right:10px" v-model="TimeData" type="daterange" format="yyyy - MM - dd" value-format="yyyy-MM-dd"
+          range-separator="至" start-placeholder="开始时间" end-placeholder="结束时间" size="small">
+        </el-date-picker>
+        <el-input placeholder="题库ID" v-model="questionId" size="small" clearable></el-input>
+        <el-input placeholder="班级号" v-model="className" size="small" clearable></el-input>
+        <el-input placeholder="学号" v-model="studentNumber" size="small" clearable></el-input>
         <el-input placeholder="学生姓名" v-model="userName" size="small" clearable></el-input>
         <el-input placeholder="考试名称" v-model="examinationName" size="small" clearable></el-input>
         <el-select v-show="SelectSystem=='原文实训'?true:false" v-model="courseId" filterable multiple collapse-tags
@@ -49,11 +40,14 @@
           <el-option v-for="item in optionData.mod" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
+        <el-button @click="clickSearch()" icon="el-icon-search" class="button" type="warning" size="small" plain>搜索</el-button>
+        <el-button @click="clickReset()" icon="el-icon-refresh-left" class="button" type="warning" size="small" plain>重置</el-button>
+        <el-button @click="clickExportFile()" icon="el-icon-upload2" class="button" type="warning" size="small" plain>导出</el-button>
       </div>
     </div>
     <div class="main" ref="heights" v-if="heightCss== ''"></div>
     <div class="main" ref="heights" v-else>
-      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'wrongRate',order:'descending'}"
+      <el-table v-if="SelectSystem=='原文实训'" v-loading="loading" :data="AnalysisData" :default-sort="{prop:'wrongRate',order:'ascending'}"
         border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="id" label="题库ID" width="80"></el-table-column>
         <el-table-column align="center" prop="wrongRate" label="错误率" width="90" sortable="custom"></el-table-column>
@@ -76,9 +70,9 @@
         <el-table-column align="center" prop="flagAvgScore" label="平均分" width="90" sortable="custom"></el-table-column>
         <el-table-column align="center" prop="flagRight" label="正确个数" width="80"></el-table-column>
         <el-table-column align="center" prop="flagWrong" label="错误个数" width="80"></el-table-column>
-        <el-table-column align="center" prop="chapterId" label="章节" width="110"></el-table-column>
-        <el-table-column align="center" prop="categoryId" label="病症类别" width="110"></el-table-column>
-        <el-table-column align="center" prop="knowledgePointsIds" label="知识点" width="110"></el-table-column>
+        <el-table-column align="center" prop="chapterId" label="章节" width="120"></el-table-column>
+        <el-table-column align="center" prop="categoryId" label="病症类别" width="120"></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="知识点" width="120"></el-table-column>
         <el-table-column align="center" prop="chiefComplaint" label="病症案例主诉" width=""></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
@@ -108,7 +102,7 @@ export default {
       curPage: 1, // 第几页
       pageSize: 10, // 每页几条
       sortColumn: 'flag_avg_score', // 排序字段
-      sortType: 0, // 排序方式
+      sortType: '', // 排序方式
       totalElements: 0, // 分页全部数量
       AnalysisData: [], // 试题分析数据
       TimeData: [], // 时间数据
@@ -160,10 +154,10 @@ export default {
     sortChange(column) { // 排序监听
       let that = this
       if (column.order == 'ascending') {
-        that.sortType = 1
+        that.sortType = 0
         that.clickSearch()
       } else if (column.order == 'descending') {
-        that.sortType = 0
+        that.sortType = 1
         that.clickSearch()
       }
     },
@@ -229,7 +223,7 @@ export default {
             curPage: that.curPage,
             pageSize: that.pageSize,
             sortColumn: that.sortColumn,
-            orderBy: that.sortType==0?'2':1
+            orderBy: that.sortType===0?'2':that.sortType
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -260,7 +254,7 @@ export default {
       that.practiceDifficulty = '' // 难度
       that.courseId = '' // 课程
       that.levelId = '' // 级别
-      that.sortTypes = 1
+      that.sortType = ''
       that.curPage = 1
       that.pageSize = 10
       that.$message({
@@ -296,7 +290,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "试题分析(" + date +").xlsx"
+          const fileName = "试题分析列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -339,7 +333,7 @@ export default {
           // console.log(res)
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "试题分析(" + date +").xlsx"
+          const fileName = "试题分析列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -442,38 +436,28 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.el-button+.el-button{
-  margin-left:0px;
+.el-tag.el-tag--info{
+  max-width:50%;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 </style>
 <style scoped>
 .el-button--text{
   color: #BF8333;
 }
-.header{
-  box-sizing: border-box;
-  padding:10px 0;
+.el-input,.el-select{
+  width:150px;
+  margin-right:10px;
+  margin-bottom:10px;
 }
-.time_box .el-input{
-  width:180px;
-  margin-left:10px;
-}
-.input_box{
-  margin-top:20px;
-  display: flex;
-}
-.input_box .el-input,.el-select{
-  margin-right:20px;
-  width:180px;
-}
-.input_box :last-child{
-  margin-right:0px;
-}
+
 .main{
   width:100%;
-  height: calc(100vh - 285px);
+  height: calc(100vh - 270px);
   box-sizing: border-box;
-  margin-top:20px;
+  margin-top:10px;
 }
 .footer{
   position:fixed;
