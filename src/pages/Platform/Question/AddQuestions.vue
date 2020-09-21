@@ -78,59 +78,59 @@
       <div class="main">
         <div class="input_box">
           <p>病症案例主诉</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入病症案例主诉" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入病症案例主诉" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>试题解析</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.questionExplain" placeholder="请输入试题解析" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.questionExplain" placeholder="请输入试题解析" size="small"></el-input>
         </div>
         <div class="input_box" v-if="SelectSystem=='问诊实训'">
           <p>兼夹症</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.interroJsonStr" placeholder="请输入兼夹症" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.interroJsonStr" placeholder="请输入兼夹症" size="small"></el-input>
         </div>
         <div class="input_box" v-if="SelectSystem=='问诊实训'">
           <p>问诊提示语</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.interroTipStr" placeholder="请输入问诊提示语" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.interroTipStr" placeholder="请输入问诊提示语" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>诊断</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisJsonStr" placeholder="请输入诊断" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.diagnosisJsonStr" placeholder="请输入诊断" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>诊断提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisTipStr" placeholder="请输入诊断提示" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.diagnosisTipStr" placeholder="请输入诊断提示" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>病机</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisJsonStr" placeholder="请输入病机" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.pathogenesisJsonStr" placeholder="请输入病机" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>病机提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisTipStr" placeholder="请输入病机提示" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.pathogenesisTipStr" placeholder="请输入病机提示" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>治法</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.treatmentJsonStr" placeholder="请输入治法" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.treatmentJsonStr" placeholder="请输入治法" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>治法提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.treatmentTipStr" placeholder="请输入治法提示" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.treatmentTipStr" placeholder="请输入治法提示" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>处方</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.drugJsonStr" placeholder="请输入处方" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.drugJsonStr" placeholder="请输入处方" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>处方提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.drugTipStr" placeholder="请输入处方提示" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.drugTipStr" placeholder="请输入处方提示" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>药物</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionJsonStr" placeholder="请输入药物" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.prescriptionJsonStr" placeholder="请输入药物" size="small"></el-input>
         </div>
         <div class="input_box">
           <p>药物提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionTipStr" placeholder="请输入药物提示" size="small"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.prescriptionTipStr" placeholder="请输入药物提示" size="small"></el-input>
         </div>
       </div>
     </div>
@@ -323,6 +323,20 @@ export default {
           })
           return
         }
+        if (that.SelectSystem == '问诊实训') {
+          if (!that.CaseQuestion.interroJsonStr) {
+            that.$message({
+              message: '请填写兼夹症', type: 'warning'
+            })
+            return
+          }
+        }
+        if (!that.CaseQuestion.prescriptionJsonStr) {
+          that.$message({
+            message: '请填写药物', type: 'warning'
+          })
+          return
+        }
         let url = ''
         let data = {}
         if (that.SelectSystem == '案例实训') {
@@ -387,7 +401,7 @@ export default {
             that.$message.error(res.data.message)
           }
         }).catch((err) =>{
-          that.$message.error('新增格式错误!')
+          that.$message.error('请求失败!')
         })
       }
     }
@@ -402,6 +416,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>
@@ -447,6 +464,7 @@ export default {
   margin-left:5px;
 }
 .footer{
+  width:90%;
   display: flex;
   justify-content: center;
   margin-top:100px;

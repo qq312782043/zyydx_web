@@ -192,9 +192,14 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "考试成绩查询" + date +".xlsx"
+          const fileName = "考试列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -226,9 +231,14 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
-          const fileName = "考试成绩查询" + date +".xlsx"
+          const fileName = "考试列表" + date +".xlsx"
           if ("download" in document.createElement("a")) { // 非IE下载
             const elink = document.createElement("a")
             elink.download = fileName
@@ -296,7 +306,7 @@ export default {
   color: #BF8333;
 }
 .el-input,.el-select{
-  width:150px;
+  width:200px;
   margin-right:10px;
   margin-bottom:10px;
 }

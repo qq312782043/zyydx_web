@@ -43,7 +43,7 @@
       <div class="box_1">
         <p class="text_1">章节：<span>{{StudentData.chapterIds}}</span></p>
         <p class="text_1">病症类别：<span>{{StudentData.categoryIds}}</span></p>
-        <p class="text_1">知识点：<span>{{StudentData.knowledgeValues}}</span></p>
+        <p class="text_1">知识点：<span>{{StudentData.knowledgePointsIds}}</span></p>
         <p class="text_1">参考人数：<span>{{StudentData.personNum}}</span></p>
       </div>
       <div class="box_1"></div>
@@ -183,6 +183,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
             const fileName = "学生列表" + date +".xlsx"
@@ -218,6 +223,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生列表" + date +".xlsx"
@@ -382,7 +392,7 @@ export default {
 }
 .main{
   width:100%;
-  height: calc(100vh - 330px);
+  height: calc(100vh - 340px);
   box-sizing: border-box;
   padding:20px;
 }

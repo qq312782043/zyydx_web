@@ -4,11 +4,11 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    // Q_http: 'http://192.168.113.88:8080/hospital-service/hospital/admin/',
-    // Y_http: 'http://192.168.113.88:8080/hospital-service/hospital/partner/', // 生产环境
+    Q_http: 'http://192.168.113.88:8080/hospital-service/hospital/admin/',
+    Y_http: 'http://192.168.113.88:8080/hospital-service/hospital/partner/', // 生产环境
 
-    Q_http: 'http://192.168.112.73:8080/hospital-service/hospital/admin/',
-    Y_http: 'http://192.168.112.73:8080/hospital-service/hospital/partner/', // 测试环境
+    // Q_http: 'http://192.168.112.73:8080/hospital-service/hospital/admin/',
+    // Y_http: 'http://192.168.112.73:8080/hospital-service/hospital/partner/', // 测试环境
 
     loginData: '', // 登录成功用户数据
     SelectSystem: '', // 用户选择的哪个系统

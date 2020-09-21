@@ -22,8 +22,7 @@
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
         <el-button @click="clickReset()" icon="el-icon-refresh-left" type="warning" size="small" plain>重置</el-button>
         <el-button v-if="IsAdmin == 1" @click="clickAddTestQuestions()" icon="el-icon-circle-plus-outline" type="warning" size="small" plain>新增</el-button>
-        <el-upload v-if="IsAdmin == 1" style="display:inline-block;margin:0 10px;"
-          :action="this.$store.state.Q_http + 'case/importCaseQuestion'" :before-upload="clickImportFile" :show-file-list="false">
+        <el-upload v-if="IsAdmin == 1" style="display:inline-block;margin:0 10px;"  action="" :before-upload="clickImportFile" :show-file-list="false">
           <el-button icon="el-icon-folder-opened" type="warning" size="small" plain>试题导入</el-button>
         </el-upload>
         <el-button v-if="IsAdmin == 1" @click="clickExportFile()" icon="el-icon-upload2" type="warning" size="small" plain>试题导出</el-button>
@@ -400,21 +399,21 @@ export default {
       if (that.SelectSystem == '原文实训') {
         url = that.$store.state.Q_http + 'original/exportOriginalQuestion'
         data = {
-          chapterId: that.ChapterData.toString(),
-          levelId: that.LevelData.toString(),
-          courseId: that.CourseData.toString(),
+          chapterIds: that.ChapterData.toString(),
+          levelIds: that.LevelData.toString(),
+          courseIds: that.CourseData.toString(),
         }
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'case/exportCaseQuestion'
         data = {
-          chapterId: that.ChapterData.toString(),
-          categoryId: that.CategoryData.toString(),
+          chapterIds: that.ChapterData.toString(),
+          categoryIds: that.CategoryData.toString(),
         }
       } else if (that.SelectSystem == '问诊实训') {
         url = that.$store.state.Q_http + 'interro/exportInterroQuestion'
         data = {
-          chapterId: that.ChapterData.toString(),
-          categoryId: that.CategoryData.toString(),
+          chapterIds: that.ChapterData.toString(),
+          categoryIds: that.CategoryData.toString(),
         }
       }
       that.$axios({
@@ -424,6 +423,11 @@ export default {
         data: data
       }).then((res) =>{
         // console.log(res)
+        that.$message({
+          message: '导出成功~',
+          type: 'success',
+          duration: '1000'
+        })
         const blob = new Blob([res.data])
         const fileName = "题库管理.xlsx"
         if ("download" in document.createElement("a")) { // 非IE下载
@@ -849,6 +853,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>

@@ -141,11 +141,11 @@ export default {
           that.$router.replace({path:that.navList[e].route})
           that.appendData()
         } else {
-          that.$message({
-            type: 'success',
-            message: res.data.data,
-            duration: 1000
-          })
+          // that.$message({
+          //   type: 'success',
+          //   message: res.data.data,
+          //   duration: 1000
+          // })
           for(var i = 0; i < that.navList.length; i++){
             that.navList[i].class = 'NoChoice'
           }

@@ -64,7 +64,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else v-loading="loading" :data="AnalysisData" :default-sort="{prop:'flagAvgScore',order:'descending'}"
+      <el-table v-else v-loading="loading" :data="AnalysisData" :default-sort="{prop:'flagAvgScore',order:'ascending'}"
         border style="width:100%" :max-height="heightCss" size="small" @sort-change="sortChange">
         <el-table-column align="center" prop="questionId" label="题库ID" width="80"></el-table-column>
         <el-table-column align="center" prop="flagAvgScore" label="平均分" width="90" sortable="custom"></el-table-column>
@@ -153,6 +153,7 @@ export default {
     },
     sortChange(column) { // 排序监听
       let that = this
+      console.log(column.order)
       if (column.order == 'ascending') {
         that.sortType = 0
         that.clickSearch()
@@ -187,7 +188,7 @@ export default {
             sortType: that.sortType
           }
         }).then((res) =>{
-          // console.log(res.data.data.elements)
+          console.log(res.data.data.elements)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements
@@ -223,7 +224,7 @@ export default {
             curPage: that.curPage,
             pageSize: that.pageSize,
             sortColumn: that.sortColumn,
-            orderBy: that.sortType===0?'2':that.sortType
+            orderBy: that.sortType===0?2:that.sortType
           }
         }).then((res) =>{
           // console.log(res.data.data)
@@ -288,6 +289,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "试题分析列表" + date +".xlsx"
@@ -331,6 +337,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "试题分析列表" + date +".xlsx"
@@ -441,6 +452,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>

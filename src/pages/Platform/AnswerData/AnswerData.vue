@@ -327,6 +327,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生答题数据" + date +".xlsx"
@@ -368,6 +373,11 @@ export default {
           }
         }).then((res) =>{
           // console.log(res)
+          that.$message({
+            message: '导出成功~',
+            type: 'success',
+            duration: '1000'
+          })
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生答题数据" + date +".xlsx"
@@ -465,6 +475,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>

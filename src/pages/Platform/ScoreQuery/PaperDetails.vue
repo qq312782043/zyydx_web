@@ -26,7 +26,7 @@
       <el-main class="card_box">
         <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
           <div>
-            <div v-html="item.questionText"></div>
+            <div v-html="(i+1)+'、'+ item.questionText"></div>
             <div>
               <p class="text_5">参考答案</p>
               <p class="text_6">{{item.optionText}}</p>
@@ -40,30 +40,33 @@
         <div :id="'c' + i" class="card" v-for="(item,i) in StudentListData" :key="i">
           <p class="text_1">{{item.sort}}、病例主诉：{{item.chiefComplaint}}</p>
           <p v-if="item.diagnosisStu.flag == 1" class="text_2">诊断：
-            <span :style="{color:item.diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.diagnosisStu.name}}
+            <span :style="{color:item.diagnosisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.diagnosisStu.name?item.diagnosisStu.name:'未作答'}}
               <i :class="item.diagnosisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="item.pathogenesisStu.flag == 1" class="text_2">病机：
-            <span :style="{color:item.pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.pathogenesisStu.name}}
+            <span :style="{color:item.pathogenesisStu.rightFlag==1?'#333':'#f56c6c'}">{{item.pathogenesisStu.name?item.pathogenesisStu.name:'未作答'}}
               <i :class="item.pathogenesisStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="item.treatmentStu.flag == 1" class="text_2">治法：
-            <span :style="{color:item.treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{item.treatmentStu.name}}
+            <span :style="{color:item.treatmentStu.rightFlag==1?'#333':'#f56c6c'}">{{item.treatmentStu.name?item.treatmentStu.name:'未作答'}}
               <i :class="item.treatmentStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="item.drugStu.flag == 1" class="text_2">处方：
-            <span :style="{color:item.drugStu.rightFlag==1?'#333':'#f56c6c'}">{{item.drugStu.name}}
+            <span :style="{color:item.drugStu.rightFlag==1?'#333':'#f56c6c'}">{{item.drugStu.name?item.drugStu.name:'未作答'}}
               <i :class="item.drugStu.rightFlag==1?'el-icon-check':'el-icon-close'"></i>
             </span>
           </p>
           <p v-if="item.prescriptionStu.flag == 1" class="text_2">药物：
-            <span :style="{color:item.prescriptionStu.rightFlag==1?'#333':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">
-              {{value.name}}
-              <i :style="{color:value.flag==1?'#333':'#f56c6c'}" :class="value.flag==1?'el-icon-check':'el-icon-close'"></i>
+            <span v-if="item.prescriptionStu.tipList.length !=0">
+              <span :style="{color:item.prescriptionStu.rightFlag==1?'#333':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">
+                {{value.name}}
+                <i :style="{color:value.flag==1?'#333':'#f56c6c'}" :class="value.flag==1?'el-icon-check':'el-icon-close'"></i>
+              </span>
             </span>
+            <span v-else style="color:#f56c6c">未作答 <i style="colo:#f56c6c" class="el-icon-close"></i></span>
           </p>
           <div class="box_3">
             <p class="text_4">参考答案</p>
@@ -75,10 +78,13 @@
           </div>
           <div class="box_3" v-if="SelectSystem=='问诊实训'">
             <p class="text_4">问诊记录</p>
-            <div v-for="(value,i) in item.reply" :key="i">
-              <p>学生：<span>{{value.question}}</span></p>
-              <p>系统：<span>{{value.reply}}</span></p>
+            <div v-if="item.reply.length!=0">
+              <div v-for="(value,i) in item.reply" :key="i">
+                <p>学生：<span>{{value.question}}</span></p>
+                <p>系统：<span>{{value.reply}}</span></p>
+              </div>
             </div>
+            <div v-else>无问诊记录</div>
           </div>
         </div>
       </el-main>

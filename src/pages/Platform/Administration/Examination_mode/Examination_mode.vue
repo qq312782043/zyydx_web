@@ -7,25 +7,25 @@
           <div class="contact">
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">课程</div>
-              <el-select v-model="courseData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="courseData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in course" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem=='原文实训'?true:false">
               <div class="text_2">级别</div>
-              <el-select v-model="levelData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="levelData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in level" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter">
               <div class="text_2">章节</div>
-              <el-select v-model="chapterData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="chapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem!='原文实训'?true:false">
               <div class="text_2">病症类别</div>
-              <el-select v-model="categoryData" clearable filterable multiple collapse-tags size="small" placeholder="请选择">
+              <el-select v-model="categoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
@@ -34,7 +34,7 @@
         <div class="Range">
           <p class="text_1">选择考试知识点<span>*不勾选则视为全选</span></p>
           <div class="knowledge">
-            <el-select style="margin-top:21px" clearable v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
+            <el-select style="margin-top:21px" v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
               collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
               <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
@@ -57,9 +57,10 @@
           </div>
         </div>
         <div class="Range" style="flex:0.7">
-          <p class="text_1">*考试题数<span>*如选择指定试题,该项配置失效</span></p>
+          <p class="text_1">*考试题数<span>*如选指定试题,该配置失效</span></p>
           <div class="knowledge">
-            <el-input v-model="topicNumber" :disabled="practice" size="small" clearable placeholder="请输入练习题数"></el-input>
+            <el-input-number v-model="topicNumber" :disabled="practice" controls-position="right" size="small"
+            placeholder="请输入练习题数" :min="1" :max="100"></el-input-number>
           </div>
         </div>
         <div class="Range" style="flex:0.7">
@@ -120,7 +121,7 @@
       <div v-else>
         <p class="gestive">正在进行的考试...</p>
         <div class="Answer_crad">
-          <p class="title">经典案例考试系统</p>
+          <p class="title">{{SelectSystem=="案例实训"?'经典案例实训考试系统':'经典案例实训问诊考试系统'}}</p>
           <p class="text_1">{{caseData.examinationName}}</p>
           <p class="text_1">范围</p>
           <p class="text_2 text_4">章节：<span>{{caseData.chapterIds}}</span></p>
@@ -150,7 +151,7 @@ export default {
       chapterData: '', // 已选章节
       category: '', // 病症类别
       categoryData: '', // 已选病症类别
-      topicNumber: '', // 练习题数
+      topicNumber: undefined, // 练习题数
       examinationName: '', // 考试名称
       course: '', // 课程
       courseData: '', // 已选课程
@@ -301,7 +302,13 @@ export default {
     },
     clickAdd(value,index) { // 点击添加试题
       let that = this
-      that.topicNumber = ''
+      if (that.searchData.length == 100) {
+        that.$message({
+          message: '最多可选100道试题', type: 'warning'
+        })
+        return
+      }
+      that.topicNumber = undefined
       that.practice = true
       that.search[index].flag = false
       that.searchData.push(value)
@@ -386,7 +393,7 @@ export default {
               that.chapterData = '' // 已选章节置空
               that.categoryData = '' // 已选病症类别置空
               that.knowledgeData = '' // 已选知识点置空
-              that.topicNumber = '' // 练习题数置空
+              that.topicNumber = undefined // 练习题数置空
               that.search = '' // 题库置空
               that.searchData = [] // 已选题库置空
               that.practice = false // 开启练习题数
@@ -435,7 +442,7 @@ export default {
               that.ChapterData = '' // 已选章节置空
               that.CategoryData = '' // 已选病症类别置空
               that.knowledgeData = '' // 已选知识点置空
-              that.topicNumber = '' // 练习题数置空
+              that.topicNumber = undefined // 练习题数置空
               that.search = '' // 题库置空
               that.searchData = [] // 已选题库置空
               that.practice = false // 开启练习题数
@@ -572,21 +579,23 @@ export default {
     },
     FnOptionData() { // 请求下拉筛选条件数据（知识点、章节、病症类别、模式）
       let that = this
-      that.$axios({
-        url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
-        method: 'post',
-      }).then((res) =>{
-        // console.log(res.data.data)
-        if (res.data.code == 200) {
-          that.knowledge = res.data.data.KnowledgePoints
-          that.chapter = res.data.data.Chapter
-          that.level = res.data.data.level
-          that.course = res.data.data.course
-          that.difficulty = res.data.data.difficulty
-        }
-      }).catch((err) =>{
-        that.$message.error('请求失败!')
-      })
+      if (that.SelectSystem == '原文实训') {
+        that.$axios({
+          url: that.$store.state.Y_http + 'originalType/queryOriginalTypeByTypeNew',
+          method: 'post',
+        }).then((res) =>{
+          // console.log(res.data.data)
+          if (res.data.code == 200) {
+            that.knowledge = res.data.data.KnowledgePoints
+            that.chapter = res.data.data.Chapter
+            that.level = res.data.data.level
+            that.course = res.data.data.course
+            that.difficulty = res.data.data.difficulty
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      }
     },
     TimeToProceed() { // 考试进行时间
       let that = this
@@ -631,6 +640,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>
@@ -682,7 +694,7 @@ export default {
   margin-bottom:5px;
   margin-left:5px;
 }
-.el-input{
+.el-input,.el-input-number{
   width:200px;
 }
 .el_search{

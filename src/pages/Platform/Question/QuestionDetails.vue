@@ -84,55 +84,55 @@
       <div class="main">
         <div class="input_box">
           <p>病症案例主诉</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box" v-if="SelectSystem=='问诊实训'">
           <p>兼夹症</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.interroJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.interroJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box" v-if="SelectSystem=='问诊实训'">
           <p>问诊提示语</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.interroTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.interroTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>诊断</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.diagnosisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>诊断提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.diagnosisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.diagnosisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>病机</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.pathogenesisJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>病机提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.pathogenesisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.pathogenesisTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>治法</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.treatmentJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.treatmentJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>治法提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.treatmentTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.treatmentTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>处方</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.drugJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.drugJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>处方提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.drugTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.drugTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>药物</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.prescriptionJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
         <div class="input_box">
           <p>药物提示</p>
-          <el-input type="textarea" autosize v-model="CaseQuestion.prescriptionTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.prescriptionTip" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
       </div>
     </div>
@@ -273,6 +273,12 @@ export default {
     clickPreserva() { // 点击保存
       let that = this
       if (that.SelectSystem == '原文实训') {
+        if (!that.CaseQuestion.optionText) {
+          that.$message({
+            message: '请填写考试题目', type: 'warning'
+          })
+          return
+        }
         that.$axios({
           url: that.$store.state.Q_http + 'original/updateOriginalQuestion',
           method: 'post',
@@ -285,7 +291,7 @@ export default {
             knowledgeIds: that.knowledgeIds.toString()==''?that.CaseQuestion.knowledgeIds:that.knowledgeIds.toString(),
           }
         }).then((res) =>{
-          // console.log(res.data.data)
+          console.log(res.data)
           if (res.data.code == 200) {
             that.disabled = true
             that.$message({
@@ -294,11 +300,25 @@ export default {
               duration: '1000'
             })
             that.FnData()
+          } else {
+            that.$message.error(res.data.message)
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
       } else if (that.SelectSystem == '案例实训') {
+        if (!that.CaseQuestion.chiefComplaint) {
+          that.$message({
+            message: '请填写案例主诉', type: 'warning'
+          })
+          return
+        }
+        if (!that.CaseQuestion.prescriptionJson) {
+          that.$message({
+            message: '请填写药物', type: 'warning'
+          })
+          return
+        }
         that.$axios({
           url: that.$store.state.Q_http + 'case/updateCaseQuestion',
           method: 'post',
@@ -332,11 +352,31 @@ export default {
               duration: '1000'
             })
             that.FnData()
+          } else {
+            that.$message.error(res.data.message)
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
         })
       } else if (that.SelectSystem == '问诊实训') {
+        if (!that.CaseQuestion.chiefComplaint) {
+          that.$message({
+            message: '请填写案例主诉', type: 'warning'
+          })
+          return
+        }
+        if (!that.CaseQuestion.interroJson) {
+          that.$message({
+            message: '请填写兼夹症', type: 'warning'
+          })
+          return
+        }
+        if (!that.CaseQuestion.prescriptionJson) {
+          that.$message({
+            message: '请填写药物', type: 'warning'
+          })
+          return
+        }
         that.$axios({
           url: that.$store.state.Q_http + 'interro/updateInterroQuestion',
           method: 'post',
@@ -372,6 +412,8 @@ export default {
               duration: '1000'
             })
             that.FnData()
+          } else {
+            that.$message.error(res.data.message)
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
@@ -389,6 +431,9 @@ export default {
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
+}
+.el-tag.el-tag--info i{
+  display:none;
 }
 </style>
 <style scoped>
@@ -434,6 +479,7 @@ export default {
   margin-left:5px;
 }
 .footer{
+  width:90%;
   display: flex;
   justify-content: center;
   margin-top:100px;

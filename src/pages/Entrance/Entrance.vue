@@ -267,7 +267,7 @@ export default {
             that.systemStatus3 = false
           }
         } else {
-          that.$message.error('登录状态已失效，请退出重新登录!')
+          that.$router.replace({path:'/'})
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
