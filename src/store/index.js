@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 Vue.use(Vuex)
 
-export default new Vuex.Store({
+export default new Vuex.Store({ // 全局变量
   state: {
     Q_http: 'http://192.168.113.88:8080/hospital-service/hospital/admin/',
     Y_http: 'http://192.168.113.88:8080/hospital-service/hospital/partner/', // 生产环境

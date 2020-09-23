@@ -111,24 +111,6 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
-  background-color:#BF8333;
-  border-color: #BF8333;
-}
-.el-checkbox__input.is-checked + .el-checkbox__label {
-  color: #BF8333;
-}
-.el-checkbox.is-bordered.is-checked{
-  border-color: #BF8333;
-}
-.el-checkbox__input.is-focus .el-checkbox__inner{
-  border-color:  #BF8333;
-}
-.el-checkbox__inner:hover{
-  border-color:  #BF8333;
-}
-</style>
 <style scoped>
 .whole{
   width:100%;

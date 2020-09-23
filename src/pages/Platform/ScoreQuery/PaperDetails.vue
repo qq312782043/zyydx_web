@@ -61,12 +61,12 @@
           </p>
           <p v-if="item.prescriptionStu.flag == 1" class="text_2">药物：
             <span v-if="item.prescriptionStu.tipList.length !=0">
-              <span :style="{color:item.prescriptionStu.rightFlag==1?'#333':'#f56c6c'}" v-for="(value,i) in item.prescriptionStu.tipList" :key="i">
+              <span v-for="(value,i) in item.prescriptionStu.tipList" :key="i" :style="{color:value.flag==1?'#333':'#f56c6c'}">
                 {{value.name}}
                 <i :style="{color:value.flag==1?'#333':'#f56c6c'}" :class="value.flag==1?'el-icon-check':'el-icon-close'"></i>
               </span>
             </span>
-            <span v-else style="color:#f56c6c">未作答 <i style="colo:#f56c6c" class="el-icon-close"></i></span>
+            <span v-else style="color:#f56c6c">未作答 <i class="el-icon-close"></i></span>
           </p>
           <div class="box_3">
             <p class="text_4">参考答案</p>

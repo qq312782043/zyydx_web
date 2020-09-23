@@ -153,7 +153,7 @@ export default {
     },
     sortChange(column) { // 排序监听
       let that = this
-      console.log(column.order)
+      // console.log(column.order)
       if (column.order == 'ascending') {
         that.sortType = 0
         that.clickSearch()
@@ -188,7 +188,7 @@ export default {
             sortType: that.sortType
           }
         }).then((res) =>{
-          console.log(res.data.data.elements)
+          // console.log(res.data.data.elements)
           if (res.data.code == 200) {
             that.loading = false
             that.totalElements = res.data.data.totalElements

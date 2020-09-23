@@ -49,7 +49,7 @@
                 <i :style="{color:item.flag==1?'#333':'#f56c6c'}" :class="item.flag==1?'el-icon-check':'el-icon-close'"></i>
               </span>
             </span>
-            <span v-else style="color:#f56c6c">未作答 <i style="colo:#f56c6c" class="el-icon-close"></i></span>
+            <span v-else style="color:#f56c6c">未作答 <i class="el-icon-close"></i></span>
           </p>
         </div>
         <div class="box_2">
@@ -123,7 +123,6 @@ export default {
         let url = ''
         if (that.SelectSystem == '案例实训') {
           url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionThree'
-          // url = 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryQuestionDescriptionThree'
         } else if (that.SelectSystem == '问诊实训') {
           url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionThree'
         }

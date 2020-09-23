@@ -270,13 +270,13 @@ export default {
   left:0;
 }
 .el-container .el-header .left_box{
-  width:160px;
-  height:40px;
+  width:170px;
+  height:45px;
   box-sizing: border-box;
   background-image: url(../../assets/logo.png);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  margin-top:10px;
+  margin-top:7px;
   float: left;
 }
 .el-container .el-header .middle_box{
@@ -286,7 +286,9 @@ export default {
   width:100%;
   text-align: center;
   position: absolute;
+  left:0;
   z-index:0;
+  box-sizing: border-box;
 }
 .el-container .el-header .right_box{
   float: right;

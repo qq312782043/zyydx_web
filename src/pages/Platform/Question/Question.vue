@@ -105,7 +105,6 @@ export default {
     return {
       heightCss: '',
       IsAdmin: this.$store.state.loginData.user.isAdmin, // 是否为管理员
-      // IsAdmin: 1, // 是否为管理员
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       escape: false, // 是否可以关闭弹窗
       loading: false, // 加载
@@ -389,7 +388,8 @@ export default {
           that.$message.error(res.data.message)
         }
       }).catch((err) =>{
-        that.$message.error('请求失败!')
+        that.$message.error('格式不对，别瞎导入!')
+
       })
     },
     clickExportFile() { // 点击导出文件
@@ -496,8 +496,11 @@ export default {
       }).then(() => {
         that.FnDeletes()
       }).catch(() => {
-        that.$refs.multipleTableY.clearSelection()
-        that.$refs.multipleTableA.clearSelection()
+        if (that.SelectSystem == '原文实训') {
+          that.$refs.multipleTableY.clearSelection()
+        } else {
+          that.$refs.multipleTableA.clearSelection()
+        }
       })
     },
     clickEdit(e) { // 点击编辑
@@ -674,7 +677,7 @@ export default {
         method: 'post',
         data: data
       }).then((res) =>{
-        console.log(res.data)
+        // console.log(res.data)
         if (res.data.code == 200) {
           that.clickSearch()
           that.$message({
@@ -725,7 +728,7 @@ export default {
         url = that.$store.state.Y_http + 'originalType/saveType'
       } else if (that.SelectSystem == '案例实训') {
         url = that.$store.state.Q_http + 'caseType/createCaseType'
-      } else if (that.SelectSystem == '案例实训') {
+      } else if (that.SelectSystem == '问诊实训') {
         url = that.$store.state.Q_http + 'interroType/createInterroType'
       }
       that.$axios({
@@ -839,15 +842,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
-  color: #BF8333;
-}
-.el-tabs--border-card>.el-tabs__header .el-tabs__item:not(.is-disabled):hover{
-  color: #BF8333;
-}
-.el-dialog__headerbtn .el-dialog__close:hover{
-  color: #BF8333;
-}
 .el-tag.el-tag--info{
   max-width:50%;
   overflow: hidden;

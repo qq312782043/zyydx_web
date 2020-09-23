@@ -296,15 +296,6 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
-.el-dropdown-menu__item{
-  color:#BF8333;
-}
-.el-dropdown-menu__item:focus, .el-dropdown-menu__item:not(.is-disabled):hover{
-  background:rgba(243, 222, 191, 0.4);
-  color: #BF8333;
-}
-</style>
 <style scoped>
 .el-container{
   width:100%;
@@ -323,13 +314,13 @@ export default {
   padding:0 40px 0 20px;
 }
 .el-header .left_box{
-  width:160px;
-  height:40px;
+  width:170px;
+  height:45px;
   box-sizing: border-box;
   background-image: url(../../assets/logo.png);
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  margin-top:10px;
+  margin-top:7px;
   float: left;
 }
 .el-header .right_box{

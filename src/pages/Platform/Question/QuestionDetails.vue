@@ -291,7 +291,7 @@ export default {
             knowledgeIds: that.knowledgeIds.toString()==''?that.CaseQuestion.knowledgeIds:that.knowledgeIds.toString(),
           }
         }).then((res) =>{
-          console.log(res.data)
+          // console.log(res.data)
           if (res.data.code == 200) {
             that.disabled = true
             that.$message({

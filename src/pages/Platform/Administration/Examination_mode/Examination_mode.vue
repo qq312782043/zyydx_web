@@ -60,13 +60,13 @@
           <p class="text_1">*考试题数<span>*如选指定试题,该配置失效</span></p>
           <div class="knowledge">
             <el-input-number v-model="topicNumber" :disabled="practice" controls-position="right" size="small"
-            placeholder="请输入练习题数" :min="1" :max="100"></el-input-number>
+            placeholder="请填写考试题数" :min="1" :max="100"></el-input-number>
           </div>
         </div>
         <div class="Range" style="flex:0.7">
           <p class="text_1">*考试名称</p>
           <div class="knowledge">
-            <el-input v-model="examinationName" maxlength="15" size="small" clearable placeholder="请输入考试名称"></el-input>
+            <el-input v-model="examinationName" maxlength="15" size="small" clearable placeholder="请填写考试名称"></el-input>
           </div>
         </div>
         <div class="Range" style="visibility:hidden"></div>
@@ -344,22 +344,25 @@ export default {
       let that = this
       if (that.SelectSystem == '原文实训') {
         if (!that.difficultyData) {
-          that.$message.error({
-            message: '请选择练习难度'
+          that.$message({
+            message: '请选择考试难度~',
+            type: 'warning'
           })
           return
         }
         if (that.searchData.length == 0) {
           if (!that.topicNumber) {
-            that.$message.error({
-              message: '请填写练习题数'
+            that.$message({
+              message: '请输入考试题数~',
+              type: 'warning'
             })
             return
           }
         }
         if (!that.examinationName) {
-          that.$message.error({
-            message: '请填写考试名称'
+          that.$message({
+            message: '请填写考试名称~',
+            type: 'warning'
           })
           return
         }
@@ -393,9 +396,11 @@ export default {
               that.chapterData = '' // 已选章节置空
               that.categoryData = '' // 已选病症类别置空
               that.knowledgeData = '' // 已选知识点置空
+              that.knowledgeId = '' // 已选知识点ID置空
               that.topicNumber = undefined // 练习题数置空
               that.search = '' // 题库置空
               that.searchData = [] // 已选题库置空
+              that.searchId = [] // 已选题库ID置空
               that.practice = false // 开启练习题数
               that.searchDataL = '已选列表'
               that.FnParent()
@@ -442,16 +447,19 @@ export default {
               that.ChapterData = '' // 已选章节置空
               that.CategoryData = '' // 已选病症类别置空
               that.knowledgeData = '' // 已选知识点置空
+              that.knowledgeId = '' // 已选知识点ID置空
               that.topicNumber = undefined // 练习题数置空
               that.search = '' // 题库置空
               that.searchData = [] // 已选题库置空
+              that.searchId = [] // 已选题库ID置空
               that.practice = false // 开启练习题数
               that.searchDataL = '已选列表'
               that.FnParent()
             }
           } else {
-            that.$message.error({
-              message: res.data.message
+            that.$message({
+              message: res.data.message,
+              type: 'warning'
             })
           }
         }).catch((err) =>{

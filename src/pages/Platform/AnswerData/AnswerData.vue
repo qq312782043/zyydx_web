@@ -245,7 +245,6 @@ export default {
         let url = ''
         if (that.SelectSystem == '案例实训') {
           url = that.$store.state.Q_http + 'caseExamination/queryQuestionDescriptionTwo'
-          // url = 'http://192.168.100.188:8909/hospital/admin/caseExamination/queryQuestionDescriptionTwo'
         } else if (that.SelectSystem == '问诊实训') {
           url = that.$store.state.Q_http + 'interroExamination/queryQuestionDescriptionTwo'
         }
