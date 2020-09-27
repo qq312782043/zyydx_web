@@ -388,8 +388,7 @@ export default {
           that.$message.error(res.data.message)
         }
       }).catch((err) =>{
-        that.$message.error('格式不对，别瞎导入!')
-
+        that.$message.error('导入失败，请查看表格格式！')
       })
     },
     clickExportFile() { // 点击导出文件

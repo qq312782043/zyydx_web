@@ -86,6 +86,10 @@
           <p>病症案例主诉</p>
           <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.chiefComplaint" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>
         </div>
+        <div class="input_box">
+          <p>病症解析</p>
+          <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.questionExplain" placeholder="请输入病症解析" size="small" :disabled="disabled"></el-input>
+        </div>
         <div class="input_box" v-if="SelectSystem=='问诊实训'">
           <p>兼夹症</p>
           <el-input type="textarea" maxlength="500" autosize v-model="CaseQuestion.interroJson" placeholder="请输入内容" size="small" :disabled="disabled"></el-input>

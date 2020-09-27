@@ -97,6 +97,9 @@ export default {
 .el-pagination__sizes .el-input .el-input__inner:hover {
   border-color: #BF8333;
 }
+.el-input-number__decrease:hover, .el-input-number__increase:hover {
+  color: #BF8333;
+}
 .el-select-dropdown.is-multiple .el-select-dropdown__item.selected {
   color: #BF8333;
 }

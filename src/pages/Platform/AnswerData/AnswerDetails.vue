@@ -62,8 +62,8 @@
         </div>
         <div class="box_2" v-if="SelectSystem == '问诊实训'">
           <p>学生问诊记录</p>
-          <div v-if="AllData.reply.length!=0">
-            <div v-for="(item,i) in AllData.reply" :key="i">
+          <div v-if="reply.length!=0">
+            <div v-for="(item,i) in reply" :key="i">
               <p>学生：<span>{{item.question}}</span></p>
               <p>系统：<span>{{item.reply}}</span></p>
             </div>
@@ -88,6 +88,7 @@ export default {
       treatmentStu: '',
       drugStu: '',
       prescriptionStu: '',
+      reply: ''
     }
   },
   created: function () {
@@ -141,6 +142,7 @@ export default {
             that.treatmentStu = res.data.data.treatmentStu
             that.drugStu = res.data.data.drugStu
             that.prescriptionStu = res.data.data.prescriptionStu
+            that.reply = res.data.data.reply
           }
         }).catch((err) =>{
           that.$message.error('请求失败!')
