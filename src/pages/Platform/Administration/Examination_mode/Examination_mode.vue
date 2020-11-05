@@ -18,13 +18,13 @@
               </el-select>
             </div>
             <div class="chapter">
-              <div class="text_2">章节</div>
+              <div class="text_2">{{SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'}}</div>
               <el-select v-model="chapterData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in chapter" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </div>
             <div class="chapter" v-show="SelectSystem!='原文实训'?true:false">
-              <div class="text_2">病症类别</div>
+              <div class="text_2">{{SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'}}</div>
               <el-select v-model="categoryData" filterable multiple collapse-tags size="small" placeholder="请选择">
                 <el-option v-for="item in category" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
@@ -32,16 +32,16 @@
           </div>
         </div>
         <div class="Range">
-          <p class="text_1">选择考试知识点<span>*不勾选则视为全选</span></p>
+          <p class="text_1">选择考试{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}<span>*不勾选则视为全选</span></p>
           <div class="knowledge">
             <el-select style="margin-top:21px" v-model="knowledgeData" filterable multiple @change="ChoiceKnowledge"
-              collapse-tags size="small" placeholder="请搜索或下拉选择知识点">
+              collapse-tags size="small" placeholder="请搜索或下拉选择">
               <el-option v-for="item in knowledge" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
           </div>
         </div>
         <div class="Range">
-          <p class="text_1">已选知识点({{knowledgeData.length==0?'暂无知识点':knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
+          <p class="text_1">已选{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}({{knowledgeData.length==0?'暂无知识点':knowledgeData.length}})<span @click="clickEmpty()" class="empty">清空</span></p>
           <el-main class="box_card" style="margin-top:31px">
             <p v-for="(item,i) in knowledgeData" :key="i">{{item}}<i @click="clickRemove(item)" class="el-icon-remove"></i></p>
           </el-main>
@@ -124,9 +124,9 @@
           <p class="title">{{SelectSystem=="案例实训"?'经典案例实训考试系统':'经典案例实训问诊考试系统'}}</p>
           <p class="text_1">{{caseData.examinationName}}</p>
           <p class="text_1">范围</p>
-          <p class="text_2 text_4">章节：<span>{{caseData.chapterIds}}</span></p>
-          <p class="text_2 text_4">病症类别：<span>{{caseData.categoryIds}}</span></p>
-          <p class="text_2" style="margin-top:20px">知识点：<span>{{caseData.knowledgePointsIds}}</span></p>
+          <p class="text_2 text_4">{{SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'}}：<span>{{caseData.chapterIds}}</span></p>
+          <p class="text_2 text_4">{{SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'}}：<span>{{caseData.categoryIds}}</span></p>
+          <p class="text_2" style="margin-top:20px">{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}：<span>{{caseData.knowledgePointsIds}}</span></p>
           <p class="text_2">最大题数：<span>{{caseData.practiceNum}}</span></p>
           <div class="set_up clear">
             <p class="text_2 text_3">发起时间：<span>{{caseData.createOn}}</span></p>
@@ -822,7 +822,7 @@ export default {
   overflow: hidden;
 }
 .Answer_crad .text_4{
-  margin-left:25px;
+  margin-left:15px;
 }
 .Answer_crad p span{
   color:#333;

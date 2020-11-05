@@ -45,14 +45,14 @@
     <div v-else>
       <div class="header">
         <div class="input_box">
-          <p>章节</p>
+          <p>{{SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'}}</p>
           <el-select @visible-change="clickvisible($event,1)" v-model="chapterId"
           :placeholder="CaseQuestion.chapterName" size="small" :disabled="disabled" clearable>
             <el-option v-for="item in chapter" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="input_box">
-          <p>病症类别</p>
+          <p>{{SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'}}</p>
           <el-select @visible-change="clickvisible($event,2)" v-model="categoryId"
           :placeholder="CaseQuestion.categoryName" size="small" :disabled="disabled" clearable>
             <el-option v-for="item in category" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
@@ -63,7 +63,7 @@
       </div>
       <div class="header">
         <div class="input_box">
-          <p>知识点</p>
+          <p>{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}</p>
           <el-select @visible-change="clickvisible($event,3)" filterable multiple collapse-tags
             v-model="knowledgeIds" :placeholder="CaseQuestion.knowledgeName" size="small" :disabled="disabled" clearable>
             <el-option v-for="item in knowledge" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
@@ -80,6 +80,18 @@
           </el-select>
         </div>
         <div class="input_box"></div>
+      </div>
+      <div class="Photo_box" v-show="SelectSystem=='问诊实训'?true:false">
+        <div class="avatar">
+          <el-image v-if="imageUrl" :src="imageUrl"
+            style="width:100px;height:100px"
+            :preview-src-list="srcList">
+          </el-image>
+        </div>
+        <div class="clear" v-show="!disabled">
+          <el-upload class="avatar-uploader" action="" :show-file-list="false" :before-upload="clickImportFile">上传</el-upload>
+          <div class="eliminate" @click="clickEliminate()">清除</div>
+        </div>
       </div>
       <div class="main">
         <div class="input_box">
@@ -151,10 +163,12 @@ export default {
   name: 'whole',
   data () {
     return {
+      srcList: [],
       IsAdmin: this.$store.state.loginData.user.isAdmin, // 是否为管理员
       SelectSystem: this.$store.state.SelectSystem, // 当前选择哪个平台
       disabled: true, // 页面禁用属性
       id: this.$route.query.id, // 页面传参ID
+      imageUrl: '', // 图片
       chapter: '', // 章节
       chapterId: '', // 已选章节ID
       category: '', // 病症类别
@@ -211,6 +225,15 @@ export default {
         // console.log(res.data)
         if (res.data.code == 200) {
           that.CaseQuestion = res.data.data
+          if (res.data.data.diagram) {
+            if (res.data.data.diagram.substr(0,4) == "http") {
+              that.imageUrl = res.data.data.diagram
+              that.srcList.push(res.data.data.diagram)
+            } else {
+              that.imageUrl = ''
+              that.srcList = []
+            }
+          }
         }
       }).catch((err) =>{
         that.$message.error('请求失败!')
@@ -219,6 +242,61 @@ export default {
     clickEdit() { // 点击编辑
       let that = this
       that.disabled = false
+    },
+    clickEliminate() { // 点击清除图片
+      let that = this
+      that.$axios({
+        url: that.$store.state.Q_http + 'interro/deleteDiagram',
+        method: 'post',
+        data: {
+          id: that.CaseQuestion.id
+        },
+      }).then((res) =>{
+        // console.log(res.data)
+        if (res.data.code == 200) {
+          that.$message({
+            message: '清除成功！',
+            type: 'success',
+            duration: '1000'
+          })
+          that.imageUrl = ''
+          that.srcList = []
+        }
+      }).catch((err) =>{
+        that.$message.error('请求失败!')
+      })
+    },
+    clickImportFile(file) { // 上传图片
+      let that = this
+      console.log(file)
+      if (file.type === 'image/jpeg' || file.type === 'image/png') {
+        const formData = new FormData()
+        formData.append('picFile', file)
+        that.$axios({
+          url: that.$store.state.Q_http + 'interro/updateDiagram?mainId=' + that.CaseQuestion.id,
+          method: 'post',
+          headers: { 'Content-Type': 'multipart/form-data' },
+          data: formData,
+        }).then((res) =>{
+          console.log(res.data)
+          if (res.data.code == 200) {
+            that.$message({
+              message: '上传成功！',
+              type: 'success',
+              duration: '1000'
+            })
+            that.imageUrl = res.data.data.path
+            that.srcList.push(res.data.data.path)
+          } else {
+            that.$message.error(res.data.message)
+          }
+        }).catch((err) =>{
+          that.$message.error('请求失败!')
+        })
+      } else {
+        that.$message.error('上传图片只能是 JPG/PNG 格式!')
+        return
+      }
     },
     clickvisible(e,value) { // 点击下拉框选择章节、知识点、类别
       let that = this
@@ -405,6 +483,7 @@ export default {
             prescriptionTipStr: that.CaseQuestion.prescriptionTip,
             interroJsonStr: that.CaseQuestion.interroJson,
             interroTipStr: that.CaseQuestion.interroTip,
+            diagram: that.imageUrl.split('hospitalpic/')[1],
           }
         }).then((res) =>{
           // console.log(res.data)
@@ -467,6 +546,37 @@ export default {
 }
 .header .input_box .el-input{
   width:215px;
+}
+.Photo_box{
+  position: absolute;
+  top:60px;
+  right:150px;
+}
+.Photo_box .avatar{
+  width: 100px;
+  height: 100px;
+  display: block;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  margin-bottom:10px;
+}
+.Photo_box .avatar-uploader{
+  width:50%;
+  text-align: center;
+  color:#333;
+  font-size:13px;
+  cursor: pointer;
+  float: left;
+}
+.Photo_box .eliminate{
+  width:50%;
+  text-align: center;
+  color:#333;
+  font-size:13px;
+  cursor: pointer;
+  float: left;
 }
 .main{
   width:80%;

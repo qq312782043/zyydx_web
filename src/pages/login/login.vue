@@ -1,7 +1,7 @@
 <template>
   <div class="whole">
     <div class="content">
-      <h3 class="top">中医药大学实训中心</h3>
+      <h3 class="top">北京中医药大学实训中心</h3>
       <el-form ref="ruleForm" :model="ruleForm" :rules="rules">
         <el-form-item prop="user">
           <el-input placeholder="请输入账号" v-model="ruleForm.user" prefix-icon="el-icon-user" clearable></el-input>

@@ -103,4 +103,7 @@ export default {
 .el-select-dropdown.is-multiple .el-select-dropdown__item.selected {
   color: #BF8333;
 }
+.el-upload--picture-card:hover, .el-upload:focus {
+  color: #BF8333;
+}
 </style>

@@ -11,12 +11,12 @@
           <el-option v-for="item in TestData" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
         </el-select>
         <el-select @visible-change="clickvisible($event,'章节')" filterable multiple collapse-tags
-          v-model="ChapterData" class="select" clearable placeholder="章节" size="small">
+          v-model="ChapterData" class="select" clearable :placeholder="SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'" size="small">
           <el-option v-for="item in TestData" :key="item.id" :label="item.typeName" :value="item.id">
           </el-option>
         </el-select>
         <el-select v-show="SelectSystem!='原文实训'?true:false" @visible-change="clickvisible($event,2)" filterable multiple collapse-tags
-          v-model="CategoryData" class="select" clearable placeholder="病症类别" size="small">
+          v-model="CategoryData" class="select" clearable :placeholder="SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'" size="small">
           <el-option v-for="item in TestData" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
         </el-select>
         <el-button @click="clickSearch()" icon="el-icon-search" type="warning" size="small" plain>搜索</el-button>
@@ -51,7 +51,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
+      <el-table v-else-if="SelectSystem=='案例实训'" @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
         :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" type="selection" width="45"></el-table-column>
         <el-table-column align="center" prop="index" label="题库序号" width="75"></el-table-column>
@@ -60,6 +60,23 @@
         <el-table-column align="center" prop="chapterName" label="章节" width="130"></el-table-column>
         <el-table-column align="center" prop="categoryName" label="病症类别" width="130"></el-table-column>
         <el-table-column align="center" prop="knowledgeName" label="知识点" width="130"></el-table-column>
+        <el-table-column align="center" prop="chiefComplaint" label="病症案例主诉" width=""></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="130">
+          <template slot-scope="scope">
+            <el-button v-if="IsAdmin == 1" @click="clickDetails(scope.row)" type="text" size="small">删除</el-button>
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else @selection-change="handleSelectionChange" v-loading="loading" ref="multipleTableA"
+        :data="queryQuestion" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" type="selection" width="45"></el-table-column>
+        <el-table-column align="center" prop="index" label="题库序号" width="75"></el-table-column>
+        <el-table-column align="center" prop="id" label="题库ID" width="75"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="修改时间" width="130" :formatter="formatTime"></el-table-column>
+        <el-table-column align="center" prop="chapterName" label="章节/症候/方剂" width="130"></el-table-column>
+        <el-table-column align="center" prop="categoryName" label="病症类别/难度" width="130"></el-table-column>
+        <el-table-column align="center" prop="knowledgeName" label="知识点/类似症/相关症" width="150"></el-table-column>
         <el-table-column align="center" prop="chiefComplaint" label="病症案例主诉" width=""></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="130">
           <template slot-scope="scope">
@@ -147,7 +164,7 @@ export default {
         name: "fourth",
         type: 4,
       }]
-    } else {
+    } else if (that.SelectSystem == '案例实训') {
       that.CaseTypeList = [{
         label: '章节',
         name: "first",
@@ -158,6 +175,20 @@ export default {
         type: 2,
       },{
         label: '知识点',
+        name: "fourth",
+        type: 3,
+      }]
+    } else {
+      that.CaseTypeList = [{
+        label: '章节/症候/方剂',
+        name: "first",
+        type: 1,
+      },{
+        label: '病症类别/难度',
+        name: "second",
+        type: 2,
+      },{
+        label: '知识点/类似症/相关症',
         name: "fourth",
         type: 3,
       }]
@@ -334,7 +365,7 @@ export default {
         responseType: 'blob',
         data: { flag: that.$store.state.SystemID }
       }).then((res) =>{
-        // console.log(res)
+        console.log(res)
         const blob = new Blob([res.data])
         let fileName = ''
         if (that.$store.state.SystemID == 1) {
@@ -344,7 +375,9 @@ export default {
         } else if (that.$store.state.SystemID == 3) {
           fileName = "智能问诊实训模板.xlsx"
         }
-        if ("download" in document.createElement("a")) { // 非IE下载
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          navigator.msSaveBlob(blob, fileName)
+        } else {
           const elink = document.createElement("a")
           elink.download = fileName
           elink.style.display = "none"
@@ -353,8 +386,6 @@ export default {
           elink.click()
           URL.revokeObjectURL(elink.href)
           document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
         }
       })
     },
@@ -429,7 +460,9 @@ export default {
         })
         const blob = new Blob([res.data])
         const fileName = "题库管理.xlsx"
-        if ("download" in document.createElement("a")) { // 非IE下载
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          navigator.msSaveBlob(blob, fileName)
+        } else {
           const elink = document.createElement("a")
           elink.download = fileName
           elink.style.display = "none"
@@ -438,8 +471,6 @@ export default {
           elink.click()
           URL.revokeObjectURL(elink.href)
           document.body.removeChild(elink)
-        } else { // IE10+下载
-          navigator.msSaveBlob(blob, fileName)
         }
       })
     },

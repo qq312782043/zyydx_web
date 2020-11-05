@@ -41,9 +41,9 @@
         <p class="text_1">平均分：<span>{{StudentData.avgScore}}</span></p>
       </div>
       <div class="box_1">
-        <p class="text_1">章节：<span>{{StudentData.chapterIds}}</span></p>
-        <p class="text_1">病症类别：<span>{{StudentData.categoryIds}}</span></p>
-        <p class="text_1">知识点：<span>{{StudentData.knowledgePointsIds}}</span></p>
+        <p class="text_1">{{SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'}}：<span>{{StudentData.chapterIds}}</span></p>
+        <p class="text_1">{{SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'}}：<span>{{StudentData.categoryIds}}</span></p>
+        <p class="text_1">{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}：<span>{{StudentData.knowledgePointsIds}}</span></p>
         <p class="text_1">参考人数：<span>{{StudentData.personNum}}</span></p>
       </div>
       <div class="box_1"></div>
@@ -191,7 +191,9 @@ export default {
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生列表" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -200,8 +202,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       } else {
@@ -231,7 +231,9 @@ export default {
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生列表" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -240,8 +242,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       }

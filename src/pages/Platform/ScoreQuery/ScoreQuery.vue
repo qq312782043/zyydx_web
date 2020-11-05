@@ -36,7 +36,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="examinationId" label="考试ID" width="70"></el-table-column>
         <el-table-column align="center" prop="examinationName" label="考试名称" width="100"></el-table-column>
         <el-table-column align="center" prop="personNum" label="参考人数" width="70" :formatter="formatTime3"></el-table-column>
@@ -51,6 +51,27 @@
         <el-table-column align="center" prop="chapterIds" label="章节" width=""></el-table-column>
         <el-table-column align="center" prop="categoryIds" label="病症类别" width=""></el-table-column>
         <el-table-column align="center" prop="knowledgePointsIds" label="知识点" width=""></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
+          <template slot-scope="scope">
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else v-loading="loading" :data="ScoreQueryData" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" prop="examinationId" label="考试ID" width="70"></el-table-column>
+        <el-table-column align="center" prop="examinationName" label="考试名称" width="100"></el-table-column>
+        <el-table-column align="center" prop="personNum" label="参考人数" width="70" :formatter="formatTime3"></el-table-column>
+        <el-table-column align="center" prop="createOn" label="考试开始时间" width="100"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="考试结束时间" width="100"></el-table-column>
+        <el-table-column align="center" prop="examTime" label="考试用时" width="100"></el-table-column>
+        <el-table-column align="center" prop="practiceNum" label="题数" width="70"></el-table-column>
+        <el-table-column align="center" prop="fullScore" label="总分" width="70"></el-table-column>
+        <el-table-column align="center" prop="maxScore" label="最高分" width="70"></el-table-column>
+        <el-table-column align="center" prop="minScore" label="最低分" width="70"></el-table-column>
+        <el-table-column align="center" prop="avgScore" label="平均分" width="70"></el-table-column>
+        <el-table-column align="center" prop="chapterIds" label="章节/症候/方剂" width=""></el-table-column>
+        <el-table-column align="center" prop="categoryIds" label="病症类别/难度" width=""></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="知识点/类似症/相关症" width=""></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
@@ -200,7 +221,9 @@ export default {
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "考试列表" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -209,8 +232,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       } else {
@@ -239,7 +260,9 @@ export default {
           const blob = new Blob([res.data])
           const date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "考试列表" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -248,8 +271,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       }

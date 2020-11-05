@@ -26,12 +26,12 @@
           </el-option>
         </el-select>
         <el-select v-show="SelectSystem!='原文实训'?true:false" v-model="categoryId" filterable multiple collapse-tags
-          clearable placeholder="病症类别" size="small">
+          clearable :placeholder="SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'" size="small">
           <el-option v-for="item in optionData.Category" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
         <el-select v-model="chapterId" filterable multiple collapse-tags
-          clearable placeholder="章节" size="small">
+          clearable :placeholder="SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'" size="small">
           <el-option v-for="item in optionData.Chapter" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
@@ -67,7 +67,7 @@
           </template>
         </el-table-column>
       </el-table>
-      <el-table v-else v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
+      <el-table v-else-if="SelectSystem=='案例实训'" v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
         <el-table-column align="center" prop="questionId" label="题库ID" width="70"></el-table-column>
         <el-table-column align="center" prop="updateOn" label="时间" width="130"></el-table-column>
         <el-table-column align="center" prop="userName" label="姓名" width="70"></el-table-column>
@@ -79,6 +79,24 @@
         <el-table-column align="center" prop="chapterId" label="章节" width="110"></el-table-column>
         <el-table-column align="center" prop="categoryId" label="病症类别" width="110"></el-table-column>
         <el-table-column align="center" prop="knowledgePointsIds" label="知识点" width="110"></el-table-column>
+        <el-table-column align="center" fixed="right" label="操作" width="80">
+          <template slot-scope="scope">
+            <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-table v-else v-loading="loading" :data="AnswerData" border style="width:100%" :max-height="heightCss" size="small">
+        <el-table-column align="center" prop="questionId" label="题库ID" width="70"></el-table-column>
+        <el-table-column align="center" prop="updateOn" label="时间" width="130"></el-table-column>
+        <el-table-column align="center" prop="userName" label="姓名" width="70"></el-table-column>
+        <el-table-column align="center" prop="className" label="班级号" width="70"></el-table-column>
+        <el-table-column align="center" prop="studentNumber" label="学号" width="70"></el-table-column>
+        <el-table-column align="center" prop="chiefComplaint" label="病症案例主诉" width=""></el-table-column>
+        <el-table-column align="center" prop="flagRight" label="结果" width="70"></el-table-column>
+        <el-table-column align="center" prop="patternType" label="模式" width="110"></el-table-column>
+        <el-table-column align="center" prop="chapterId" label="章节/症候/方剂" width="110"></el-table-column>
+        <el-table-column align="center" prop="categoryId" label="病症类别/难度" width="110"></el-table-column>
+        <el-table-column align="center" prop="knowledgePointsIds" label="知识点/类似症/相关症" width="150"></el-table-column>
         <el-table-column align="center" fixed="right" label="操作" width="80">
           <template slot-scope="scope">
             <el-button @click="clickToView(scope.row)" type="text" size="small">查看</el-button>
@@ -334,7 +352,9 @@ export default {
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生答题数据" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -343,8 +363,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       } else {
@@ -380,7 +398,9 @@ export default {
           const blob = new Blob([res.data])
           var date = new Date().getFullYear() + "年" + (new Date().getMonth() + 1) + "月" + new Date().getDate() + "日"
           const fileName = "学生答题数据" + date +".xlsx"
-          if ("download" in document.createElement("a")) { // 非IE下载
+          if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+            navigator.msSaveBlob(blob, fileName)
+          } else {
             const elink = document.createElement("a")
             elink.download = fileName
             elink.style.display = "none"
@@ -389,8 +409,6 @@ export default {
             elink.click()
             URL.revokeObjectURL(elink.href)
             document.body.removeChild(elink)
-          } else { // IE10+下载
-            navigator.msSaveBlob(blob, fileName)
           }
         })
       }

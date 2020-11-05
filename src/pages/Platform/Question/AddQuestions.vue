@@ -41,14 +41,14 @@
     <div v-else>
       <div class="header">
         <div class="input_box">
-          <p>章节</p>
-          <el-select @visible-change="clickvisible($event,1)" v-model="chapterId" placeholder="请选择章节" size="small" clearable>
+          <p>{{SelectSystem=='问诊实训'?'章节/症候/方剂':'章节'}}</p>
+          <el-select @visible-change="clickvisible($event,1)" v-model="chapterId" placeholder="请选择" size="small" clearable>
             <el-option v-for="item in chapter" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="input_box">
-          <p>病症类别</p>
-          <el-select @visible-change="clickvisible($event,2)" v-model="categoryId" placeholder="请选择病症类别" size="small" clearable>
+          <p>{{SelectSystem=='问诊实训'?'病症类别/难度':'病症类别'}}</p>
+          <el-select @visible-change="clickvisible($event,2)" v-model="categoryId" placeholder="请选择" size="small" clearable>
             <el-option v-for="item in category" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
@@ -57,19 +57,19 @@
       </div>
       <div class="header">
         <div class="input_box">
-          <p>知识点</p>
+          <p>{{SelectSystem=='问诊实训'?'知识点/类似症/相关症':'知识点'}}</p>
           <el-select @visible-change="clickvisible($event,3)" filterable multiple collapse-tags
-            v-model="knowledgeIds" placeholder="请选择知识点" size="small" clearable>
+            v-model="knowledgeIds" placeholder="请选择" size="small" clearable>
             <el-option v-for="item in knowledge" :key="item.id" :label="item.typeName" :value="item.id"></el-option>
           </el-select>
         </div>
         <div class="input_box">
           <p>年龄</p>
-          <el-input v-model="Age" placeholder="请输入年龄" size="small" clearable></el-input>
+          <el-input v-model="Age" placeholder="请输入" size="small" clearable></el-input>
         </div>
         <div class="input_box">
           <p>性别</p>
-          <el-select v-model="SexData" placeholder="请选择性别" size="small" clearable>
+          <el-select v-model="SexData" placeholder="请选择" size="small" clearable>
             <el-option v-for="item in sex" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
         </div>

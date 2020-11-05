@@ -10,6 +10,9 @@ export default new Vuex.Store({ // 全局变量
     Q_http: 'http://192.168.112.73:8080/hospital-service/hospital/admin/',
     Y_http: 'http://192.168.112.73:8080/hospital-service/hospital/partner/', // 测试环境
 
+    // Q_http: 'http://192.168.112.83:8383/hospital-service/hospital/admin/',
+    // Y_http: 'http://192.168.112.83:8383/hospital-service/hospital/partner/', // 测试环境
+
     loginData: '', // 登录成功用户数据
     SelectSystem: '', // 用户选择的哪个系统
     SystemID: '', // 系统ID
